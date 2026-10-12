@@ -86,9 +86,15 @@ const { links, currentPath } = Astro.props;
 
     toggle.addEventListener('click', () => setOpen(!isOpen));
 
-    // Close on link click (lets "#contacto" scroll once the page is unlocked)
+    // Link tap: close instantly (lets "#contacto" scroll once the page is unlocked).
+    // Tap on empty space: close like the close button does.
     menu.addEventListener('click', (event) => {
-      if ((event.target as HTMLElement).closest('a')) setOpen(false, { instant: true });
+      if ((event.target as HTMLElement).closest('a')) {
+        setOpen(false, { instant: true });
+      } else {
+        setOpen(false);
+        toggle.focus({ preventScroll: true });
+      }
     });
 
     document.addEventListener('keydown', (event) => {

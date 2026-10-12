@@ -36,7 +36,7 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
       src={cover}
       alt={coverAlt}
       widths={[120, 240, 360]}
-      sizes="(min-width: 768px) 120px, (min-width: 480px) 112px, 72px"
+      sizes="(min-width: 768px) 120px, (min-width: 480px) 112px, 84px"
       loading="eager"
     />
   </div>
@@ -178,7 +178,7 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
     // Only below 480px: from there the base cover sizes apply
     @media (max-width: ($bp-mobile - 0.02px)) {
       .music-card__cover {
-        width: 4.5rem; // 72px
+        width: clamp(4.5rem, 22vw, 5.25rem); // 72px → 84px
       }
     }
 
@@ -186,8 +186,9 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
       display: contents;
     }
 
+    // Fluid so the short copy keeps to two lines on every phone width
     .music-card__text {
-      font-size: $text-sm;
+      font-size: clamp(0.75rem, 3.9vw, 0.9375rem); // 12px → 15px
     }
 
     .music-card__actions {
