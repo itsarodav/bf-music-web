@@ -1,0 +1,89 @@
+@use '../tokens' as *;
+@use '../base/breakpoints' as *;
+
+// Legal pages (terms, privacy): readable long-form text on the dark page
+.legal {
+  padding: calc(#{$navbar-height-mobile} + #{$space-6}) $section-inset-mobile $space-10;
+  color: $color-text-on-dark;
+
+  @include tablet {
+    padding: 10rem $section-inset-tablet $space-12;
+  }
+}
+
+// Header and body share one centered reading column
+.legal__header,
+.legal__body {
+  max-width: 42rem; // ~70 characters per line
+  margin-inline: auto;
+}
+
+.legal__header {
+  margin-bottom: $space-8;
+
+  @include tablet {
+    margin-bottom: $space-12;
+  }
+}
+
+.legal__title {
+  font-family: $font-display;
+  font-size: $text-4xl;
+  font-weight: $font-regular;
+  line-height: $leading-tight;
+
+  @include tablet {
+    font-size: $text-5xl; // fits the 42rem column on one line
+  }
+}
+
+.legal__updated {
+  margin-top: $space-2;
+  font-size: $text-sm;
+  color: $color-text-on-dark-muted;
+}
+
+.legal__body {
+  color: $color-text-on-dark-muted;
+  line-height: 1.65;
+
+  h2 {
+    margin-top: $space-5;
+    margin-bottom: $space-1-5;
+    font-size: $text-xl;
+    font-weight: $font-medium;
+    line-height: $leading-tight;
+    color: $color-text-on-dark;
+  }
+
+  p + p,
+  p + ul,
+  ul + p {
+    margin-top: $space-2;
+  }
+
+  ul {
+    padding-left: $space-3;
+    list-style: disc;
+
+    li + li {
+      margin-top: $space-1;
+    }
+  }
+
+  a {
+    color: $color-text-on-dark;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+
+    &:focus-visible {
+      outline: 2px solid $color-focus-ring;
+      outline-offset: 3px;
+    }
+  }
+
+  strong {
+    font-weight: $font-medium;
+    color: $color-text-on-dark;
+  }
+}

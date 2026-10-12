@@ -1,0 +1,51 @@
+// Color palette
+$color-white: #FFFFFF;
+$color-black: #000000;
+$color-ink: #141414; // text on light surfaces
+$color-graphite: #404142; // long-form statements and navbar over light sections
+
+// Brand colors (third-party platforms)
+$color-spotify: #1ED760;
+$color-youtube: #FF0000;
+
+// Text on dark/photo backgrounds
+$color-text-on-dark: $color-white;
+$color-text-on-dark-muted: rgba(255, 255, 255, 0.72);
+
+// Light surfaces (contact + footer)
+$color-surface-light: $color-white;
+$color-text-on-light: $color-ink;
+$color-text-on-light-muted: rgba(20, 20, 20, 0.72);
+$color-border-light: rgba(20, 20, 20, 0.28);
+
+// Credits bar
+$color-surface-dark: #141414;
+
+// Glass surfaces
+// Light glass: solid-ish white pill (primary button)
+$glass-light-bg: rgba(255, 255, 255, 0.86);
+$glass-light-bg-hover: rgba(255, 255, 255, 0.96);
+$glass-light-border: rgba(255, 255, 255, 0.9);
+
+// Dark glass: translucent tinted panels (card, navbar, secondary button)
+$glass-dark-bg-top: rgba(255, 255, 255, 0.16);
+$glass-dark-bg-bottom: rgba(255, 255, 255, 0.06);
+$glass-dark-bg-hover: rgba(255, 255, 255, 0.22);
+$glass-dark-border: rgba(255, 255, 255, 0.24);
+$glass-highlight: rgba(255, 255, 255, 0.4); // inner top edge
+$glass-tint: rgba(20, 16, 12, 0.18); // warm dark tint so white text stays legible
+
+// Navbar over light sections (frosted white glass)
+$glass-navbar-light-bg: rgba(255, 255, 255, 0.72);
+$glass-navbar-light-border: rgba(20, 20, 20, 0.08);
+
+// Overlays
+$overlay-hero-vignette: rgba(0, 0, 0, 0.55);
+$overlay-hero-top: rgba(0, 0, 0, 0.4);
+$overlay-hero-bottom: rgba(0, 0, 0, 0.55);
+$overlay-hero-recede: rgba(10, 8, 6, 0.45); // hero behind the rising statement
+$overlay-menu: rgba(12, 12, 12, 0.55);
+
+// Focus
+$color-focus-ring: rgba(255, 255, 255, 0.9);
+$color-focus-ring-on-light: $color-graphite;

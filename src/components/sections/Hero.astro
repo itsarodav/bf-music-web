@@ -1,0 +1,106 @@
+---
+import { getImage } from 'astro:assets';
+import MusicCard, { type MusicCardAction } from '../cards/MusicCard.astro';
+
+interface Props {
+  /** Shown as one word per line on tablet */
+  titleWords: string[];
+  /** Landscape photo, used on landscape screens */
+  background: ImageMetadata;
+  /** Portrait crop centered on the artist, used on portrait screens (phones, tablets) */
+  backgroundPortrait: ImageMetadata;
+  backgroundAlt: string;
+  card: {
+    cover: ImageMetadata;
+    coverAlt: string;
+    text: string;
+    actions: MusicCardAction[];
+  };
+}
+
+const { titleWords, background, backgroundPortrait, backgroundAlt, card } = Astro.props;
+
+// Art direction: portrait screens get the portrait crop, so no bytes are spent on
+// the sides of the photo that a phone never shows. The image is rendered with a
+// 1.1 zoom (see _hero.scss), which is why sizes are 10% larger than the cover area.
+const PORTRAIT_MEDIA = '(max-aspect-ratio: 1/1)';
+const portrait = {
+  // Capped at 1440: enough for 3x phones without the weight of the full 1800px crop
+  widths: [640, 960, 1280, 1440],
+  sizes: '(max-aspect-ratio: 3/4) 83vh, 110vw',
+  quality: 55,
+};
+const landscape = {
+  widths: [960, 1280, 1600, 1920, 2240, 2560],
+  sizes: '(max-aspect-ratio: 4/3) 147vh, 110vw',
+  quality: 55,
+};
+
+const [portraitAvif, portraitWebp, landscapeAvif, landscapeWebp, fallback] = await Promise.all([
+  getImage({ src: backgroundPortrait, widths: portrait.widths, format: 'avif', quality: portrait.quality }),
+  getImage({ src: backgroundPortrait, widths: portrait.widths, format: 'webp', quality: portrait.quality }),
+  getImage({ src: background, widths: landscape.widths, format: 'avif', quality: landscape.quality }),
+  getImage({ src: background, widths: landscape.widths, format: 'webp', quality: landscape.quality }),
+  getImage({ src: background, width: 1920, format: 'jpg', quality: landscape.quality }),
+]);
+---
+
+<section class="hero" aria-labelledby="hero-title" data-hero>
+  <div class="hero__media" data-hero-media>
+    <picture>
+      <source media={PORTRAIT_MEDIA} type="image/avif" srcset={portraitAvif.srcSet.attribute} sizes={portrait.sizes} />
+      <source media={PORTRAIT_MEDIA} type="image/webp" srcset={portraitWebp.srcSet.attribute} sizes={portrait.sizes} />
+      <source type="image/avif" srcset={landscapeAvif.srcSet.attribute} sizes={landscape.sizes} />
+      <source type="image/webp" srcset={landscapeWebp.srcSet.attribute} sizes={landscape.sizes} />
+      <img
+        src={fallback.src}
+        alt={backgroundAlt}
+        width={background.width}
+        height={background.height}
+        loading="eager"
+        fetchpriority="high"
+        decoding="async"
+      />
+    </picture>
+  </div>
+  <!-- Dims the photo as the next section covers it (driven by Statement) -->
+  <div class="hero__shade" data-hero-shade aria-hidden="true"></div>
+
+  <div class="hero__content" data-hero-content>
+    <h1 id="hero-title" class="hero__title">
+      {titleWords.map((word, index) => (
+        <>
+          <span class="hero__title-word" data-reveal="title">{word}</span>
+          {index < titleWords.length - 1 && ' '}
+        </>
+      ))}
+    </h1>
+
+    <div class="hero__card" data-reveal="card">
+      <MusicCard {...card} />
+    </div>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (!reducedMotion) {
+    gsap
+      .timeline({ defaults: { ease: 'power3.out' } })
+      .fromTo('[data-hero-media]', { scale: 1.06 }, { scale: 1, duration: 2.4, ease: 'power2.out' }, 0)
+      .fromTo('[data-reveal="navbar"]', { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 0.2)
+      .fromTo(
+        '[data-reveal="title"]',
+        { autoAlpha: 0, y: 48 },
+        { autoAlpha: 1, y: 0, duration: 1.1, stagger: 0.12 },
+        0.3,
+      )
+      .fromTo('[data-reveal="card"]', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.9 }, 0.7);
+  }
+
+  // Elements start hidden via .has-intro (see Layout); GSAP has taken over now.
+  document.documentElement.classList.remove('has-intro');
+</script>

@@ -1,0 +1,15 @@
+// Blur
+$blur-sm: 8px;
+$blur-md: 16px;
+$blur-lg: 24px;
+$blur-xl: 40px;
+
+// Glass saturation boost (Apple-like vibrancy)
+$glass-saturate: 180%;
+
+// Shadows
+$shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.18);
+$shadow-glass-lg: 0 16px 48px rgba(0, 0, 0, 0.24);
+$shadow-button: 0 2px 8px rgba(0, 0, 0, 0.12);
+$shadow-panel-rise: 0 -24px 64px -40px rgba(0, 0, 0, 0.45); // upwards only: panel scrolling over the hero
+$shadow-text: 0 2px 24px rgba(0, 0, 0, 0.25);

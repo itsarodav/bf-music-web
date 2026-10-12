@@ -1,0 +1,62 @@
+---
+// Site footer: sitemap, legal links and brand logos, followed by the credits bar.
+import Icon from '../ui/Icon.astro';
+import Credits from './Credits.astro';
+import { sitemapLinks, legalLinks } from '../../data/navigation';
+import { site, credits } from '../../data/site';
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+---
+
+<footer class="footer" data-nav-theme="light">
+  <div class="footer__main">
+    <nav class="footer__nav" aria-label="Mapa del sitio">
+      <ul class="footer__list">
+        {sitemapLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="footer__link"
+              aria-current={link.href === currentPath ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <nav class="footer__nav" aria-label="Legal">
+      <ul class="footer__list">
+        {legalLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="footer__link"
+              aria-current={link.href === currentPath ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="footer__brands">
+      <a href="/" class="footer__brand" aria-label={`${site.name}, inicio`}>
+        <Icon name="logo-bf" size={88} class="footer__brand-icon" />
+      </a>
+      <a
+        href={credits.agency.href}
+        class="footer__brand"
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={credits.agency.label}
+      >
+        <Icon name="lemonims" size={88} class="footer__brand-icon" />
+      </a>
+    </div>
+  </div>
+
+  <Credits />
+</footer>

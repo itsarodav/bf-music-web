@@ -1,0 +1,194 @@
+@use '../tokens' as *;
+@use '../base/breakpoints' as *;
+@use '../base/mixins' as *;
+
+// Fixed on every breakpoint. Two state classes, set in Navbar.astro:
+// - .is-scrolled: tablet+ turns from a transparent bar over the hero into
+//   glass (mobile is always glass).
+// - .navbar--light: over sections marked data-nav-theme="light" the glass
+//   turns frosted white and text/logo switch to graphite.
+.navbar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: $z-navbar;
+}
+
+.navbar__bar {
+  @include transition(background-color, border-color, padding, -webkit-backdrop-filter, backdrop-filter);
+
+  position: relative;
+  z-index: 1; // above the mobile menu overlay
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  @include page-gutter;
+
+  height: $navbar-height-mobile;
+  // Lower opacity than the default glass, as in the mobile design
+  background-color: rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  -webkit-backdrop-filter: blur($blur-lg) saturate($glass-saturate);
+  backdrop-filter: blur($blur-lg) saturate($glass-saturate);
+
+  @include tablet {
+    align-items: flex-start;
+    height: auto;
+    padding-block: $space-3;
+    border-bottom-color: transparent;
+    background-color: transparent;
+    -webkit-backdrop-filter: blur(0) saturate(100%);
+    backdrop-filter: blur(0) saturate(100%);
+
+    .is-scrolled & {
+      align-items: center;
+      padding-block: $space-0-5;
+      background-color: rgba(20, 16, 12, 0.24);
+      border-bottom-color: rgba(255, 255, 255, 0.12);
+      -webkit-backdrop-filter: blur($blur-lg) saturate($glass-saturate);
+      backdrop-filter: blur($blur-lg) saturate($glass-saturate);
+    }
+  }
+}
+
+.navbar__logo {
+  @include focus-ring;
+  @include transition(color, margin);
+
+  --logo-size: 3rem;
+
+  display: block;
+  color: $color-white;
+  border-radius: $radius-sm;
+  // The SVG has ~21% built-in padding on the left; pull it back so the
+  // visible mark sits on the gutter at any logo size
+  margin-left: calc(var(--logo-size) * -0.214);
+
+  .navbar__logo-icon {
+    width: var(--logo-size);
+    height: var(--logo-size);
+  }
+
+  @include tablet {
+    --logo-size: 3.5rem;
+
+    margin-top: -0.5rem;
+
+    .is-scrolled & {
+      margin-top: 0;
+    }
+  }
+}
+
+// ---------- Tablet / desktop links ----------
+.navbar__nav {
+  display: none;
+
+  @include tablet {
+    display: block;
+  }
+}
+
+.navbar__list {
+  display: flex;
+  gap: $space-3;
+
+  @include desktop {
+    gap: $space-4;
+  }
+}
+
+.navbar__link {
+  @include focus-ring(4px);
+  @include link-underline;
+
+  display: inline-block;
+  padding: $space-0-5 0;
+  font-size: $text-base;
+  font-weight: $font-medium;
+  color: $color-text-on-dark;
+  text-shadow: $shadow-text;
+  border-radius: 2px;
+  transition:
+    color $duration-slow $ease-out,
+    text-shadow $duration-slow $ease-out;
+}
+
+// ---------- Hamburger (mobile only) ----------
+.navbar__toggle {
+  @include glass('dark', $blur-md);
+  @include focus-ring;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: $radius-md;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+
+  @include tablet {
+    display: none;
+  }
+}
+
+.navbar__toggle-line {
+  display: block;
+  width: 1.25rem;
+  height: 2px;
+  border-radius: 2px;
+  background-color: $color-white;
+  transition:
+    transform $duration-base $ease-out,
+    opacity $duration-fast $ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+// Morph into an X
+.navbar__toggle[aria-expanded='true'] {
+  .navbar__toggle-line:nth-child(1) {
+    transform: translateY(7px) rotate(45deg);
+  }
+
+  .navbar__toggle-line:nth-child(2) {
+    opacity: 0;
+  }
+
+  .navbar__toggle-line:nth-child(3) {
+    transform: translateY(-7px) rotate(-45deg);
+  }
+}
+
+// ---------- Light theme (over white sections) ----------
+// Not while the mobile menu is open: its overlay is dark.
+body:not(.is-menu-open) .navbar--light {
+  .navbar__bar {
+    background-color: $glass-navbar-light-bg;
+    border-bottom-color: $glass-navbar-light-border;
+  }
+
+  .navbar__logo,
+  .navbar__link {
+    color: $color-graphite;
+    text-shadow: none;
+  }
+
+  .navbar__toggle {
+    background: rgba(20, 20, 20, 0.06);
+    border-color: rgba(20, 20, 20, 0.1);
+    box-shadow: none;
+  }
+
+  .navbar__toggle-line {
+    background-color: $color-graphite;
+  }
+
+  :focus-visible {
+    outline-color: $color-focus-ring-on-light;
+  }
+}

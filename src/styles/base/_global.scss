@@ -1,0 +1,54 @@
+@use '../tokens/colors' as *;
+@use '../tokens/typography' as *;
+@use 'mixins' as *;
+
+html {
+  scroll-behavior: smooth;
+
+  @media (prefers-reduced-motion: reduce) {
+    scroll-behavior: auto;
+  }
+}
+
+body {
+  font-family: $font-primary;
+  font-size: $text-base;
+  color: $color-ink;
+  background-color: $color-black;
+}
+
+// Prevent background scroll while the mobile menu is open
+body.is-menu-open {
+  overflow: hidden;
+}
+
+.visually-hidden {
+  @include visually-hidden;
+}
+
+// Skip link: hidden until focused
+.skip-link {
+  @include visually-hidden;
+
+  &:focus {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    z-index: 1000;
+    width: auto;
+    height: auto;
+    margin: 0;
+    padding: 0.5rem 1rem;
+    clip: auto;
+    border-radius: 999px;
+    background: $color-white;
+    color: $color-ink;
+  }
+}
+
+// Hero intro: hidden until GSAP sets the starting state (see Layout + Hero)
+// Never animate a transform on .navbar itself: it would become the containing
+// block of the fixed mobile menu and clip it to the bar's height.
+.has-intro [data-reveal] {
+  opacity: 0;
+}

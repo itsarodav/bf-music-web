@@ -1,0 +1,57 @@
+@use '../tokens' as *;
+@use '../base/breakpoints' as *;
+
+// Full-screen statement on a white panel (see Statement.astro).
+// With motion, the section is taller than the screen and the panel sticks,
+// so the scroll distance drives the word-by-word reveal. It sits above the
+// pinned hero, which shows through the panel's rounded corners on entry.
+.statement {
+  position: relative;
+  z-index: $z-base;
+
+  @media (prefers-reduced-motion: no-preference) {
+    height: 220vh;
+    height: 220svh;
+  }
+}
+
+.statement__panel {
+  position: sticky;
+  top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding: calc(#{$navbar-height-mobile} + #{$space-4}) $space-6;
+  color: $color-graphite;
+  background-color: $color-surface-light;
+  box-shadow: $shadow-panel-rise;
+
+  @include tablet {
+    padding: $space-12 $section-inset-tablet;
+  }
+}
+
+.statement__text {
+  width: 100%;
+  max-width: $statement-max-width;
+  font-size: $text-statement-mobile;
+  font-weight: $font-medium;
+  line-height: 1.12;
+  letter-spacing: $tracking-statement;
+  text-wrap: pretty;
+
+  @include tablet {
+    font-size: $text-statement-tablet;
+  }
+
+  @include desktop {
+    font-size: $text-statement-desktop;
+  }
+
+  em {
+    font-style: italic;
+    font-weight: $font-bold;
+  }
+}

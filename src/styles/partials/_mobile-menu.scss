@@ -1,0 +1,56 @@
+@use '../tokens' as *;
+@use '../base/breakpoints' as *;
+@use '../base/mixins' as *;
+
+// Full-screen glass overlay. Hidden by default; GSAP animates
+// opacity/visibility (autoAlpha) and the items.
+.mobile-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 0; // inside .navbar stacking context, below .navbar__bar (z 1)
+  display: flex;
+  align-items: flex-end;
+  @include page-gutter;
+
+  padding-top: calc(#{$navbar-height-mobile} + #{$space-4});
+  padding-bottom: $space-8;
+  visibility: hidden;
+  opacity: 0;
+  background-color: $overlay-menu;
+  -webkit-backdrop-filter: blur($blur-xl) saturate($glass-saturate);
+  backdrop-filter: blur($blur-xl) saturate($glass-saturate);
+
+  @include tablet {
+    display: none;
+  }
+}
+
+.mobile-menu__nav {
+  width: 100%;
+}
+
+.mobile-menu__list {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1;
+}
+
+.mobile-menu__link {
+  @include focus-ring(4px);
+
+  display: inline-block;
+  padding: $space-0-5 0;
+  font-family: $font-display;
+  font-size: clamp(2.5rem, 11vw, 3.5rem);
+  line-height: $leading-tight;
+  color: $color-text-on-dark;
+  transition: opacity $duration-fast $ease-out;
+
+  &[aria-current='page'] {
+    opacity: 0.6;
+  }
+
+  &:active {
+    opacity: 0.6;
+  }
+}

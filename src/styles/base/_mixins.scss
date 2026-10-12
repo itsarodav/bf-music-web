@@ -1,0 +1,109 @@
+@use '../tokens/colors' as *;
+@use '../tokens/effects' as *;
+@use '../tokens/motion' as *;
+@use '../tokens/spacing' as *;
+@use 'breakpoints' as *;
+
+// Apple-like glass surface.
+// $tone: 'dark' → translucent tinted panel (card, navbar, secondary button)
+//        'light' → near-white frosted pill (primary button)
+@mixin glass($tone: 'dark', $blur: $blur-lg) {
+  -webkit-backdrop-filter: blur($blur) saturate($glass-saturate);
+  backdrop-filter: blur($blur) saturate($glass-saturate);
+
+  @if $tone == 'light' {
+    background-color: $glass-light-bg;
+    border: 1px solid $glass-light-border;
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 1),
+      $shadow-button;
+  } @else {
+    background:
+      linear-gradient(180deg, $glass-dark-bg-top 0%, $glass-dark-bg-bottom 100%),
+      $glass-tint;
+    border: 1px solid $glass-dark-border;
+    box-shadow:
+      inset 0 1px 0 $glass-highlight,
+      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      $shadow-glass;
+  }
+}
+
+// Shared horizontal page gutter. Navbar, hero, contact, footer and credits
+// all use it, so their content lines up on the same vertical edge.
+@mixin page-gutter {
+  padding-inline: $gutter-mobile;
+
+  @include tablet {
+    padding-inline: $gutter-tablet;
+  }
+
+  @include wide {
+    padding-inline: $gutter-wide;
+  }
+}
+
+// Visible focus ring for keyboard users only
+@mixin focus-ring($offset: 3px) {
+  &:focus-visible {
+    outline: 2px solid $color-focus-ring;
+    outline-offset: $offset;
+  }
+}
+
+@mixin transition($properties...) {
+  transition-property: $properties;
+  transition-duration: $duration-base;
+  transition-timing-function: $ease-out;
+
+  @media (prefers-reduced-motion: reduce) {
+    transition-duration: 1ms;
+  }
+}
+
+// Animated underline: grows from the left on hover, stays visible
+// on the current page. Element must be inline-block/flex.
+@mixin link-underline($offset: 0) {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: $offset;
+    height: 1px;
+    background-color: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform $duration-slow $ease-out;
+
+    @media (prefers-reduced-motion: reduce) {
+      transition: none;
+    }
+  }
+
+  @media (hover: hover) {
+    &:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+
+  &[aria-current='page']::after {
+    transform: scaleX(1);
+  }
+}
+
+// Hide visually but keep for screen readers
+@mixin visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

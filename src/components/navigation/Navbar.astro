@@ -1,0 +1,80 @@
+---
+import Icon from '../ui/Icon.astro';
+import MobileMenu from './MobileMenu.astro';
+import { navLinks } from '../../data/navigation';
+import { site } from '../../data/site';
+
+const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const isCurrent = (href: string) => href === currentPath;
+---
+
+<header class="navbar" data-navbar>
+  <div class="navbar__bar" data-reveal="navbar">
+    <a href="/" class="navbar__logo" aria-label={`${site.name}, inicio`}>
+      <Icon name="logo-bf" size={88} class="navbar__logo-icon" />
+    </a>
+
+    <nav class="navbar__nav" aria-label="Principal">
+      <ul class="navbar__list">
+        {navLinks.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="navbar__link"
+              aria-current={isCurrent(link.href) ? 'page' : undefined}
+            >
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <button
+      type="button"
+      class="navbar__toggle"
+      aria-label="Abrir menú"
+      aria-expanded="false"
+      aria-controls="mobile-menu"
+      data-menu-toggle
+    >
+      <span class="navbar__toggle-line"></span>
+      <span class="navbar__toggle-line"></span>
+      <span class="navbar__toggle-line"></span>
+    </button>
+  </div>
+
+  <MobileMenu links={navLinks} currentPath={currentPath} />
+</header>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const navbar = document.querySelector<HTMLElement>('[data-navbar]');
+
+  if (navbar) {
+    // The line where the bar meets the content (its bottom edge)
+    const barHeight = () => navbar.querySelector<HTMLElement>('.navbar__bar')?.offsetHeight ?? 64;
+
+    // Glass as soon as the page leaves the top
+    ScrollTrigger.create({
+      start: 8,
+      end: 'max',
+      toggleClass: { targets: navbar, className: 'is-scrolled' },
+    });
+
+    // Light theme while any light section sits under the bar. Computed from
+    // all triggers, so adjacent light sections (contact + footer) don't flicker.
+    const lightTriggers = [...document.querySelectorAll<HTMLElement>('[data-nav-theme="light"]')].map((section) =>
+      ScrollTrigger.create({
+        trigger: section,
+        start: () => `top ${barHeight()}px`,
+        end: () => `bottom ${barHeight()}px`,
+        onToggle: () => navbar.classList.toggle('navbar--light', lightTriggers.some((trigger) => trigger.isActive)),
+      }),
+    );
+  }
+</script>

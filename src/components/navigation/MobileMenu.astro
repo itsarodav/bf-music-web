@@ -1,0 +1,106 @@
+---
+import type { NavLink } from '../../data/navigation';
+
+interface Props {
+  links: NavLink[];
+  currentPath: string;
+}
+
+const { links, currentPath } = Astro.props;
+---
+
+<div id="mobile-menu" class="mobile-menu" data-mobile-menu inert>
+  <nav class="mobile-menu__nav" aria-label="Menú móvil">
+    <ul class="mobile-menu__list">
+      {links.map((link) => (
+        <li class="mobile-menu__item" data-menu-item>
+          <a
+            href={link.href}
+            class="mobile-menu__link"
+            aria-current={link.href === currentPath ? 'page' : undefined}
+          >
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+</div>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-mobile-menu]');
+  const page = document.querySelector<HTMLElement>('[data-page]');
+
+  if (toggle && menu) {
+    const items = menu.querySelectorAll('[data-menu-item]');
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const tabletUp = window.matchMedia('(min-width: 768px)');
+    let isOpen = false;
+
+    const timeline = gsap
+      .timeline({
+        paused: true,
+        onReverseComplete: () => {
+          menu.inert = true;
+        },
+      })
+      .fromTo(menu, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.35, ease: 'power2.out' })
+      // opacity (not autoAlpha) so links stay focusable while they animate in
+      .fromTo(
+        items,
+        { y: 32, opacity: 0 },
+        { y: 0, opacity: 1, duration: 0.5, stagger: 0.06, ease: 'power3.out' },
+        '-=0.15',
+      );
+
+    const setOpen = (open: boolean, { instant = false } = {}) => {
+      if (open === isOpen) return;
+      isOpen = open;
+
+      toggle.setAttribute('aria-expanded', String(open));
+      toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      document.body.classList.toggle('is-menu-open', open);
+      if (page) page.inert = open;
+
+      if (open) {
+        const focusFirstLink = () => menu.querySelector<HTMLAnchorElement>('a')?.focus({ preventScroll: true });
+        menu.inert = false;
+        if (instant || reducedMotion) {
+          timeline.progress(1);
+          focusFirstLink();
+        } else {
+          timeline.timeScale(1).play();
+          // Wait until the overlay is visible, hidden elements can't take focus
+          gsap.delayedCall(0.1, focusFirstLink);
+        }
+      } else if (instant || reducedMotion) {
+        timeline.progress(0).pause();
+        menu.inert = true;
+      } else {
+        timeline.timeScale(1.6).reverse();
+      }
+    };
+
+    toggle.addEventListener('click', () => setOpen(!isOpen));
+
+    // Close on link click (lets "#contacto" scroll once the page is unlocked)
+    menu.addEventListener('click', (event) => {
+      if ((event.target as HTMLElement).closest('a')) setOpen(false, { instant: true });
+    });
+
+    document.addEventListener('keydown', (event) => {
+      if (event.key === 'Escape' && isOpen) {
+        setOpen(false);
+        toggle.focus();
+      }
+    });
+
+    // The overlay doesn't exist on tablet+, so make sure it's closed there
+    tabletUp.addEventListener('change', (event) => {
+      if (event.matches) setOpen(false, { instant: true });
+    });
+  }
+</script>

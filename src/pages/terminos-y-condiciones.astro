@@ -1,0 +1,55 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LegalContent from '../components/sections/LegalContent.astro';
+import { legal } from '../data/site';
+---
+
+<Layout title="Términos y condiciones" description="Términos y condiciones de uso de la web de Blanca Ferrer.">
+  <LegalContent title="Términos y condiciones" lastUpdated={legal.lastUpdated}>
+    <h2>1. Titular de la web</h2>
+    <p>
+      Esta web ({legal.domain}) es titularidad de <strong>{legal.owner}</strong>. Su gestión y representación
+      corresponden a <strong>{legal.manager}</strong>, sello discográfico y agencia de management de la artista.
+    </p>
+    <p>Para cualquier consulta puedes escribir a <a href={`mailto:${legal.email}`}>{legal.email}</a>.</p>
+
+    <h2>2. Objeto</h2>
+    <p>
+      La web ofrece información sobre la actividad artística de {legal.owner}: su música, biografía, proyectos,
+      materiales de prensa y vías de contacto profesional. Al navegar por ella aceptas estas condiciones.
+    </p>
+
+    <h2>3. Propiedad intelectual</h2>
+    <p>
+      La música, las imágenes, los textos, los logotipos y el diseño de esta web pertenecen a {legal.owner}, a {legal.manager} o a sus respectivos autores. No está permitido reproducirlos, distribuirlos ni modificarlos
+      sin autorización previa, salvo para uso personal y privado.
+    </p>
+    <p>
+      Los medios de comunicación pueden usar los materiales del press kit para informar sobre la artista, citando
+      su procedencia.
+    </p>
+
+    <h2>4. Enlaces externos</h2>
+    <p>
+      La web incluye enlaces a plataformas de terceros como Spotify, YouTube, Instagram o TikTok. No controlamos
+      sus contenidos ni somos responsables de ellos; al visitarlas se aplican sus propias condiciones y políticas
+      de privacidad.
+    </p>
+
+    <h2>5. Responsabilidad</h2>
+    <p>
+      Intentamos que la información publicada sea correcta y esté actualizada, pero puede contener errores o
+      cambiar sin previo aviso (por ejemplo, fechas de conciertos o lanzamientos). No nos hacemos responsables de
+      los daños derivados del uso de la web.
+    </p>
+
+    <h2>6. Cambios</h2>
+    <p>
+      Podemos actualizar estos términos en cualquier momento. La fecha de la última actualización aparece al
+      principio de esta página.
+    </p>
+
+    <h2>7. Legislación aplicable</h2>
+    <p>Estas condiciones se rigen por la legislación española.</p>
+  </LegalContent>
+</Layout>

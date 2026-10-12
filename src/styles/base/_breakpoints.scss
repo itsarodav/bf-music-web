@@ -1,0 +1,45 @@
+// Breakpoints
+$bp-mobile: 480px;
+$bp-tablet: 768px;
+$bp-desktop: 1024px;
+$bp-wide: 1440px;
+
+@mixin mobile {
+  @media (min-width: $bp-mobile) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (min-width: $bp-tablet) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (min-width: $bp-desktop) {
+    @content;
+  }
+}
+
+@mixin wide {
+  @media (min-width: $bp-wide) {
+    @content;
+  }
+}
+
+// Max-width helper: only for styles that must NOT leak upwards
+// (e.g. mobile-only UI). Prefer the min-width mixins above.
+@mixin below-tablet {
+  @media (max-width: ($bp-tablet - 0.02px)) {
+    @content;
+  }
+}
+
+// Map used to generate responsive modifier classes (e.g. .btn--desktop-sm)
+$breakpoints: (
+  'mobile': $bp-mobile,
+  'tablet': $bp-tablet,
+  'desktop': $bp-desktop,
+  'wide': $bp-wide,
+);

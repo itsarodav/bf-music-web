@@ -1,0 +1,48 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from '../components/sections/Hero.astro';
+import Statement from '../components/sections/Statement.astro';
+
+import heroBg from '../assets/images/hero-bg.jpg';
+import heroBgPortrait from '../assets/images/hero-bg-portrait.jpg';
+import albumCover from '../assets/images/album-sokal-affair.jpg';
+import { brandColors } from '../data/brands';
+---
+
+<Layout heroIntro>
+  <Hero
+    titleWords={['Blanca', 'Ferrer']}
+    background={heroBg}
+    backgroundPortrait={heroBgPortrait}
+    backgroundAlt="Blanca Ferrer mirando hacia arriba frente a un naranjo"
+    card={{
+      cover: albumCover,
+      coverAlt: "Portada del álbum 'Sokal Affair' de Blanca Ferrer",
+      text: "Escucha 'Sokal Affair', el álbum debut. ¡Ya disponible en todas las plataformas!",
+      actions: [
+        {
+          label: 'Spotify',
+          href: 'https://open.spotify.com/album/5wszrDGx7PaO2oP6UdGkJK',
+          icon: 'spotify',
+          iconColor: brandColors.spotify,
+        },
+        {
+          label: 'YouTube',
+          href: 'https://www.youtube.com/watch?v=60sEKpCR2T8',
+          icon: 'youtube',
+          iconColor: brandColors.youtube,
+        },
+      ],
+    }}
+  />
+
+  <Statement
+    parts={[
+      'Blanca Ferrer es ',
+      { em: 'pianista' },
+      ' y ',
+      { em: 'compositora' },
+      '. Su música nace de una formación sólida y una energía genuina, que da lugar a un universo sonoro fresco y atemporal.',
+    ]}
+  />
+</Layout>

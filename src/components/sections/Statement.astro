@@ -1,0 +1,81 @@
+---
+// Full-screen statement (home: the central sentence of her bio).
+// Scroll-driven: the white panel rises over the hero, which stays pinned and
+// recedes behind it; then the panel sticks while the words fill in one by one.
+// Words are split here, at build time.
+type Part = string | { em: string };
+
+interface Props {
+  id?: string;
+  /** Plain strings and { em } fragments (bold italic), joined as written */
+  parts: Part[];
+}
+
+const { id = 'intro', parts } = Astro.props;
+
+// Each fragment becomes words and the whitespace between them, so the
+// browser still breaks lines naturally ("compositora" + "." stay together).
+const tokens = parts.flatMap((part) => {
+  const em = typeof part !== 'string';
+  const text = em ? part.em : part;
+  return text.split(/(\s+)/).filter(Boolean).map((value) => ({ value, em, space: /^\s+$/.test(value) }));
+});
+---
+
+<section id={id} class="statement" aria-label="Sobre Blanca Ferrer" data-statement data-nav-theme="light">
+  <div class="statement__panel" data-statement-panel>
+    <p class="statement__text">
+      {tokens.map((token) =>
+        token.space ? (
+          token.value
+        ) : token.em ? (
+          <em class="statement__word" data-statement-word>{token.value}</em>
+        ) : (
+          <span class="statement__word" data-statement-word>{token.value}</span>
+        ),
+      )}
+    </p>
+  </div>
+</section>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const section = document.querySelector<HTMLElement>('[data-statement]');
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (section && !reducedMotion) {
+    const panel = section.querySelector<HTMLElement>('[data-statement-panel]');
+    const words = section.querySelectorAll<HTMLElement>('[data-statement-word]');
+
+    // 1. Entrance: the panel scrolls up over the hero (pinned with CSS sticky).
+    //    The hero recedes: its content sinks back and fades, the photo dims a
+    //    little, and the panel lands flat.
+    const hero = document.querySelector<HTMLElement>('[data-hero]');
+    gsap
+      .timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: { trigger: section, start: 'top bottom', end: 'top top', scrub: 0.4 },
+      })
+      // Corners settle flat and the rising shadow (CSS) fades once it has landed
+      .fromTo(
+        panel,
+        { borderRadius: '2rem 2rem 0 0' },
+        { borderRadius: '0rem 0rem 0 0', boxShadow: '0 -24px 64px -40px rgba(0, 0, 0, 0)' },
+        0,
+      )
+      .to(hero?.querySelector('[data-hero-content]') ?? [], { scale: 0.94, yPercent: -8, opacity: 0.2 }, 0)
+      .to(hero?.querySelector('[data-hero-shade]') ?? [], { opacity: 1 }, 0);
+
+    // 2. Reading: the sentence shows as a ghost, then each word fills in with
+    //    the scroll. Scrubbed with a short lag so it feels smooth, not mechanical.
+    gsap
+      .timeline({
+        scrollTrigger: { trigger: section, start: 'top 35%', end: 'bottom bottom', scrub: 0.6 },
+      })
+      .fromTo(words, { opacity: 0.14 }, { opacity: 1, duration: 1, stagger: 0.35, ease: 'power1.inOut' });
+  }
+</script>

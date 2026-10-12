@@ -1,0 +1,69 @@
+@use '../tokens' as *;
+@use '../base/breakpoints' as *;
+@use '../base/mixins' as *;
+
+// Shared on every page (Layout), light surface followed by the footer.
+.contact {
+  display: flex;
+  flex-direction: column;
+  gap: $space-4;
+  @include page-gutter;
+
+  padding-block: $space-5;
+  color: $color-text-on-light;
+  background-color: $color-surface-light;
+  // Same rule above and below: separates it from a light section before it
+  // (home statement) and from the footer after it
+  border-block: 1px solid $color-border-light;
+  scroll-margin-top: $navbar-height-mobile;
+
+  @include tablet {
+    gap: $space-5;
+    padding-block: $space-14 $space-12;
+    scroll-margin-top: 0;
+  }
+}
+
+.contact__title {
+  font-family: $font-display;
+  font-size: $text-4xl;
+  font-weight: $font-regular;
+  line-height: $leading-none;
+
+  @include tablet {
+    font-size: 3rem; // 48px
+  }
+}
+
+.contact__group {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-1-5;
+}
+
+.contact__subtitle {
+  font-size: $text-lg;
+  font-weight: $font-regular;
+  line-height: $leading-tight;
+
+  @include desktop {
+    font-size: $text-2xl;
+  }
+}
+
+.contact__social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $space-1 $space-2;
+}
+
+.contact__link {
+  @include focus-ring(4px);
+  @include link-underline(-2px);
+
+  display: inline-block;
+  font-size: $text-base;
+  font-weight: $font-medium;
+  border-radius: 2px;
+}

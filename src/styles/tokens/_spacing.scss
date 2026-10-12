@@ -1,0 +1,30 @@
+// Spacing (8px base)
+$space-0-5: 0.25rem; // 4px
+$space-1: 0.5rem;    // 8px
+$space-1-5: 0.75rem; // 12px
+$space-2: 1rem;      // 16px
+$space-3: 1.5rem;    // 24px
+$space-4: 2rem;      // 32px
+$space-5: 2.5rem;    // 40px
+$space-6: 3rem;      // 48px
+$space-7: 3.5rem;    // 56px
+$space-8: 4rem;      // 64px
+$space-10: 5rem;     // 80px
+$space-12: 6rem;     // 96px
+$space-14: 7rem;     // 112px
+
+// Page gutters (mobile first)
+$gutter-mobile: $space-2;
+$gutter-tablet: $space-4;
+$gutter-desktop: $space-4;
+$gutter-wide: $space-5;
+
+// Inset for centered reading columns (legal pages, statement)
+$section-inset-mobile: $space-4;   // 32px
+$section-inset-tablet: 6.25rem;    // 100px
+
+// Statement column (bio intro), ~1020px in the design at 1440
+$statement-max-width: 64rem;
+
+// Navbar height (mobile glass bar)
+$navbar-height-mobile: 4rem; // 64px

@@ -1,0 +1,29 @@
+---
+// Dark credits bar. The copy is kept in English on purpose: they are the brands' slogans.
+import Icon from '../ui/Icon.astro';
+import { credits } from '../../data/site';
+---
+
+<div class="credits">
+  <p class="credits__item">
+    Crafted with
+    <Icon name="heart" size={14} class="credits__icon" />
+    <span class="visually-hidden">love</span>
+    and
+    <Icon name="headphones" size={14} class="credits__icon" />
+    <span class="visually-hidden">headphones</span>
+    by
+    <a href={credits.author.href} class="credits__link" target="_blank" rel="noopener noreferrer">
+      {credits.author.label}
+    </a>
+  </p>
+
+  <span class="credits__divider" aria-hidden="true"></span>
+
+  <p class="credits__item">
+    In your system by
+    <a href={credits.agency.href} class="credits__link" target="_blank" rel="noopener noreferrer">
+      {credits.agency.label}
+    </a>
+  </p>
+</div>
