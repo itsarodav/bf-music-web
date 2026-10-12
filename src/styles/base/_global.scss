@@ -1,5 +1,4 @@
-@use '../tokens/colors' as *;
-@use '../tokens/typography' as *;
+@use '../tokens' as *;
 @use 'mixins' as *;
 
 html {
@@ -26,21 +25,31 @@ body.is-menu-open {
   @include visually-hidden;
 }
 
+// Brand-colored icons (opt-in with <Icon brand />). The SVGs fill with
+// currentColor, so fixed details (the white YouTube triangle) stay as they are.
+.icon--brand-spotify {
+  color: $color-spotify;
+}
+
+.icon--brand-youtube {
+  color: $color-youtube;
+}
+
 // Skip link: hidden until focused
 .skip-link {
   @include visually-hidden;
 
   &:focus {
     position: fixed;
-    top: 1rem;
-    left: 1rem;
-    z-index: 1000;
+    top: $space-2;
+    left: $space-2;
+    z-index: $z-skip-link;
     width: auto;
     height: auto;
     margin: 0;
-    padding: 0.5rem 1rem;
+    padding: $space-1 $space-2;
     clip: auto;
-    border-radius: 999px;
+    border-radius: $radius-pill;
     background: $color-white;
     color: $color-ink;
   }

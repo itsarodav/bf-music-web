@@ -2,10 +2,10 @@
 // Site footer: sitemap, legal links and brand logos, followed by the credits bar.
 import Icon from '../ui/Icon.astro';
 import Credits from './Credits.astro';
-import { sitemapLinks, legalLinks } from '../../data/navigation';
-import { site, credits } from '../../data/site';
+import { sitemapLinks, legalLinks, getCurrentPath } from '../../data/navigation';
+import { site, credits, a11y } from '../../data/site';
 
-const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const currentPath = getCurrentPath(Astro.url);
 ---
 
 <footer class="footer" data-nav-theme="light">
@@ -51,7 +51,7 @@ const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
         class="footer__brand"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={credits.agency.label}
+        aria-label={`${credits.agency.label} ${a11y.newTab}`}
       >
         <Icon name="lemonims" size={88} class="footer__brand-icon" />
       </a>

@@ -2,6 +2,18 @@
 @use '../base/breakpoints' as *;
 @use '../base/mixins' as *;
 
+// Photo framing (art direction): a slight zoom anchored below her face brings
+// her a bit closer and nudges her up, away from the name and the card.
+// Hero.astro sizes the image for these zooms.
+$hero-zoom: 1.1;
+$hero-zoom-phone: 1.25;
+$hero-origin-portrait: 50% 75%;
+$hero-origin-landscape: 50% 85%;
+$hero-origin-phone: 50% 92%; // lower origin: she rises further above the name and card
+
+$hero-card-width-tablet: 16.5rem; // 264px, vertical card
+$hero-card-width-desktop: 25rem; // 400px, horizontal card
+
 // Sticky: it stays pinned while the next section (statement) scrolls over it.
 .hero {
   position: sticky;
@@ -33,7 +45,7 @@
 .hero__media {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: $z-behind;
   overflow: hidden;
 
   picture {
@@ -42,8 +54,6 @@
     height: 100%;
   }
 
-  // Slight zoom anchored below her face: scaling from a low origin brings
-  // her a bit closer and nudges her up, away from the name and the card.
   // Framing follows the image in use (orientation, same media as Hero.astro),
   // not the width breakpoints.
   img {
@@ -51,20 +61,19 @@
     height: 100%;
     object-fit: cover;
     object-position: 50% 50%;
-    transform: scale(1.1);
+    transform: scale($hero-zoom);
     // Portrait crop
-    transform-origin: 50% 75%;
+    transform-origin: $hero-origin-portrait;
 
     // Landscape photo
     @media (min-aspect-ratio: 1/1) {
-      transform-origin: 50% 85%;
+      transform-origin: $hero-origin-landscape;
     }
 
-    // Phones: closer still, with a lower origin so she rises further
-    // above the name and the card
+    // Phones: closer still
     @include below-tablet {
-      transform: scale(1.25);
-      transform-origin: 50% 92%;
+      transform: scale($hero-zoom-phone);
+      transform-origin: $hero-origin-phone;
     }
   }
 
@@ -111,7 +120,7 @@
 .hero__shade {
   position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: $z-behind;
   pointer-events: none;
   background-color: $overlay-hero-recede;
   opacity: 0;
@@ -137,13 +146,13 @@
   font-family: $font-display;
   font-size: $text-display-mobile;
   font-weight: $font-regular;
-  line-height: 0.95;
+  line-height: $leading-display;
   letter-spacing: $tracking-display;
   text-shadow: $shadow-text;
 
   @include tablet {
     font-size: $text-display-tablet;
-    line-height: 0.9;
+    line-height: $leading-display-tight;
   }
 
   @include desktop {
@@ -173,10 +182,10 @@
 
   @include tablet {
     flex-shrink: 0;
-    width: 16.5rem; // 264px, vertical card
+    width: $hero-card-width-tablet;
   }
 
   @include desktop {
-    width: 25rem; // 400px, horizontal card
+    width: $hero-card-width-desktop;
   }
 }

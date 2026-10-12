@@ -16,6 +16,12 @@ $text-6xl: 5rem;      // 80px
 $text-7xl: 6rem;      // 96px
 $text-8xl: 8rem;      // 128px
 
+// Section headings on tablet+ ("Contacto", "Últimos vídeos"), see section-title mixin
+$text-section-title: 3rem; // 48px
+
+// Mobile menu links
+$text-menu: clamp(2.5rem, 11vw, 3.5rem); // 40–56px
+
 // Fluid display sizes (hero name)
 $text-display-mobile: clamp(3rem, 15.5vw, 5.5rem);    // 48–88px, fills ~90% width
 $text-display-tablet: clamp(6.5rem, 17vw, 9rem);      // 104–144px (two lines)
@@ -35,10 +41,14 @@ $font-semibold: 600;
 $font-bold: 700;
 
 // Line heights
+$leading-display-tight: 0.9; // hero name, two lines on tablet
+$leading-display: 0.95; // hero name
 $leading-none: 1;
+$leading-statement: 1.12;
 $leading-tight: 1.2;
 $leading-snug: 1.35;
 $leading-normal: 1.5;
+$leading-relaxed: 1.65; // long-form reading (legal pages)
 
 // Letter spacing
 $tracking-tight: -0.02em;

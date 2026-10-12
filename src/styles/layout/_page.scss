@@ -2,9 +2,11 @@
 @use '../base/breakpoints' as *;
 @use '../base/mixins' as *;
 
+$page-min-height: 70vh; // keeps contact + footer below the fold on short pages
+
 // Generic inner page (placeholder until each view is designed)
 .page {
-  min-height: 70vh;
+  min-height: $page-min-height;
   @include page-gutter;
 
   padding-top: calc(#{$navbar-height-mobile} + #{$space-8});
@@ -12,7 +14,7 @@
   color: $color-text-on-dark;
 
   @include tablet {
-    padding-top: 10rem;
+    padding-top: $page-offset-top-tablet;
   }
 }
 

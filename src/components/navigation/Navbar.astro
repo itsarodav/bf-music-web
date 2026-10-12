@@ -1,10 +1,10 @@
 ---
 import Icon from '../ui/Icon.astro';
 import MobileMenu from './MobileMenu.astro';
-import { navLinks } from '../../data/navigation';
+import { navLinks, getCurrentPath } from '../../data/navigation';
 import { site } from '../../data/site';
 
-const currentPath = Astro.url.pathname.replace(/\/$/, '') || '/';
+const currentPath = getCurrentPath(Astro.url);
 const isCurrent = (href: string) => href === currentPath;
 ---
 

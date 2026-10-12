@@ -2,6 +2,14 @@
 @use '../base/breakpoints' as *;
 @use '../base/mixins' as *;
 
+$shorts-intro-max-width: 26rem;
+// Mobile card width: never narrower than this, never wider than most of the
+// screen (so the next card peeks in) or the design's 240px
+$shorts-card-min-width: 8.5rem;
+$shorts-card-max-width-mobile: min(62vw, 15rem);
+$shorts-dot-size: 6px;
+$shorts-dot-active-width: 18px;
+
 // Home: latest Shorts (see LatestShorts.astro). A full-screen white panel
 // that rises over the pinned statement, then leads into the contact section.
 // Mobile: header stacked, cards in a swipeable row bleeding to the screen
@@ -16,6 +24,7 @@
   --shorts-card-width: calc((100svh - var(--shorts-reserved)) * 9 / 16);
 
   @include page-gutter;
+  @include panel-rise;
 
   position: relative;
   z-index: $z-base + 1; // above the pinned statement it rises over
@@ -31,12 +40,10 @@
   scroll-margin-top: 0;
 
   // Overlap the statement's last screen, so the statement stays pinned while
-  // this panel scrolls over it. Rounded corners and the upward shadow are set
-  // by GSAP during the entrance.
+  // this panel scrolls over it (rounded corners and shadow: panel-rise)
   @media (prefers-reduced-motion: no-preference) {
     margin-top: -100vh;
     margin-top: -100svh;
-    box-shadow: $shadow-panel-rise;
   }
 
   @include tablet {
@@ -83,18 +90,11 @@
   display: flex;
   flex-direction: column;
   gap: $space-1-5;
-  max-width: 26rem;
+  max-width: $shorts-intro-max-width;
 }
 
 .shorts__title {
-  font-family: $font-display;
-  font-size: $text-4xl;
-  font-weight: $font-regular;
-  line-height: $leading-none;
-
-  @include tablet {
-    font-size: 3rem; // 48px, same as "Contacto"
-  }
+  @include section-title;
 }
 
 .shorts__lead {
@@ -125,7 +125,7 @@
 .shorts__track {
   display: grid;
   grid-auto-flow: column;
-  grid-auto-columns: clamp(8.5rem, var(--shorts-card-width), min(62vw, 15rem));
+  grid-auto-columns: clamp(#{$shorts-card-min-width}, var(--shorts-card-width), #{$shorts-card-max-width-mobile});
   gap: $space-1-5;
   // Bleed to the screen edges so cards slide under the gutter, but snap
   // and start aligned with the rest of the content
@@ -181,13 +181,13 @@
 .shorts__dot {
   @include transition(width, background-color);
 
-  width: 6px;
-  height: 6px;
+  width: $shorts-dot-size;
+  height: $shorts-dot-size;
   border-radius: $radius-pill;
   background-color: $glass-on-light-border;
 
   &.is-active {
-    width: 18px;
+    width: $shorts-dot-active-width;
     background-color: $color-graphite;
   }
 }

@@ -1,6 +1,7 @@
 ---
 // Dark credits bar. The copy is kept in English on purpose: they are the brands' slogans.
 import Icon from '../ui/Icon.astro';
+import NewTabHint from '../ui/NewTabHint.astro';
 import { credits } from '../../data/site';
 ---
 
@@ -14,7 +15,7 @@ import { credits } from '../../data/site';
     <span class="visually-hidden">headphones</span>
     by
     <a href={credits.author.href} class="credits__link" target="_blank" rel="noopener noreferrer">
-      {credits.author.label}
+      {credits.author.label}<NewTabHint />
     </a>
   </p>
 
@@ -23,7 +24,7 @@ import { credits } from '../../data/site';
   <p class="credits__item">
     In your system by
     <a href={credits.agency.href} class="credits__link" target="_blank" rel="noopener noreferrer">
-      {credits.agency.label}
+      {credits.agency.label}<NewTabHint />
     </a>
   </p>
 </div>

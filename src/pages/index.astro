@@ -6,8 +6,7 @@ import LatestShorts from '../components/sections/LatestShorts.astro';
 
 import heroBg from '../assets/images/hero-bg.jpg';
 import heroBgPortrait from '../assets/images/hero-bg-portrait.jpg';
-import albumCover from '../assets/images/album-sokal-affair.jpg';
-import { brandColors } from '../data/brands';
+import { featuredRelease } from '../data/releases';
 ---
 
 <Layout heroIntro>
@@ -17,28 +16,19 @@ import { brandColors } from '../data/brands';
     backgroundPortrait={heroBgPortrait}
     backgroundAlt="Blanca Ferrer mirando hacia arriba frente a un naranjo"
     card={{
-      cover: albumCover,
-      coverAlt: "Portada del álbum 'Sokal Affair' de Blanca Ferrer",
-      text: "Escucha 'Sokal Affair', el álbum debut. ¡Ya disponible en todas las plataformas!",
-      textShort: "Escucha 'Sokal Affair', el álbum debut. ¡Ya disponible!",
+      cover: featuredRelease.cover,
+      coverAlt: featuredRelease.coverAlt,
+      text: featuredRelease.text,
+      textShort: featuredRelease.textShort,
       actions: [
-        {
-          label: 'Spotify',
-          href: 'https://open.spotify.com/album/5wszrDGx7PaO2oP6UdGkJK',
-          icon: 'spotify',
-          iconColor: brandColors.spotify,
-        },
-        {
-          label: 'YouTube',
-          href: 'https://www.youtube.com/watch?v=60sEKpCR2T8',
-          icon: 'youtube',
-          iconColor: brandColors.youtube,
-        },
+        { label: 'Spotify', href: featuredRelease.links.spotify, icon: 'spotify', brandIcon: true },
+        { label: 'YouTube', href: featuredRelease.links.youtube, icon: 'youtube', brandIcon: true },
       ],
     }}
   />
 
   <Statement
+    label="Sobre Blanca Ferrer"
     parts={[
       'Blanca Ferrer es ',
       { em: 'pianista' },

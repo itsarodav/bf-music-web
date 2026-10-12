@@ -1,5 +1,6 @@
 @use '../tokens' as *;
 @use '../base/breakpoints' as *;
+@use '../base/mixins' as *;
 
 // Full-screen statement on a white panel (see Statement.astro).
 // With motion, the section is taller than the screen and the panel sticks,
@@ -33,6 +34,8 @@
 }
 
 .statement__panel {
+  @include panel-rise;
+
   position: sticky;
   top: 0;
   display: flex;
@@ -46,7 +49,12 @@
   padding: calc(#{$navbar-height-mobile} + #{$space-4}) $space-6;
   color: $color-graphite;
   background-color: $color-surface-light;
-  box-shadow: $shadow-panel-rise;
+
+  // Without motion the panel still slides over the pinned hero: keep the
+  // upward shadow on it (panel-rise only shows it while GSAP drives it)
+  @media (prefers-reduced-motion: reduce) {
+    box-shadow: $shadow-panel-rise;
+  }
 
   @include tablet {
     padding: $space-12 $section-inset-tablet;
@@ -58,7 +66,7 @@
   max-width: $statement-max-width;
   font-size: $text-statement-mobile;
   font-weight: $font-medium;
-  line-height: 1.12;
+  line-height: $leading-statement;
   letter-spacing: $tracking-statement;
   text-wrap: pretty;
 

@@ -3,6 +3,8 @@
 // its accessible name is the title plus where it opens.
 import { Image } from 'astro:assets';
 import Icon from '../ui/Icon.astro';
+import NewTabHint from '../ui/NewTabHint.astro';
+import { breakpoints } from '../../data/breakpoints';
 
 interface Props {
   title: string;
@@ -34,7 +36,7 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
       height={thumbnail.height}
       alt=""
       widths={[240, 320, 480, 640]}
-      sizes="(min-width: 768px) 300px, 240px"
+      sizes={`(min-width: ${breakpoints.tablet}px) 300px, 240px`}
       loading={eager ? 'eager' : 'lazy'}
     />
     <span class="short-card__play" aria-hidden="true">
@@ -48,7 +50,7 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
       <Icon name={platform.icon} size={16} class="short-card__platform" />
       <span class="visually-hidden">{platform.name},</span>
       <time datetime={date.toISOString()}>{dateLabel}</time>
-      <span class="visually-hidden">(se abre en una pestaña nueva)</span>
+      <NewTabHint />
     </p>
   </div>
 </a>
@@ -58,7 +60,16 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
   @use '../../styles/base/breakpoints' as *;
   @use '../../styles/base/mixins' as *;
 
+  // Component tokens
+  $play-size: 2.5rem; // 40px glass badge
+  $play-optical-offset: 2px; // nudges the triangle right so it looks centered
+  $media-hover-zoom: 1.05;
+  $play-hover-scale: 1.08;
+  $play-press-scale: 0.94;
+
   .short-card {
+    @include focus-ring(4px, $color-focus-ring-on-light);
+
     // Containing block for the visually-hidden labels (position: absolute):
     // without it they'd escape the carousel's clipping and widen the page
     position: relative;
@@ -69,11 +80,6 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
     text-decoration: none;
     border-radius: $radius-xl;
     -webkit-tap-highlight-color: transparent;
-
-    &:focus-visible {
-      outline: 2px solid $color-focus-ring-on-light;
-      outline-offset: 4px;
-    }
   }
 
   .short-card__media {
@@ -81,7 +87,7 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
     aspect-ratio: 9 / 16;
     border-radius: $radius-xl;
     overflow: hidden;
-    background-color: rgba(20, 20, 20, 0.06); // placeholder while loading
+    background-color: $color-placeholder-on-light; // while the image loads
     // Keeps the rounded clip during the zoom in Safari
     isolation: isolate;
 
@@ -90,7 +96,7 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
       content: '';
       position: absolute;
       inset: 55% 0 0;
-      background: linear-gradient(180deg, transparent, rgba(0, 0, 0, 0.32));
+      background: linear-gradient(180deg, transparent, $overlay-media-bottom);
       pointer-events: none;
     }
 
@@ -98,7 +104,7 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
       width: 100%;
       height: 100%;
       object-fit: cover;
-      transition: transform 900ms $ease-out;
+      transition: transform $duration-slower $ease-out;
     }
 
     @include desktop {
@@ -111,18 +117,18 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
     @include transition(transform, background-color);
 
     position: absolute;
-    z-index: 1;
+    z-index: $z-base;
     right: $space-1-5;
     bottom: $space-1-5;
     display: grid;
     place-items: center;
-    width: 2.5rem;
-    height: 2.5rem;
+    width: $play-size;
+    height: $play-size;
     border-radius: $radius-pill;
-    color: $color-white;
+    color: $color-text-on-dark;
 
     :global(svg) {
-      margin-left: 2px; // optical centering of the triangle
+      margin-left: $play-optical-offset;
     }
   }
 
@@ -148,7 +154,7 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
   .short-card__meta {
     display: flex;
     align-items: center;
-    gap: 0.375rem;
+    gap: $space-0-75;
     font-size: $text-sm;
     color: $color-text-on-light-muted;
   }
@@ -156,23 +162,23 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
   // Logo in the muted text color (the YouTube triangle stays white)
   .short-card__meta :global(.short-card__platform) {
     flex-shrink: 0;
-    color: rgba(20, 20, 20, 0.5);
+    color: $color-text-on-light-subtle;
   }
 
   // Hover: slow zoom on the photo, the badge lifts a little
   @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     .short-card:hover {
       .short-card__media :global(img) {
-        transform: scale(1.05);
+        transform: scale($media-hover-zoom);
       }
 
       .short-card__play {
-        transform: scale(1.08);
+        transform: scale($play-hover-scale);
       }
     }
   }
 
   .short-card:active .short-card__play {
-    transform: scale(0.94);
+    transform: scale($play-press-scale);
   }
 </style>

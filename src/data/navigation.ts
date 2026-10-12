@@ -3,6 +3,9 @@ export interface NavLink {
   href: string;
 }
 
+// Current page path without the trailing slash, to compare with link hrefs
+export const getCurrentPath = (url: URL) => url.pathname.replace(/\/$/, '') || '/';
+
 // Main navigation. "Contacto" is a section rendered on every page,
 // so it is a same-page anchor rather than a route.
 export const navLinks: NavLink[] = [

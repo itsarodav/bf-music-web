@@ -2,6 +2,14 @@
 @use '../base/breakpoints' as *;
 @use '../base/mixins' as *;
 
+// Logos: both SVGs have built-in padding; this size keeps the visible marks ~30px
+$footer-brand-size: 2.5rem;
+// Pulls the BF mark back over its SVG padding so it lines up with the text column on mobile
+$footer-brand-inset: -0.5rem;
+$footer-list-gap-tablet: 1.125rem; // 18px
+$credits-divider-width: 2px;
+$credits-divider-height: 1.25rem;
+
 // ---------- Footer: sitemap, legal and logos ----------
 .footer {
   color: $color-text-on-light;
@@ -31,7 +39,7 @@
   gap: $space-2;
 
   @include tablet {
-    gap: 1.125rem;
+    gap: $footer-list-gap-tablet;
   }
 }
 
@@ -42,7 +50,7 @@
   display: inline-block;
   font-size: $text-base;
   font-weight: $font-medium;
-  border-radius: 2px;
+  border-radius: $radius-xs;
 }
 
 .footer__brands {
@@ -67,18 +75,17 @@
 
   @media (hover: hover) {
     &:hover {
-      opacity: 0.6;
+      opacity: $opacity-muted;
     }
   }
 
-  // Both SVGs have built-in padding; this keeps the visible marks ~30px
   .footer__brand-icon {
-    width: 2.5rem;
-    height: 2.5rem;
+    width: $footer-brand-size;
+    height: $footer-brand-size;
   }
 
   &:first-child {
-    margin-left: -0.5rem; // align the BF mark with the text column on mobile
+    margin-left: $footer-brand-inset;
   }
 }
 
@@ -109,7 +116,7 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.375rem;
+  gap: $space-0-75;
 
   .credits__icon {
     flex-shrink: 0;
@@ -121,7 +128,7 @@
   @include link-underline(-2px);
 
   display: inline-block;
-  border-radius: 2px;
+  border-radius: $radius-xs;
 }
 
 .credits__divider {
@@ -129,8 +136,8 @@
 
   @include tablet {
     display: block;
-    width: 2px;
-    height: 1.25rem;
+    width: $credits-divider-width;
+    height: $credits-divider-height;
     background-color: $color-text-on-dark;
   }
 }

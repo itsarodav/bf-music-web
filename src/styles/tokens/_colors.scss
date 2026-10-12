@@ -1,45 +1,57 @@
-// Color palette
+// Color palette. The only file with color literals: everything else (shadows,
+// overlays, glass) derives from these with rgba($color, $alpha).
 $color-white: #FFFFFF;
 $color-black: #000000;
 $color-ink: #141414; // text on light surfaces
 $color-graphite: #404142; // long-form statements and navbar over light sections
+$color-warm-black: #0A0806; // overlays that dim the photo without going cold
+$color-warm-ink: #14100C; // glass tint, keeps white text legible over the photo
+$color-charcoal: #0C0C0C; // mobile menu overlay
 
-// Brand colors (third-party platforms)
+// Brand colors (third-party platforms), applied with .icon--brand-* (base/_global)
 $color-spotify: #1ED760;
 $color-youtube: #FF0000;
 
+// Shadows (see tokens/_effects)
+$color-shadow: $color-black;
+
 // Text on dark/photo backgrounds
 $color-text-on-dark: $color-white;
-$color-text-on-dark-muted: rgba(255, 255, 255, 0.72);
+$color-text-on-dark-muted: rgba($color-white, 0.72);
 
 // Light surfaces (contact + footer)
 $color-surface-light: $color-white;
 $color-text-on-light: $color-ink;
-$color-text-on-light-muted: rgba(20, 20, 20, 0.72);
-$color-border-light: rgba(20, 20, 20, 0.28);
+$color-text-on-light-muted: rgba($color-ink, 0.72);
+$color-text-on-light-subtle: rgba($color-ink, 0.5); // platform logo next to the date
+$color-border-light: rgba($color-ink, 0.28);
+$color-placeholder-on-light: rgba($color-ink, 0.06); // media box while the image loads
 
 // Credits bar
-$color-surface-dark: #141414;
+$color-surface-dark: $color-ink;
 
 // Glass surfaces
 // Light glass: solid-ish white pill (primary button)
-$glass-light-bg: rgba(255, 255, 255, 0.86);
-$glass-light-bg-hover: rgba(255, 255, 255, 0.96);
-$glass-light-border: rgba(255, 255, 255, 0.5); // soft white edge, not hyper-real
+$glass-light-bg: rgba($color-white, 0.86);
+$glass-light-bg-hover: rgba($color-white, 0.96);
+$glass-light-border: rgba($color-white, 0.5); // soft white edge, not hyper-real
+$glass-light-highlight: $color-white; // inner top edge
 
 // Dark glass: translucent tinted panels (card, navbar, secondary button)
-$glass-dark-bg-top: rgba(255, 255, 255, 0.16);
-$glass-dark-bg-bottom: rgba(255, 255, 255, 0.06);
-$glass-dark-bg-hover: rgba(255, 255, 255, 0.22);
-$glass-dark-border: rgba(255, 255, 255, 0.14); // soft white edge, not hyper-real
-$glass-dark-border-hover: rgba(255, 255, 255, 0.24);
-$glass-highlight: rgba(255, 255, 255, 0.4); // inner top edge
-$glass-tint: rgba(20, 16, 12, 0.18); // warm dark tint so white text stays legible
+$glass-dark-bg-top: rgba($color-white, 0.16);
+$glass-dark-bg-bottom: rgba($color-white, 0.06);
+$glass-dark-bg-hover: rgba($color-white, 0.22);
+$glass-dark-border: rgba($color-white, 0.14); // soft white edge, not hyper-real
+$glass-dark-border-hover: rgba($color-white, 0.24);
+$glass-highlight: rgba($color-white, 0.4); // inner top edge
+$glass-lowlight: rgba($color-white, 0.04); // inner bottom edge
+$glass-tint: rgba($color-warm-ink, 0.18); // warm dark tint so white text stays legible
 
 // Glass on light surfaces (buttons over white sections)
-$glass-on-light-bg: rgba(20, 20, 20, 0.04);
-$glass-on-light-bg-hover: rgba(20, 20, 20, 0.08);
-$glass-on-light-border: rgba(20, 20, 20, 0.14);
+$glass-on-light-bg: rgba($color-ink, 0.04);
+$glass-on-light-bg-hover: rgba($color-ink, 0.08);
+$glass-on-light-border: rgba($color-ink, 0.14);
+$glass-on-light-highlight: rgba($color-white, 0.8); // inner top edge
 
 // Navbar after the hero: solid white, black content and a mid-grey divider
 // (same as contact/footer) so it reads apart from the white sections below.
@@ -49,13 +61,14 @@ $navbar-light-border: $color-border-light;
 $navbar-light-text: $color-ink;
 
 // Overlays
-$overlay-hero-vignette: rgba(0, 0, 0, 0.55);
-$overlay-hero-top: rgba(0, 0, 0, 0.4);
-$overlay-hero-bottom: rgba(0, 0, 0, 0.55);
-$overlay-hero-recede: rgba(10, 8, 6, 0.45); // hero behind the rising statement
-$overlay-statement-recede: rgba(10, 8, 6, 0.22); // statement behind the rising Shorts panel
-$overlay-menu: rgba(12, 12, 12, 0.55);
+$overlay-hero-vignette: rgba($color-black, 0.55);
+$overlay-hero-top: rgba($color-black, 0.4);
+$overlay-hero-bottom: rgba($color-black, 0.55);
+$overlay-hero-recede: rgba($color-warm-black, 0.45); // hero behind the rising statement
+$overlay-statement-recede: rgba($color-warm-black, 0.22); // statement behind the rising Shorts panel
+$overlay-media-bottom: rgba($color-black, 0.32); // bottom of a video thumbnail, under the play badge
+$overlay-menu: rgba($color-charcoal, 0.55);
 
 // Focus
-$color-focus-ring: rgba(255, 255, 255, 0.9);
+$color-focus-ring: rgba($color-white, 0.9);
 $color-focus-ring-on-light: $color-graphite;

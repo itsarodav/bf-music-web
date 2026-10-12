@@ -6,6 +6,11 @@ export const site = {
   ogImageAlt: 'Blanca Ferrer frente a un naranjo',
 };
 
+// Screen reader hint for links that open in a new tab (see NewTabHint)
+export const a11y = {
+  newTab: '(se abre en una pestaña nueva)',
+};
+
 // Website owner and the management/label that represents her (used in legal pages)
 export const legal = {
   owner: 'Blanca Ferrer',

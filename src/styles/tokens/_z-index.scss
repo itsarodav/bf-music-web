@@ -1,4 +1,9 @@
 // Stacking order
+$z-behind: -1; // backgrounds and shades inside their section
 $z-base: 1;
-$z-hero-content: 10;
 $z-navbar: 100;
+$z-skip-link: 1000;
+
+// Inside .navbar's own stacking context
+$z-navbar-menu: 0; // mobile menu overlay
+$z-navbar-bar: 1; // the bar stays above the overlay

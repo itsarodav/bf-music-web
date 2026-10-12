@@ -29,6 +29,7 @@ const { links, currentPath } = Astro.props;
 
 <script>
   import { gsap } from 'gsap';
+  import { media } from '../../data/breakpoints';
 
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const menu = document.querySelector<HTMLElement>('[data-mobile-menu]');
@@ -37,7 +38,7 @@ const { links, currentPath } = Astro.props;
   if (toggle && menu) {
     const items = menu.querySelectorAll('[data-menu-item]');
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const tabletUp = window.matchMedia('(min-width: 768px)');
+    const tabletUp = window.matchMedia(media.tabletUp);
     let isOpen = false;
 
     const timeline = gsap

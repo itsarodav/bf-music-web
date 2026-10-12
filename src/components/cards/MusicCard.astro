@@ -1,13 +1,15 @@
 ---
 import { Image } from 'astro:assets';
 import Button from '../ui/Button.astro';
+import { breakpoints } from '../../data/breakpoints';
 
 export interface MusicCardAction {
   label: string;
   href: string;
   /** Icon file name in src/icons (without .svg) */
   icon?: string;
-  iconColor?: string;
+  /** Show the icon in its official brand color (Spotify, YouTube) */
+  brandIcon?: boolean;
   variant?: 'primary' | 'secondary' | 'tertiary';
 }
 
@@ -36,7 +38,7 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
       src={cover}
       alt={coverAlt}
       widths={[120, 240, 360]}
-      sizes="(min-width: 768px) 120px, (min-width: 480px) 112px, 84px"
+      sizes={`(min-width: ${breakpoints.tablet}px) 120px, (min-width: ${breakpoints.mobile}px) 112px, 84px`}
       loading="eager"
     />
   </div>
@@ -59,7 +61,7 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
             external
             variant={action.variant ?? 'primary'}
             size={{ base: 'md', tablet: 'sm' }}
-            icon={action.icon ? { name: action.icon, color: action.iconColor } : undefined}
+            icon={action.icon ? { name: action.icon, brand: action.brandIcon } : undefined}
           >
             {action.label}
           </Button>
@@ -73,6 +75,15 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
   @use '../../styles/tokens' as *;
   @use '../../styles/base/breakpoints' as *;
   @use '../../styles/base/mixins' as *;
+
+  // Component tokens: cover size per breakpoint (keep the `sizes` attribute above in sync)
+  $cover-size-phone-min: 4.5rem; // 72px, smallest phones
+  $cover-size-phone: 5.25rem; // 84px
+  $cover-size-mobile: 7rem; // 112px
+  $cover-size-tablet: 7.5rem; // 120px
+  $cover-size-desktop: 6.5rem; // 104px
+  // Fluid copy on phones, so the short text keeps to two lines at any width
+  $text-size-phone: clamp(0.75rem, 3.9vw, 0.9375rem); // 12px → 15px
 
   .music-card {
     @include glass('dark', $blur-xl);
@@ -92,7 +103,7 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
     flex-shrink: 0;
     // Always 1:1: never stretch to the content's height
     align-self: flex-start;
-    width: 5.25rem; // 84px on small phones
+    width: $cover-size-phone;
     aspect-ratio: 1;
     border-radius: $radius-md;
     overflow: hidden;
@@ -105,15 +116,15 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
     }
 
     @include mobile {
-      width: 7rem; // 112px
+      width: $cover-size-mobile;
     }
 
     @include tablet {
-      width: 7.5rem; // 120px
+      width: $cover-size-tablet;
     }
 
     @include desktop {
-      width: 6.5rem; // 104px
+      width: $cover-size-desktop;
     }
   }
 
@@ -178,7 +189,7 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
     // Only below 480px: from there the base cover sizes apply
     @media (max-width: ($bp-mobile - 0.02px)) {
       .music-card__cover {
-        width: clamp(4.5rem, 22vw, 5.25rem); // 72px → 84px
+        width: clamp(#{$cover-size-phone-min}, 22vw, #{$cover-size-phone});
       }
     }
 
@@ -186,9 +197,8 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
       display: contents;
     }
 
-    // Fluid so the short copy keeps to two lines on every phone width
     .music-card__text {
-      font-size: clamp(0.75rem, 3.9vw, 0.9375rem); // 12px → 15px
+      font-size: $text-size-phone;
     }
 
     .music-card__actions {
@@ -238,8 +248,8 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
     @include desktop {
       flex-direction: row;
       align-items: stretch;
-      gap: 1.25rem;
-      padding: 1.25rem;
+      gap: $space-2-5;
+      padding: $space-2-5;
 
       .music-card__text {
         font-size: $text-base;

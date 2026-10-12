@@ -1,3 +1,13 @@
+// Design tokens. Rules:
+// - Color literals only live in _colors.scss; everything else derives from
+//   those colors with rgba($color, $alpha).
+// - Partials and components never write raw values in declarations. Allowed
+//   literals: 0, 1px hairlines, 100%, auto, gradient stops and fr ratios.
+// - A value shared by several files or with a design meaning goes here.
+//   A value specific to one component is a local variable at the top of its
+//   partial/<style>, with a comment saying what it is (e.g. Button's $sizes).
+// - Values that JS needs at build time (breakpoints in `sizes`, matchMedia)
+//   are mirrored in src/data/breakpoints.ts. Change both together.
 @forward 'colors';
 @forward 'typography';
 @forward 'spacing';

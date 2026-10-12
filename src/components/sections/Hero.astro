@@ -1,6 +1,7 @@
 ---
 import { getImage } from 'astro:assets';
 import MusicCard, { type MusicCardAction } from '../cards/MusicCard.astro';
+import { media } from '../../data/breakpoints';
 
 interface Props {
   /** Shown as one word per line on tablet */
@@ -28,7 +29,7 @@ const PORTRAIT_MEDIA = '(max-aspect-ratio: 1/1)';
 const portrait = {
   // Capped at 1440: enough for 3x phones without the weight of the full 1800px crop
   widths: [640, 960, 1280, 1440],
-  sizes: '(max-width: 767.98px) 95vh, (max-aspect-ratio: 3/4) 83vh, 110vw',
+  sizes: `${media.belowTablet} 95vh, (max-aspect-ratio: 3/4) 83vh, 110vw`,
   quality: 55,
 };
 const landscape = {

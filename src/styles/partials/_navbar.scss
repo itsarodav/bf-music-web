@@ -2,6 +2,21 @@
 @use '../base/breakpoints' as *;
 @use '../base/mixins' as *;
 
+$navbar-logo-size: 2.625rem; // 42px
+$navbar-logo-size-tablet: 3rem; // 48px
+// The BF SVG has ~21% built-in padding on the left
+$navbar-logo-svg-inset: 0.214;
+// Tablet+: the logo sits a bit higher than the links (its SVG has padding on top)
+$navbar-logo-raise: $space-0-5;
+
+// Hamburger
+$navbar-toggle-size: 2.75rem; // 44px, minimum touch target
+$navbar-toggle-line-width: 1.25rem;
+$navbar-toggle-line-thickness: 2px;
+$navbar-toggle-line-gap: 5px;
+// Outer lines travel to the middle one to form the X
+$navbar-toggle-line-shift: $navbar-toggle-line-gap + $navbar-toggle-line-thickness;
+
 // Fixed on every breakpoint. Two state classes, set in Navbar.astro:
 // - .is-scrolled: tablet+ compacts the bar (less padding, smaller logo offset).
 // - .navbar--light: over sections marked data-nav-theme="light" the bar turns
@@ -20,7 +35,7 @@
   @include transition(padding);
 
   position: relative;
-  z-index: 1; // above the mobile menu overlay
+  z-index: $z-navbar-bar; // above the mobile menu overlay
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -35,7 +50,7 @@
     height: auto;
     // Extra bottom padding makes up for the logo's raised offset, so the bar
     // keeps its height (97px over the hero, 65px compact)
-    padding-block: $space-3 calc(#{$space-3} + 0.25rem);
+    padding-block: $space-3 calc(#{$space-3} + #{$navbar-logo-raise});
 
     .is-scrolled & {
       align-items: center;
@@ -48,14 +63,14 @@
   @include focus-ring;
   @include transition(margin);
 
-  --logo-size: 2.625rem; // 42px
+  --logo-size: #{$navbar-logo-size};
 
   display: block;
-  color: $color-white;
+  color: $color-text-on-dark;
   border-radius: $radius-sm;
-  // The SVG has ~21% built-in padding on the left; pull it back so the
-  // visible mark sits on the gutter at any logo size
-  margin-left: calc(var(--logo-size) * -0.214);
+  // Pull the SVG's padding back so the visible mark sits on the gutter at
+  // any logo size
+  margin-left: calc(var(--logo-size) * -#{$navbar-logo-svg-inset});
 
   .navbar__logo-icon {
     width: var(--logo-size);
@@ -63,10 +78,10 @@
   }
 
   @include tablet {
-    --logo-size: 3rem; // 48px
+    --logo-size: #{$navbar-logo-size-tablet};
 
-    // Optical alignment with the links (the SVG has padding on top)
-    margin-top: -0.25rem;
+    // Optical alignment with the links
+    margin-top: calc(-1 * #{$navbar-logo-raise});
 
     .is-scrolled & {
       margin-top: 0;
@@ -102,7 +117,7 @@
   font-weight: $font-medium;
   color: $color-text-on-dark;
   text-shadow: $shadow-text;
-  border-radius: 2px;
+  border-radius: $radius-xs;
 }
 
 // ---------- Hamburger (mobile only) ----------
@@ -114,9 +129,9 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 5px;
-  width: 2.75rem;
-  height: 2.75rem;
+  gap: $navbar-toggle-line-gap;
+  width: $navbar-toggle-size;
+  height: $navbar-toggle-size;
   border-radius: $radius-md;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
@@ -128,10 +143,10 @@
 
 .navbar__toggle-line {
   display: block;
-  width: 1.25rem;
-  height: 2px;
-  border-radius: 2px;
-  background-color: $color-white;
+  width: $navbar-toggle-line-width;
+  height: $navbar-toggle-line-thickness;
+  border-radius: $navbar-toggle-line-thickness;
+  background-color: $color-text-on-dark;
   transition:
     transform $duration-base $ease-out,
     opacity $duration-fast $ease-out;
@@ -144,7 +159,7 @@
 // Morph into an X
 .navbar__toggle[aria-expanded='true'] {
   .navbar__toggle-line:nth-child(1) {
-    transform: translateY(7px) rotate(45deg);
+    transform: translateY($navbar-toggle-line-shift) rotate(45deg);
   }
 
   .navbar__toggle-line:nth-child(2) {
@@ -152,7 +167,7 @@
   }
 
   .navbar__toggle-line:nth-child(3) {
-    transform: translateY(-7px) rotate(-45deg);
+    transform: translateY(-$navbar-toggle-line-shift) rotate(-45deg);
   }
 }
 

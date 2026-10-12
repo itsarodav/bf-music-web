@@ -7,7 +7,7 @@
 .mobile-menu {
   position: fixed;
   inset: 0;
-  z-index: 0; // inside .navbar stacking context, below .navbar__bar (z 1)
+  z-index: $z-navbar-menu;
   display: flex;
   align-items: flex-end;
   @include page-gutter;
@@ -41,16 +41,16 @@
   display: inline-block;
   padding: $space-0-5 0;
   font-family: $font-display;
-  font-size: clamp(2.5rem, 11vw, 3.5rem);
+  font-size: $text-menu;
   line-height: $leading-tight;
   color: $color-text-on-dark;
   transition: opacity $duration-fast $ease-out;
 
   &[aria-current='page'] {
-    opacity: 0.6;
+    opacity: $opacity-muted;
   }
 
   &:active {
-    opacity: 0.6;
+    opacity: $opacity-muted;
   }
 }

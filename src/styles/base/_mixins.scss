@@ -2,6 +2,9 @@
 @use '../tokens/effects' as *;
 @use '../tokens/motion' as *;
 @use '../tokens/spacing' as *;
+@use '../tokens/typography' as *;
+@use '../tokens/radius' as *;
+@use '../tokens/z-index' as *;
 @use 'breakpoints' as *;
 
 // Apple-like glass surface.
@@ -15,7 +18,7 @@
     background-color: $glass-light-bg;
     border: 1px solid $glass-light-border;
     box-shadow:
-      inset 0 1px 0 rgba(255, 255, 255, 1),
+      inset 0 1px 0 $glass-light-highlight,
       $shadow-button;
   } @else {
     background:
@@ -24,7 +27,7 @@
     border: 1px solid $glass-dark-border;
     box-shadow:
       inset 0 1px 0 $glass-highlight,
-      inset 0 -1px 0 rgba(255, 255, 255, 0.04),
+      inset 0 -1px 0 $glass-lowlight,
       $shadow-glass;
   }
 }
@@ -43,10 +46,11 @@
   }
 }
 
-// Visible focus ring for keyboard users only
-@mixin focus-ring($offset: 3px) {
+// Visible focus ring for keyboard users only.
+// $color: $color-focus-ring-on-light for elements on white surfaces.
+@mixin focus-ring($offset: 3px, $color: $color-focus-ring) {
   &:focus-visible {
-    outline: 2px solid $color-focus-ring;
+    outline: $focus-ring-width solid $color;
     outline-offset: $offset;
   }
 }
@@ -92,6 +96,44 @@
 
   &[aria-current='page']::after {
     transform: scaleX(1);
+  }
+}
+
+// Section heading in the display font ("Contacto", "Últimos vídeos")
+@mixin section-title {
+  font-family: $font-display;
+  font-size: $text-4xl;
+  font-weight: $font-regular;
+  line-height: $leading-none;
+
+  @include tablet {
+    font-size: $text-section-title;
+  }
+}
+
+// Panel that scrolls up over the pinned section before it (statement over
+// the hero, Shorts over the statement). GSAP scrubs --rise from 0 to 1 with
+// the scroll (src/scripts/rise-over.ts): rounded top corners and an upward
+// shadow while it rises, flat and without shadow once it has landed.
+// Defaults to landed, so without motion (or JS) it is a plain flat panel.
+// The shadow lives on ::before so it can fade with opacity; the element
+// must create a stacking context (sticky, or positioned with a z-index).
+@mixin panel-rise {
+  --rise: 1;
+
+  $corner: calc((1 - var(--rise)) * #{$radius-panel});
+  border-top-left-radius: $corner;
+  border-top-right-radius: $corner;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: $z-behind;
+    border-radius: inherit;
+    box-shadow: $shadow-panel-rise;
+    opacity: calc(1 - var(--rise));
+    pointer-events: none;
   }
 }
 

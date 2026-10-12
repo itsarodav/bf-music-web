@@ -23,8 +23,6 @@ const {
 } = Astro.props;
 
 const shorts = await getLatestShorts(3);
-
-const newTab = '(se abre en una pestaña nueva)';
 ---
 
 {shorts.length > 0 && (
@@ -38,7 +36,7 @@ const newTab = '(se abre en una pestaña nueva)';
       {/* One clear action (Instagram) plus the other platforms as quiet logo buttons */}
       <div class="shorts__follow">
         <Button href={social.instagram} external variant="secondary" surface="light" icon="instagram">
-          Seguir en Instagram<span class="visually-hidden"> {newTab}</span>
+          Seguir en Instagram
         </Button>
         <Button
           href={youtubeChannel.subscribeUrl}
@@ -46,7 +44,7 @@ const newTab = '(se abre en una pestaña nueva)';
           variant="secondary"
           surface="light"
           icon="youtube"
-          ariaLabel={`Suscribirse en YouTube ${newTab}`}
+          ariaLabel="Suscribirse en YouTube"
         />
         <Button
           href={social.tiktok}
@@ -54,7 +52,7 @@ const newTab = '(se abre en una pestaña nueva)';
           variant="secondary"
           surface="light"
           icon="tiktok"
-          ariaLabel={`Seguir en TikTok ${newTab}`}
+          ariaLabel="Seguir en TikTok"
         />
       </div>
     </div>
@@ -80,6 +78,7 @@ const newTab = '(se abre en una pestaña nueva)';
 <script>
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { riseOver } from '../../scripts/rise-over';
 
   gsap.registerPlugin(ScrollTrigger);
 
@@ -109,23 +108,16 @@ const newTab = '(se abre en una pestaña nueva)';
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   if (section && track && !reducedMotion) {
-    // 1. Entrance: the panel scrolls up over the statement (kept pinned with
-    //    CSS sticky). The statement recedes like the hero did: the sentence
-    //    sinks back and fades, the panel dims, and this one lands flat.
+    // 1. Entrance: the panel scrolls up over the statement, which recedes
+    //    behind it like the hero did
     const statement = document.querySelector<HTMLElement>('[data-statement]');
-    gsap
-      .timeline({
-        defaults: { ease: 'none' },
-        scrollTrigger: { trigger: section, start: 'top bottom', end: 'top top', scrub: 0.4 },
-      })
-      .fromTo(
-        section,
-        { borderRadius: '2rem 2rem 0 0' },
-        { borderRadius: '0rem 0rem 0 0', boxShadow: '0 -24px 64px -40px rgba(0, 0, 0, 0)' },
-        0,
-      )
-      .to(statement?.querySelector('[data-statement-text]') ?? [], { scale: 0.94, yPercent: -8, opacity: 0.2 }, 0)
-      .to(statement?.querySelector('[data-statement-shade]') ?? [], { opacity: 1 }, 0);
+    riseOver({
+      trigger: section,
+      recede: {
+        content: statement?.querySelector('[data-statement-text]'),
+        shade: statement?.querySelector('[data-statement-shade]'),
+      },
+    });
 
     // 2. Cards rise in one after another as the panel arrives
     gsap.from(items, {

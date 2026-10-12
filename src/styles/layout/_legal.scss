@@ -1,5 +1,8 @@
 @use '../tokens' as *;
 @use '../base/breakpoints' as *;
+@use '../base/mixins' as *;
+
+$legal-link-underline-offset: 3px;
 
 // Legal pages (terms, privacy): readable long-form text on the dark page
 .legal {
@@ -7,14 +10,14 @@
   color: $color-text-on-dark;
 
   @include tablet {
-    padding: 10rem $section-inset-tablet $space-12;
+    padding: $page-offset-top-tablet $section-inset-tablet $space-12;
   }
 }
 
 // Header and body share one centered reading column
 .legal__header,
 .legal__body {
-  max-width: 42rem; // ~70 characters per line
+  max-width: $reading-max-width;
   margin-inline: auto;
 }
 
@@ -33,7 +36,7 @@
   line-height: $leading-tight;
 
   @include tablet {
-    font-size: $text-5xl; // fits the 42rem column on one line
+    font-size: $text-5xl; // fits the reading column on one line
   }
 }
 
@@ -45,7 +48,7 @@
 
 .legal__body {
   color: $color-text-on-dark-muted;
-  line-height: 1.65;
+  line-height: $leading-relaxed;
 
   h2 {
     margin-top: $space-5;
@@ -72,14 +75,11 @@
   }
 
   a {
+    @include focus-ring;
+
     color: $color-text-on-dark;
     text-decoration: underline;
-    text-underline-offset: 3px;
-
-    &:focus-visible {
-      outline: 2px solid $color-focus-ring;
-      outline-offset: 3px;
-    }
+    text-underline-offset: $legal-link-underline-offset;
   }
 
   strong {

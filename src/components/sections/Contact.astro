@@ -1,6 +1,7 @@
 ---
 // Shared contact section, rendered by Layout on every page.
 // The navbar "Contacto" link targets #contacto.
+import NewTabHint from '../ui/NewTabHint.astro';
 import { contact, socialLinks } from '../../data/contact';
 ---
 
@@ -18,7 +19,7 @@ import { contact, socialLinks } from '../../data/contact';
       {socialLinks.map((link) => (
         <li>
           <a href={link.href} class="contact__link" target="_blank" rel="noopener noreferrer">
-            {link.label}
+            {link.label}<NewTabHint />
           </a>
         </li>
       ))}
