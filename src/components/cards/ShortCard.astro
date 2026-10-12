@@ -59,6 +59,9 @@ const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'sho
   @use '../../styles/base/mixins' as *;
 
   .short-card {
+    // Containing block for the visually-hidden labels (position: absolute):
+    // without it they'd escape the carousel's clipping and widen the page
+    position: relative;
     display: flex;
     flex-direction: column;
     gap: $space-1-5;
