@@ -5,13 +5,30 @@
 // With motion, the section is taller than the screen and the panel sticks,
 // so the scroll distance drives the word-by-word reveal. It sits above the
 // pinned hero, which shows through the panel's rounded corners on entry.
+//
+// Scroll choreography, in % of the screen height. Tune it here only: the
+// script reads --statement-read, and the section height follows from both.
+// - read: scroll distance over which the words fill in (it starts while the
+//   panel is still rising, when its top reaches 35% of the screen)
+// - hold: the full sentence rests, nothing moves
+// Then one more screen while the next section (latest Shorts) rises over the
+// pinned panel. Scrolling is never locked: a fast swipe just goes faster.
+// Height = read + hold + 165: the 100 of the pinned panel itself, plus the
+// 100 the next section takes to rise, minus the 35 already read on entry.
 .statement {
+  --statement-read: 180; // longer on phones: one swipe covers more screen
+  --statement-hold: 60;
+
   position: relative;
   z-index: $z-base;
 
   @media (prefers-reduced-motion: no-preference) {
-    height: 220vh;
-    height: 220svh;
+    height: calc((var(--statement-read) + var(--statement-hold) + 165) * 1vh);
+    height: calc((var(--statement-read) + var(--statement-hold) + 165) * 1svh);
+  }
+
+  @include tablet {
+    --statement-read: 155;
   }
 }
 
@@ -54,4 +71,13 @@
     font-style: italic;
     font-weight: $font-bold;
   }
+}
+
+// Dims the panel as the next section rises over it (GSAP, see LatestShorts)
+.statement__shade {
+  position: absolute;
+  inset: 0;
+  background-color: $overlay-statement-recede;
+  opacity: 0;
+  pointer-events: none;
 }

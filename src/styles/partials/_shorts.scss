@@ -1,0 +1,193 @@
+@use '../tokens' as *;
+@use '../base/breakpoints' as *;
+@use '../base/mixins' as *;
+
+// Home: latest Shorts (see LatestShorts.astro). A full-screen white panel
+// that rises over the pinned statement, then leads into the contact section.
+// Mobile: header stacked, cards in a swipeable row bleeding to the screen
+// edges. Tablet: header in one row, three cards side by side. Desktop: header
+// as a left column next to the cards.
+//
+// The whole section fits one screen: cards take their width from the screen
+// height (9:16), minus what the rest of the panel needs at each breakpoint
+// (--shorts-reserved), and never grow wider than their column.
+.shorts {
+  --shorts-reserved: 27rem;
+  --shorts-card-width: calc((100svh - var(--shorts-reserved)) * 9 / 16);
+
+  @include page-gutter;
+
+  position: relative;
+  z-index: $z-base + 1; // above the pinned statement it rises over
+  display: grid;
+  align-content: center;
+  gap: $space-3;
+  min-height: 100vh;
+  min-height: 100svh;
+  padding-top: calc(#{$navbar-height-mobile} + #{$space-3});
+  padding-bottom: $space-4;
+  color: $color-text-on-light;
+  background-color: $color-surface-light;
+  scroll-margin-top: 0;
+
+  // Overlap the statement's last screen, so the statement stays pinned while
+  // this panel scrolls over it. Rounded corners and the upward shadow are set
+  // by GSAP during the entrance.
+  @media (prefers-reduced-motion: no-preference) {
+    margin-top: -100vh;
+    margin-top: -100svh;
+    box-shadow: $shadow-panel-rise;
+  }
+
+  @include tablet {
+    --shorts-reserved: 25rem;
+
+    gap: $space-6;
+    padding-block: calc(#{$navbar-height-mobile} + #{$space-6}) $space-6;
+  }
+
+  @include desktop {
+    --shorts-reserved: 16rem;
+
+    grid-template-columns: minmax(0, 1fr) minmax(0, 2.4fr);
+    align-items: start;
+    gap: $space-8;
+  }
+
+  @include wide {
+    gap: $space-12;
+  }
+}
+
+// ---------- Header ----------
+.shorts__header {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: $space-3;
+
+  @include tablet {
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: space-between;
+  }
+
+  @include desktop {
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+}
+
+.shorts__intro {
+  display: flex;
+  flex-direction: column;
+  gap: $space-1-5;
+  max-width: 26rem;
+}
+
+.shorts__title {
+  font-family: $font-display;
+  font-size: $text-4xl;
+  font-weight: $font-regular;
+  line-height: $leading-none;
+
+  @include tablet {
+    font-size: 3rem; // 48px, same as "Contacto"
+  }
+}
+
+.shorts__lead {
+  font-size: $text-base;
+  line-height: $leading-normal;
+  color: $color-text-on-light-muted;
+  text-wrap: pretty;
+
+  @include desktop {
+    font-size: $text-lg;
+  }
+}
+
+.shorts__follow {
+  display: flex;
+  flex-shrink: 0;
+  gap: $space-1;
+}
+
+// ---------- Cards ----------
+.shorts__body {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  min-width: 0;
+}
+
+.shorts__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: clamp(8.5rem, var(--shorts-card-width), min(62vw, 15rem));
+  gap: $space-1-5;
+  // Bleed to the screen edges so cards slide under the gutter, but snap
+  // and start aligned with the rest of the content
+  margin-inline: calc(-1 * #{$gutter-mobile});
+  padding-inline: $gutter-mobile;
+  // Room for the focus ring, which the scroll container would clip
+  padding-block: $space-1;
+  margin-block: calc(-1 * #{$space-1});
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scroll-padding-inline: $gutter-mobile;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include tablet {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(3, minmax(0, var(--shorts-card-width)));
+    // On short screens the cards are narrower than their column: spread them
+    // so the row still lines up with the header's left and right edges
+    justify-content: space-between;
+    gap: $space-2;
+    margin-inline: 0;
+    padding-inline: 0;
+    overflow: visible;
+  }
+
+  @include desktop {
+    // Header on the left: keep the cards together, flush with the right edge
+    justify-content: end;
+    gap: $space-3;
+  }
+}
+
+.shorts__item {
+  scroll-snap-align: start;
+}
+
+// ---------- Swipe position (mobile) ----------
+.shorts__dots {
+  display: flex;
+  justify-content: center;
+  gap: $space-0-5;
+
+  @include tablet {
+    display: none;
+  }
+}
+
+.shorts__dot {
+  @include transition(width, background-color);
+
+  width: 6px;
+  height: 6px;
+  border-radius: $radius-pill;
+  background-color: $glass-on-light-border;
+
+  &.is-active {
+    width: 18px;
+    background-color: $color-graphite;
+  }
+}

@@ -1,7 +1,9 @@
 ---
 // Full-screen statement (home: the central sentence of her bio).
 // Scroll-driven: the white panel rises over the hero, which stays pinned and
-// recedes behind it; then the panel sticks while the words fill in one by one.
+// recedes behind it; then the panel sticks while the words fill in one by one,
+// rests with the full sentence, and stays pinned while the next section rises
+// over it. Distances live in _statement.scss (--statement-read/-hold).
 // Words are split here, at build time.
 type Part = string | { em: string };
 
@@ -24,7 +26,7 @@ const tokens = parts.flatMap((part) => {
 
 <section id={id} class="statement" aria-label="Sobre Blanca Ferrer" data-statement data-nav-theme="light">
   <div class="statement__panel" data-statement-panel>
-    <p class="statement__text">
+    <p class="statement__text" data-statement-text>
       {tokens.map((token) =>
         token.space ? (
           token.value
@@ -35,6 +37,7 @@ const tokens = parts.flatMap((part) => {
         ),
       )}
     </p>
+    <div class="statement__shade" aria-hidden="true" data-statement-shade></div>
   </div>
 </section>
 
@@ -74,7 +77,17 @@ const tokens = parts.flatMap((part) => {
     //    the scroll. Scrubbed with a short lag so it feels smooth, not mechanical.
     gsap
       .timeline({
-        scrollTrigger: { trigger: section, start: 'top 35%', end: 'bottom bottom', scrub: 0.6 },
+        // Reading distance comes from CSS (it changes per breakpoint); the rest
+        // of the section is the hold and the next section's entrance
+        scrollTrigger: {
+          trigger: section,
+          start: 'top 35%',
+          end: () => {
+            const read = parseFloat(getComputedStyle(section).getPropertyValue('--statement-read'));
+            return `+=${(read / 100) * window.innerHeight}`;
+          },
+          scrub: 0.6,
+        },
       })
       .fromTo(words, { opacity: 0.14 }, { opacity: 1, duration: 1, stagger: 0.35, ease: 'power1.inOut' });
   }

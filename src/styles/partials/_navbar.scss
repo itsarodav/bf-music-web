@@ -3,10 +3,13 @@
 @use '../base/mixins' as *;
 
 // Fixed on every breakpoint. Two state classes, set in Navbar.astro:
-// - .is-scrolled: tablet+ turns from a transparent bar over the hero into
-//   glass (mobile is always glass).
-// - .navbar--light: over sections marked data-nav-theme="light" the glass
-//   turns frosted white and text/logo switch to graphite.
+// - .is-scrolled: tablet+ compacts the bar (less padding, smaller logo offset).
+// - .navbar--light: over sections marked data-nav-theme="light" the bar turns
+//   solid white with a hairline and text/logo switch to graphite.
+// Over the hero it stays transparent with white content, scrolled or not.
+// The theme swap is instant on purpose (colors, background, border): it
+// happens as the white panel's edge crosses the bar, and fading some parts
+// but not others left white lines on a still-white bar for a moment.
 .navbar {
   position: fixed;
   inset: 0 0 auto;
@@ -14,7 +17,7 @@
 }
 
 .navbar__bar {
-  @include transition(background-color, border-color, padding, -webkit-backdrop-filter, backdrop-filter);
+  @include transition(padding);
 
   position: relative;
   z-index: 1; // above the mobile menu overlay
@@ -24,37 +27,28 @@
   @include page-gutter;
 
   height: $navbar-height-mobile;
-  // Lower opacity than the default glass, as in the mobile design
-  background-color: rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
-  -webkit-backdrop-filter: blur($blur-lg) saturate($glass-saturate);
-  backdrop-filter: blur($blur-lg) saturate($glass-saturate);
+  background-color: transparent;
+  border-bottom: 1px solid transparent;
 
   @include tablet {
     align-items: flex-start;
     height: auto;
-    padding-block: $space-3;
-    border-bottom-color: transparent;
-    background-color: transparent;
-    -webkit-backdrop-filter: blur(0) saturate(100%);
-    backdrop-filter: blur(0) saturate(100%);
+    // Extra bottom padding makes up for the logo's raised offset, so the bar
+    // keeps its height (97px over the hero, 65px compact)
+    padding-block: $space-3 calc(#{$space-3} + 0.25rem);
 
     .is-scrolled & {
       align-items: center;
-      padding-block: $space-0-5;
-      background-color: rgba(20, 16, 12, 0.24);
-      border-bottom-color: rgba(255, 255, 255, 0.12);
-      -webkit-backdrop-filter: blur($blur-lg) saturate($glass-saturate);
-      backdrop-filter: blur($blur-lg) saturate($glass-saturate);
+      padding-block: $space-1;
     }
   }
 }
 
 .navbar__logo {
   @include focus-ring;
-  @include transition(color, margin);
+  @include transition(margin);
 
-  --logo-size: 3rem;
+  --logo-size: 2.625rem; // 42px
 
   display: block;
   color: $color-white;
@@ -69,9 +63,10 @@
   }
 
   @include tablet {
-    --logo-size: 3.5rem;
+    --logo-size: 3rem; // 48px
 
-    margin-top: -0.5rem;
+    // Optical alignment with the links (the SVG has padding on top)
+    margin-top: -0.25rem;
 
     .is-scrolled & {
       margin-top: 0;
@@ -108,9 +103,6 @@
   color: $color-text-on-dark;
   text-shadow: $shadow-text;
   border-radius: 2px;
-  transition:
-    color $duration-slow $ease-out,
-    text-shadow $duration-slow $ease-out;
 }
 
 // ---------- Hamburger (mobile only) ----------
@@ -168,24 +160,28 @@
 // Not while the mobile menu is open: its overlay is dark.
 body:not(.is-menu-open) .navbar--light {
   .navbar__bar {
-    background-color: $glass-navbar-light-bg;
-    border-bottom-color: $glass-navbar-light-border;
+    background-color: $navbar-light-bg;
+    border-bottom-color: $navbar-light-border;
   }
 
   .navbar__logo,
   .navbar__link {
-    color: $color-graphite;
+    color: $navbar-light-text;
     text-shadow: none;
   }
 
+  // Hamburger: no glass on white, just a grey outline (same as the divider)
+  // and black lines
   .navbar__toggle {
-    background: rgba(20, 20, 20, 0.06);
-    border-color: rgba(20, 20, 20, 0.1);
+    background: transparent;
+    border-color: $navbar-light-border;
     box-shadow: none;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   .navbar__toggle-line {
-    background-color: $color-graphite;
+    background-color: $navbar-light-text;
   }
 
   :focus-visible {

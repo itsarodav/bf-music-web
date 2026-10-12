@@ -48,33 +48,37 @@ const isCurrent = (href: string) => href === currentPath;
 </header>
 
 <script>
-  import { gsap } from 'gsap';
-  import { ScrollTrigger } from 'gsap/ScrollTrigger';
-
-  gsap.registerPlugin(ScrollTrigger);
-
   const navbar = document.querySelector<HTMLElement>('[data-navbar]');
 
   if (navbar) {
     // The line where the bar meets the content (its bottom edge)
     const barHeight = () => navbar.querySelector<HTMLElement>('.navbar__bar')?.offsetHeight ?? 64;
 
-    // Glass as soon as the page leaves the top
-    ScrollTrigger.create({
-      start: 8,
-      end: 'max',
-      toggleClass: { targets: navbar, className: 'is-scrolled' },
-    });
+    // Both states are checked live against the real layout (not positions
+    // cached on load), so they're right after a reload mid-page, a resize or a
+    // section changing height:
+    // - is-scrolled: compact bar as soon as the page leaves the top
+    // - navbar--light: any light section sits under the bar's bottom edge
+    const lightSections = [...document.querySelectorAll<HTMLElement>('[data-nav-theme="light"]')];
+    let frame = 0;
 
-    // Light theme while any light section sits under the bar. Computed from
-    // all triggers, so adjacent light sections (contact + footer) don't flicker.
-    const lightTriggers = [...document.querySelectorAll<HTMLElement>('[data-nav-theme="light"]')].map((section) =>
-      ScrollTrigger.create({
-        trigger: section,
-        start: () => `top ${barHeight()}px`,
-        end: () => `bottom ${barHeight()}px`,
-        onToggle: () => navbar.classList.toggle('navbar--light', lightTriggers.some((trigger) => trigger.isActive)),
-      }),
-    );
+    const updateTheme = () => {
+      frame = 0;
+      const line = barHeight();
+      const light = lightSections.some((section) => {
+        const { top, bottom } = section.getBoundingClientRect();
+        return top <= line && bottom > line;
+      });
+      navbar.classList.toggle('is-scrolled', window.scrollY > 8);
+      navbar.classList.toggle('navbar--light', light);
+    };
+
+    const requestUpdate = () => {
+      if (!frame) frame = requestAnimationFrame(updateTheme);
+    };
+
+    window.addEventListener('scroll', requestUpdate, { passive: true });
+    window.addEventListener('resize', requestUpdate);
+    updateTheme();
   }
 </script>

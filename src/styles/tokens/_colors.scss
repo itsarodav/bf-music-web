@@ -25,25 +25,35 @@ $color-surface-dark: #141414;
 // Light glass: solid-ish white pill (primary button)
 $glass-light-bg: rgba(255, 255, 255, 0.86);
 $glass-light-bg-hover: rgba(255, 255, 255, 0.96);
-$glass-light-border: rgba(255, 255, 255, 0.9);
+$glass-light-border: rgba(255, 255, 255, 0.5); // soft white edge, not hyper-real
 
 // Dark glass: translucent tinted panels (card, navbar, secondary button)
 $glass-dark-bg-top: rgba(255, 255, 255, 0.16);
 $glass-dark-bg-bottom: rgba(255, 255, 255, 0.06);
 $glass-dark-bg-hover: rgba(255, 255, 255, 0.22);
-$glass-dark-border: rgba(255, 255, 255, 0.24);
+$glass-dark-border: rgba(255, 255, 255, 0.14); // soft white edge, not hyper-real
+$glass-dark-border-hover: rgba(255, 255, 255, 0.24);
 $glass-highlight: rgba(255, 255, 255, 0.4); // inner top edge
 $glass-tint: rgba(20, 16, 12, 0.18); // warm dark tint so white text stays legible
 
-// Navbar over light sections (frosted white glass)
-$glass-navbar-light-bg: rgba(255, 255, 255, 0.72);
-$glass-navbar-light-border: rgba(20, 20, 20, 0.08);
+// Glass on light surfaces (buttons over white sections)
+$glass-on-light-bg: rgba(20, 20, 20, 0.04);
+$glass-on-light-bg-hover: rgba(20, 20, 20, 0.08);
+$glass-on-light-border: rgba(20, 20, 20, 0.14);
+
+// Navbar after the hero: solid white, black content and a mid-grey divider
+// (same as contact/footer) so it reads apart from the white sections below.
+// Opaque on purpose, so it stays sober even when what's behind dims.
+$navbar-light-bg: $color-surface-light;
+$navbar-light-border: $color-border-light;
+$navbar-light-text: $color-ink;
 
 // Overlays
 $overlay-hero-vignette: rgba(0, 0, 0, 0.55);
 $overlay-hero-top: rgba(0, 0, 0, 0.4);
 $overlay-hero-bottom: rgba(0, 0, 0, 0.55);
 $overlay-hero-recede: rgba(10, 8, 6, 0.45); // hero behind the rising statement
+$overlay-statement-recede: rgba(10, 8, 6, 0.22); // statement behind the rising Shorts panel
 $overlay-menu: rgba(12, 12, 12, 0.55);
 
 // Focus

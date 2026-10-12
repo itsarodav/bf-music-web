@@ -1,0 +1,141 @@
+---
+// Home: her latest Shorts, before the contact section. Content comes from the
+// YouTube feed at build time (src/data/shorts.ts); each card opens the video
+// on YouTube. A full-screen panel that rises over the statement (same entrance
+// as the statement over the hero) and fits the screen without scrolling.
+// Mobile: swipeable row with a peek of the next card. Tablet and up: the three
+// cards side by side.
+import ShortCard from '../cards/ShortCard.astro';
+import Button from '../ui/Button.astro';
+import { getLatestShorts, youtubeChannel } from '../../data/shorts';
+import { social } from '../../data/contact';
+
+interface Props {
+  id?: string;
+  title?: string;
+  lead?: string;
+}
+
+const {
+  id = 'videos',
+  title = 'Últimos vídeos',
+  lead = 'Piano, órgano, espineta y mucho jazz en formato corto.',
+} = Astro.props;
+
+const shorts = await getLatestShorts(3);
+
+const newTab = '(se abre en una pestaña nueva)';
+---
+
+{shorts.length > 0 && (
+  <section id={id} class="shorts" data-nav-theme="light" aria-labelledby={`${id}-title`} data-shorts>
+    <div class="shorts__header">
+      <div class="shorts__intro">
+        <h2 id={`${id}-title`} class="shorts__title">{title}</h2>
+        <p class="shorts__lead">{lead}</p>
+      </div>
+
+      {/* One clear action (Instagram) plus the other platforms as quiet logo buttons */}
+      <div class="shorts__follow">
+        <Button href={social.instagram} external variant="secondary" surface="light" icon="instagram">
+          Seguir en Instagram<span class="visually-hidden"> {newTab}</span>
+        </Button>
+        <Button
+          href={youtubeChannel.subscribeUrl}
+          external
+          variant="secondary"
+          surface="light"
+          icon="youtube"
+          ariaLabel={`Suscribirse en YouTube ${newTab}`}
+        />
+        <Button
+          href={social.tiktok}
+          external
+          variant="secondary"
+          surface="light"
+          icon="tiktok"
+          ariaLabel={`Seguir en TikTok ${newTab}`}
+        />
+      </div>
+    </div>
+
+    <div class="shorts__body">
+      <ul class="shorts__track" data-shorts-track>
+        {shorts.map((short, index) => (
+          <li class="shorts__item" data-shorts-item>
+            <ShortCard {...short} eager={index === 0} />
+          </li>
+        ))}
+      </ul>
+
+      {/* Position in the swipeable row (mobile only). Decorative: the list
+          already tells screen readers how many videos there are. */}
+      <div class="shorts__dots" aria-hidden="true" data-shorts-dots>
+        {shorts.map((_, index) => <span class:list={['shorts__dot', index === 0 && 'is-active']} />)}
+      </div>
+    </div>
+  </section>
+)}
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const section = document.querySelector<HTMLElement>('[data-shorts]');
+  const track = section?.querySelector<HTMLElement>('[data-shorts-track]');
+  const items = section ? [...section.querySelectorAll<HTMLElement>('[data-shorts-item]')] : [];
+  const dots = section ? [...section.querySelectorAll<HTMLElement>('[data-shorts-dots] > *')] : [];
+
+  // Dots follow the card that is snapped into view
+  if (track && dots.length) {
+    let frame = 0;
+    track.addEventListener(
+      'scroll',
+      () => {
+        cancelAnimationFrame(frame);
+        frame = requestAnimationFrame(() => {
+          const step = items[1] ? items[1].offsetLeft - items[0].offsetLeft : track.clientWidth;
+          const last = track.scrollLeft + track.clientWidth >= track.scrollWidth - 2;
+          const active = last ? items.length - 1 : Math.round(track.scrollLeft / step);
+          dots.forEach((dot, index) => dot.classList.toggle('is-active', index === active));
+        });
+      },
+      { passive: true },
+    );
+  }
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (section && track && !reducedMotion) {
+    // 1. Entrance: the panel scrolls up over the statement (kept pinned with
+    //    CSS sticky). The statement recedes like the hero did: the sentence
+    //    sinks back and fades, the panel dims, and this one lands flat.
+    const statement = document.querySelector<HTMLElement>('[data-statement]');
+    gsap
+      .timeline({
+        defaults: { ease: 'none' },
+        scrollTrigger: { trigger: section, start: 'top bottom', end: 'top top', scrub: 0.4 },
+      })
+      .fromTo(
+        section,
+        { borderRadius: '2rem 2rem 0 0' },
+        { borderRadius: '0rem 0rem 0 0', boxShadow: '0 -24px 64px -40px rgba(0, 0, 0, 0)' },
+        0,
+      )
+      .to(statement?.querySelector('[data-statement-text]') ?? [], { scale: 0.94, yPercent: -8, opacity: 0.2 }, 0)
+      .to(statement?.querySelector('[data-statement-shade]') ?? [], { opacity: 1 }, 0);
+
+    // 2. Cards rise in one after another as the panel arrives
+    gsap.from(items, {
+      y: 32,
+      opacity: 0,
+      duration: 0.9,
+      ease: 'power3.out',
+      stagger: 0.12,
+      clearProps: 'transform,opacity',
+      scrollTrigger: { trigger: section, start: 'top 45%', once: true },
+    });
+  }
+</script>

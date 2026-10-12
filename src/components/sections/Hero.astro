@@ -91,7 +91,13 @@ const [portraitAvif, portraitWebp, landscapeAvif, landscapeWebp, fallback] = awa
     gsap
       .timeline({ defaults: { ease: 'power3.out' } })
       .fromTo('[data-hero-media]', { scale: 1.06 }, { scale: 1, duration: 2.4, ease: 'power2.out' }, 0)
-      .fromTo('[data-reveal="navbar"]', { autoAlpha: 0, y: -12 }, { autoAlpha: 1, y: 0, duration: 0.8 }, 0.2)
+      // clearProps: no leftover transform on the fixed bar once it has landed
+      .fromTo(
+        '[data-reveal="navbar"]',
+        { autoAlpha: 0, y: -12 },
+        { autoAlpha: 1, y: 0, duration: 0.8, clearProps: 'transform' },
+        0.2,
+      )
       .fromTo(
         '[data-reveal="title"]',
         { autoAlpha: 0, y: 48 },
