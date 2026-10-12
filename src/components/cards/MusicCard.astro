@@ -15,16 +15,19 @@ interface Props {
   cover: ImageMetadata;
   coverAlt: string;
   text: string;
+  /** Shorter copy for phones (below 480px), where the full text crowds the card */
+  textShort?: string;
   actions: MusicCardAction[];
   /**
-   * responsive: horizontal on mobile, vertical on tablet, horizontal from desktop (hero design)
+   * responsive: compact on phones (cover + text, buttons below), horizontal from
+   *   480px, vertical on tablet, horizontal from desktop (hero design)
    * horizontal / vertical: fixed at every breakpoint
    */
   layout?: 'responsive' | 'horizontal' | 'vertical';
   class?: string;
 }
 
-const { cover, coverAlt, text, actions, layout = 'responsive', class: className } = Astro.props;
+const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class: className } = Astro.props;
 ---
 
 <article class:list={['music-card', `music-card--${layout}`, className]}>
@@ -33,13 +36,20 @@ const { cover, coverAlt, text, actions, layout = 'responsive', class: className 
       src={cover}
       alt={coverAlt}
       widths={[120, 240, 360]}
-      sizes="(min-width: 768px) 120px, 112px"
+      sizes="(min-width: 768px) 120px, (min-width: 480px) 112px, 72px"
       loading="eager"
     />
   </div>
 
   <div class="music-card__content">
-    <p class="music-card__text">{text}</p>
+    {textShort ? (
+      <p class="music-card__text">
+        <span class="music-card__text-short">{textShort}</span>
+        <span class="music-card__text-full">{text}</span>
+      </p>
+    ) : (
+      <p class="music-card__text">{text}</p>
+    )}
 
     {actions.length > 0 && (
       <div class="music-card__actions">
@@ -48,7 +58,7 @@ const { cover, coverAlt, text, actions, layout = 'responsive', class: className 
             href={action.href}
             external
             variant={action.variant ?? 'primary'}
-            size={{ base: 'sm', mobile: 'md', tablet: 'sm' }}
+            size={{ base: 'md', tablet: 'sm' }}
             icon={action.icon ? { name: action.icon, color: action.iconColor } : undefined}
           >
             {action.label}
@@ -80,6 +90,8 @@ const { cover, coverAlt, text, actions, layout = 'responsive', class: className 
 
   .music-card__cover {
     flex-shrink: 0;
+    // Always 1:1: never stretch to the content's height
+    align-self: flex-start;
     width: 5.25rem; // 84px on small phones
     aspect-ratio: 1;
     border-radius: $radius-md;
@@ -127,6 +139,22 @@ const { cover, coverAlt, text, actions, layout = 'responsive', class: className 
     gap: $space-1;
   }
 
+  // Short copy on phones, full copy from 480px (only one is ever rendered,
+  // so screen readers read one)
+  .music-card__text-full {
+    display: none;
+  }
+
+  @include mobile {
+    .music-card__text-short {
+      display: none;
+    }
+
+    .music-card__text-full {
+      display: inline;
+    }
+  }
+
   // ---------- Layouts ----------
   // Horizontal: content stretches to the cover height so space-between works
   .music-card--horizontal {
@@ -138,9 +166,64 @@ const { cover, coverAlt, text, actions, layout = 'responsive', class: className 
     flex-direction: column;
   }
 
+  // Phones (below 480px): cover and text side by side, buttons below sharing
+  // the full width. The content wrapper steps aside (display: contents) so
+  // text and buttons join the card's grid.
   .music-card--responsive {
-    flex-direction: row;
-    align-items: stretch;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: $space-2 $space-1-5;
+
+    // Only below 480px: from there the base cover sizes apply
+    @media (max-width: ($bp-mobile - 0.02px)) {
+      .music-card__cover {
+        width: 4.5rem; // 72px
+      }
+    }
+
+    .music-card__content {
+      display: contents;
+    }
+
+    .music-card__text {
+      font-size: $text-sm;
+    }
+
+    .music-card__actions {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-auto-columns: minmax(0, 1fr);
+      grid-auto-flow: column;
+      gap: $space-1;
+
+      :global(.btn) {
+        width: 100%;
+      }
+    }
+
+    @include mobile {
+      display: flex;
+      flex-direction: row;
+      align-items: stretch;
+      gap: $space-2;
+
+      .music-card__content {
+        display: flex;
+      }
+
+      .music-card__text {
+        font-size: $text-base;
+      }
+
+      .music-card__actions {
+        display: flex;
+
+        :global(.btn) {
+          width: auto;
+        }
+      }
+    }
 
     @include tablet {
       flex-direction: column;

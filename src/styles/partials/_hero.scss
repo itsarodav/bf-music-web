@@ -59,6 +59,13 @@
     @media (min-aspect-ratio: 1/1) {
       transform-origin: 50% 85%;
     }
+
+    // Phones: closer still, with a lower origin so she rises further
+    // above the name and the card
+    @include below-tablet {
+      transform: scale(1.25);
+      transform-origin: 50% 92%;
+    }
   }
 
   // Depth overlay, three layers (top to bottom of the stack):
@@ -68,7 +75,7 @@
   // The vignette center follows where the face lands at each breakpoint.
   &::after {
     --vignette-x: 42%;
-    --vignette-y: 38%;
+    --vignette-y: 32%;
 
     content: '';
     position: absolute;

@@ -38,8 +38,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  // Large viewport: on phones the browser bar hides while scrolling and the
+  // screen grows; 100svh would leave a strip at the bottom showing the black
+  // page background behind the pinned panel
   min-height: 100vh;
-  min-height: 100svh;
+  min-height: 100lvh;
   padding: calc(#{$navbar-height-mobile} + #{$space-4}) $space-6;
   color: $color-graphite;
   background-color: $color-surface-light;
