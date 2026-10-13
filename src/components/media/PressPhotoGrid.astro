@@ -1,0 +1,94 @@
+---
+// Press photos in an even grid: every preview square and the same size
+// (2 columns on phones, 3 from tablet), so the set reads in tidy rows. The
+// preview is only a crop (`position` keeps the subject in frame): the
+// download is the full photo. Under each one, a download button with the
+// format and weight. No credit on the web: it's in the files' metadata.
+import { Image } from 'astro:assets';
+import DownloadButton from '../ui/DownloadButton.astro';
+import { breakpoints } from '../../data/breakpoints';
+import type { ResolvedDownload } from '../../data/downloads';
+
+export interface PressPhoto {
+  image: ImageMetadata;
+  alt: string;
+  download: ResolvedDownload;
+  /** object-position of the square crop, e.g. '75% 50%' */
+  position?: string;
+}
+
+interface Props {
+  items: PressPhoto[];
+}
+
+const { items } = Astro.props;
+---
+
+<ul class="photo-grid">
+  {items.map((item) => (
+    <li>
+      <figure class="photo-grid__figure">
+        <div class="photo-grid__media">
+          <Image
+            src={item.image}
+            alt={item.alt}
+            widths={[240, 360, 480, 640]}
+            sizes={`(min-width: ${breakpoints.tablet}px) 220px, 45vw`}
+            style={item.position ? `object-position: ${item.position}` : undefined}
+          />
+        </div>
+        <DownloadButton download={item.download} label={item.download.format} size="sm" showSize fullWidth />
+      </figure>
+    </li>
+  ))}
+</ul>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+  @use '../../styles/base/mixins' as *;
+
+  $hover-scale: 1.03;
+
+  .photo-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: $space-3 $space-1-5;
+    list-style: none;
+
+    @include tablet {
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: $space-4 $space-2;
+    }
+  }
+
+  .photo-grid__figure {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+  }
+
+  .photo-grid__media {
+    aspect-ratio: 1;
+    border-radius: $radius-lg;
+    overflow: hidden;
+    background-color: $color-placeholder-on-light; // while the image loads
+    isolation: isolate;
+
+    :global(img) {
+      @include transition(scale);
+
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition-duration: $duration-slower;
+    }
+  }
+
+  @media (hover: hover) {
+    .photo-grid__figure:hover .photo-grid__media :global(img) {
+      scale: $hover-scale;
+    }
+  }
+</style>

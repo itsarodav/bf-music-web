@@ -11,6 +11,7 @@
 import { Image } from 'astro:assets';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
+import Tag from '../ui/Tag.astro';
 import { a11y } from '../../data/site';
 import { breakpoints } from '../../data/breakpoints';
 import type { Release } from '../../data/releases';
@@ -52,8 +53,8 @@ const year = releaseDate.slice(0, 4);
     <div class="release-card__info">
       <h2 id={titleId} class="release-card__title">{title}</h2>
       <p class="release-card__meta">
-        <span class="release-card__tag">{type}</span>
-        <time class="release-card__tag" datetime={releaseDate}>{year}</time>
+        <Tag>{type}</Tag>
+        <Tag as="time" datetime={releaseDate}>{year}</Tag>
       </p>
     </div>
 
@@ -119,6 +120,9 @@ const year = releaseDate.slice(0, 4);
   $cover-size-phone: clamp(5rem, 24vw, 6rem); // 80px → 96px
   $cover-size-tablet: 8.5rem; // 136px
   $track-number-width: 1.5rem;
+  // Height of the title's first line: number and duration sit on it, so
+  // they stay level with the title when a guest line follows
+  $track-line-height: $text-base * $leading-snug;
 
   // The card has no padding of its own: header and tracklist each pad
   // themselves, so the divider between them runs edge to edge.
@@ -200,17 +204,6 @@ const year = releaseDate.slice(0, 4);
     min-width: 0;
   }
 
-  // Small outlined tags: type (Álbum, Single) and year
-  .release-card__tag {
-    padding-inline: $space-1;
-    border: 1px solid $glass-on-light-border;
-    border-radius: $radius-pill;
-    font-size: $text-xs;
-    font-weight: $font-semibold;
-    line-height: $leading-normal;
-    color: $color-text-on-light-muted;
-  }
-
   .release-card__title {
     font-size: $text-xl;
     font-weight: $font-semibold;
@@ -266,7 +259,7 @@ const year = releaseDate.slice(0, 4);
 
     display: grid;
     grid-template-columns: $track-number-width minmax(0, 1fr) auto;
-    align-items: center;
+    align-items: start;
     gap: $space-1-5;
     padding: $space-1;
     border-radius: $radius-sm;
@@ -290,6 +283,9 @@ const year = releaseDate.slice(0, 4);
     font-size: $text-sm;
     font-variant-numeric: tabular-nums;
     color: $color-text-on-light-muted;
+    display: flex;
+    align-items: center;
+    min-height: $track-line-height;
   }
 
   // Number and Spotify logo share the cell: the logo replaces the number

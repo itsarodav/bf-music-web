@@ -1,14 +1,191 @@
 ---
+// Press kit: the front door for festival programmers and press, not the
+// whole archive (that's the ZIP). Each block fits one screen with one line of
+// text and one action at most, and links to /bio and /musica instead of
+// repeating them. All copy and files live in data/press-kit.
 import Layout from '../layouts/Layout.astro';
 import PageContent from '../components/sections/PageContent.astro';
+import PressKitNav from '../components/navigation/PressKitNav.astro';
+import YouTubeFacade from '../components/media/YouTubeFacade.astro';
+import PressPhotoGrid from '../components/media/PressPhotoGrid.astro';
+import DownloadCard from '../components/cards/DownloadCard.astro';
+import PresentationCard from '../components/cards/PresentationCard.astro';
+import TextCard from '../components/cards/TextCard.astro';
+import Button from '../components/ui/Button.astro';
+import DownloadButton from '../components/ui/DownloadButton.astro';
+import { pressKit, downloads } from '../data/press-kit';
+
+const { watch, bio, photos, brand, live, contact } = pressKit;
+const id = Object.fromEntries(pressKit.sections.map((section) => [section.label, section.id]));
 ---
 
-<Layout title="Press kit">
+<Layout title="Press kit" description={pressKit.description}>
   <PageContent title="Press kit">
-    <p>
-      Todo lo necesario para <em>prensa, festivales y programadores</em> en un solo lugar: biografía, fotografías en alta
-      resolución, logotipos y necesidades técnicas, listos para descargar y usar en publicaciones, carteles o
-      programas de mano.
-    </p>
+    <!-- Header: one-liner + the one main action -->
+    <TextCard label="Presentación" copyLabel="Copiar presentación" text={pressKit.oneLiner} textId="press-one-liner" lead>
+      <div slot="footer" class="press-header__actions">
+        <DownloadButton download={downloads.zip} variant="primary" size="sm" class="press-header__zip" />
+        <DownloadButton download={downloads.dossier} label="Dossier PDF" size="sm" />
+        <DownloadButton download={downloads.pressRelease} size="sm" />
+      </div>
+    </TextCard>
+
+    <PressKitNav sections={pressKit.sections} zip={downloads.zip} />
+
+    <!-- 1. Watch and listen -->
+    <section id={id['Ver y escuchar']} class="page__section press-section" aria-labelledby="press-watch-title">
+      <div class="press-section__header">
+        <h2 id="press-watch-title" class="page__subtitle">{watch.title}</h2>
+        <Button href={watch.listen.href} external variant="secondary" surface="light" size="sm" icon={{ name: 'spotify', brand: true }}>
+          <span class="press-label--short">{watch.listen.short}</span>
+          <span class="press-label--full">{watch.listen.label}</span>
+        </Button>
+      </div>
+      <YouTubeFacade {...watch.video} />
+    </section>
+
+    <!-- 2. Short bio -->
+    <section id={id['Sobre Blanca']} class="page__section press-section" aria-labelledby="press-bio-title">
+      <h2 id="press-bio-title" class="page__subtitle">{bio.title}</h2>
+      <TextCard label="Bio corta" copyLabel="Copiar bio" text={bio.short} textId="press-bio-text">
+        <Button slot="footer" href={bio.full.href} variant="secondary" surface="light" size="sm" icon="arrow-right" iconPosition="end">
+          {bio.full.label}
+        </Button>
+      </TextCard>
+    </section>
+
+    <!-- 3. Press photos -->
+    <section id={id['Fotos']} class="page__section press-section" aria-labelledby="press-photos-title">
+      <div class="press-section__header">
+        <h2 id="press-photos-title" class="page__subtitle">{photos.title}</h2>
+        <DownloadButton download={photos.downloadAll} label="Descargar todas" size="sm" />
+      </div>
+      <PressPhotoGrid items={photos.items} />
+    </section>
+
+    <!-- 4. Brand: no visible title (brief), named for the sub-nav and screen readers -->
+    <section id={id['Marca']} class="page__section press-section" aria-labelledby="press-brand-title">
+      <h2 id="press-brand-title" class="visually-hidden">{brand.title}</h2>
+      <ul class="press-brand">
+        {brand.items.map((item) => (
+          <li>
+            <DownloadCard {...item} />
+          </li>
+        ))}
+      </ul>
+    </section>
+
+    <!-- 5. Live -->
+    <section id={id['En directo']} class="page__section press-section" aria-labelledby="press-live-title">
+      <h2 id="press-live-title" class="page__subtitle">{live.title}</h2>
+      <p class="page__text">{live.text}</p>
+      <div class="press-live__actions">
+        <DownloadButton download={downloads.rider} label="Rider técnico (PDF)" />
+        <Button href={live.repertoire.href} variant="tertiary" surface="light" icon="arrow-right" iconPosition="end">
+          {live.repertoire.label}
+        </Button>
+      </div>
+      <!-- Booking contact, right where a programmer decides to book -->
+      <PresentationCard status={contact.status} ticker={contact.ticker} />
+    </section>
   </PageContent>
 </Layout>
+
+<style lang="scss">
+  @use '../styles/tokens' as *;
+  @use '../styles/base/breakpoints' as *;
+
+  // Anchored sections land below the navbar + sub-nav (offset set by PressKitNav)
+  .press-section {
+    scroll-margin-top: calc(var(--press-anchor-offset, #{$space-14}) + #{$space-2});
+  }
+
+  // Section title with its action on the right; on narrow phones the action
+  // drops under the title when they don't fit side by side
+  .press-section__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-1 $space-2;
+  }
+
+  // Short button labels on phones, so the button fits next to its title
+  // (only one is ever displayed, so screen readers read one)
+  .press-label--full {
+    display: none;
+  }
+
+  @include mobile {
+    .press-label--short {
+      display: none;
+    }
+
+    .press-label--full {
+      display: inline;
+    }
+  }
+
+  // ---------- Header ----------
+  // Phones: the ZIP button takes its own row, the other two share the next
+  .press-header__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-1-5 $space-1;
+    width: 100%;
+
+    > :global(.btn) {
+      flex: 1 1 auto;
+    }
+
+    > :global(.press-header__zip) {
+      flex-basis: 100%;
+    }
+
+    @include mobile {
+      gap: $space-1;
+
+      > :global(.btn),
+      > :global(.press-header__zip) {
+        flex: 0 0 auto;
+      }
+    }
+  }
+
+  // ---------- Brand ----------
+  .press-brand {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: $space-2;
+    list-style: none;
+
+    // 2 × 2 from 480px
+    @include mobile {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  // ---------- Live ----------
+  .press-live__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-1 $space-2;
+  }
+
+  // Short button labels on phones, so the button fits next to its title
+  // (only one is ever displayed, so screen readers read one)
+  .press-label--full {
+    display: none;
+  }
+
+  @include mobile {
+    .press-label--short {
+      display: none;
+    }
+
+    .press-label--full {
+      display: inline;
+    }
+  }
+</style>

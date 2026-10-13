@@ -13,7 +13,9 @@ $navbar-logo-raise: $space-0-5;
 $navbar-toggle-size: 2.75rem; // 44px, minimum touch target
 $navbar-toggle-line-width: 1.25rem;
 $navbar-toggle-line-thickness: 2px;
-$navbar-toggle-line-gap: 5px;
+// Line pitch (thickness + gap) = 8px: whole device pixels at 1x, 1.25x,
+// 1.5x, 1.75x and 2x, so the three lines always render identical
+$navbar-toggle-line-gap: 6px;
 // Outer lines travel to the middle one to form the X
 $navbar-toggle-line-shift: $navbar-toggle-line-gap + $navbar-toggle-line-thickness;
 

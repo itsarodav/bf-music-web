@@ -44,7 +44,7 @@ const sokalAffair: Release = {
       title: 'Hey, Pippi Langstrumpf!',
       durationMs: 266736,
       spotify: 'https://open.spotify.com/track/4pFTUBWr9vpI9m5x7ww4OX',
-      featuring: ['Miquel Álvarez', 'Quique Ramirez', 'Latino Blanco'],
+      featuring: ['Latino Blanco'],
     },
     { title: 'Covert Operations', durationMs: 140298, spotify: 'https://open.spotify.com/track/6gaAac4xdkDsVHmZCZwaNy' },
   ],
@@ -71,7 +71,6 @@ export const featuredRelease = {
   cover: sokalAffair.cover,
   coverAlt: "Portada del álbum 'Sokal Affair' de Blanca Ferrer",
   text: "Escucha 'Sokal Affair', el álbum debut. ¡Ya disponible en todas las plataformas!",
-  textShort: "Escucha 'Sokal Affair', el álbum debut. ¡Ya disponible!",
   links: {
     spotify: sokalAffair.links.spotify,
     youtube: 'https://www.youtube.com/watch?v=60sEKpCR2T8',

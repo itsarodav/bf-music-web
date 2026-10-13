@@ -1,0 +1,149 @@
+---
+// Brand asset to download. Every asset sits on its own backdrop in the same
+// frame (light, dark, or the cover as a square thumbnail), so the cards
+// read as one set. Below: the name, its variant, and one button per format
+// with the weight inside ("SVG 10 KB"), so it's clear what comes down.
+import { Image } from 'astro:assets';
+import DownloadButton from '../ui/DownloadButton.astro';
+import type { ResolvedDownload } from '../../data/downloads';
+
+type Preview =
+  /** A logo file from /public. fit: 'wide' for the full logo, 'square' for the isotype */
+  | { src: string; tone: 'light' | 'dark'; fit: 'wide' | 'square' }
+  | { image: ImageMetadata; alt: string };
+
+interface Props {
+  title: string;
+  /** "Negro", "Blanco", "Sokal Affair, 3000 px" */
+  variant: string;
+  preview: Preview;
+  files: ResolvedDownload[];
+  class?: string;
+}
+
+const { title, variant, preview, files, class: className } = Astro.props;
+const tone = 'src' in preview ? preview.tone : 'light';
+---
+
+<article class:list={['download-card', className]}>
+  <div class:list={['download-card__preview', `download-card__preview--${tone}`]}>
+    {'src' in preview ? (
+      <img
+        src={preview.src}
+        alt=""
+        class:list={['download-card__logo', `download-card__logo--${preview.fit}`]}
+        loading="lazy"
+        decoding="async"
+      />
+    ) : (
+      <Image src={preview.image} alt={preview.alt} widths={[160, 240, 320]} sizes="160px" class="download-card__cover" />
+    )}
+  </div>
+
+  <div class="download-card__body">
+    <h3 class="download-card__title">
+      {title}
+      <span class="download-card__variant">{variant}</span>
+    </h3>
+
+    <div class="download-card__files">
+      {files.map((file) => (
+        <DownloadButton download={file} size="sm" showSize />
+      ))}
+    </div>
+  </div>
+</article>
+
+<style lang="scss">
+  @use 'sass:list';
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+
+  // Component tokens
+  $preview-ratio: list.slash(3, 2);
+  $logo-wide-width: 72%;
+  // Square assets are sized by width (a height in % has nothing to resolve
+  // against here): in a 3:2 frame, 34% wide = about half the height
+  $logo-square-width: 34%;
+  $cover-width: 44%;
+
+  // Fills its grid cell, so cards in a row share their height
+  .download-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    border: 1px solid $glass-on-light-border;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    background-color: $color-surface-light;
+    color: $color-text-on-light;
+  }
+
+  // ---------- Preview ----------
+  .download-card__preview {
+    display: grid;
+    place-items: center;
+    aspect-ratio: $preview-ratio;
+    border-bottom: 1px solid $glass-on-light-border;
+  }
+
+  .download-card__preview--light {
+    background-color: $glass-on-light-bg;
+  }
+
+  .download-card__preview--dark {
+    background-color: $color-ink;
+  }
+
+  .download-card__logo {
+    display: block;
+  }
+
+  .download-card__logo--wide {
+    width: $logo-wide-width;
+    height: auto;
+  }
+
+  .download-card__logo--square {
+    width: $logo-square-width;
+    height: auto;
+  }
+
+  .download-card__preview :global(.download-card__cover) {
+    display: block;
+    width: $cover-width;
+    height: auto;
+    aspect-ratio: 1;
+    border-radius: $radius-sm;
+    object-fit: cover;
+  }
+
+  // ---------- Body ----------
+  .download-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1-5;
+    padding: $space-2;
+  }
+
+  .download-card__title {
+    display: flex;
+    flex-direction: column;
+    gap: $space-0-5;
+    font-size: $text-base;
+    font-weight: $font-semibold;
+    line-height: $leading-tight;
+  }
+
+  .download-card__variant {
+    font-size: $text-sm;
+    font-weight: $font-regular;
+    color: $color-text-on-light-muted;
+  }
+
+  .download-card__files {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-1;
+  }
+</style>

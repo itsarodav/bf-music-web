@@ -1,0 +1,348 @@
+---
+// Booking contact card with Lemonims' touches (from the linkims home): a
+// white card like the rest of the page, the lime logo on a Lemonims blue
+// tile and the lime ticker. Kept compact so it doesn't outshine the press kit: logo, booking contact and a
+// "live" status pill on top; email, phone and Lemonims' profiles (icon
+// buttons) in one row below; a thin lime ticker along the bottom.
+// Ticker and pulse stand still with reduced motion.
+import Icon from '../ui/Icon.astro';
+import Tag from '../ui/Tag.astro';
+import { booking, lemonimsSocial } from '../../data/contact';
+import { a11y } from '../../data/site';
+
+interface Props {
+  /** "Booking abierto" */
+  status: string;
+  /** Lemonims' tagline, repeated in the ticker */
+  ticker: string;
+  class?: string;
+}
+
+const { status, ticker, class: className } = Astro.props;
+
+const contactLinks = [
+  { label: 'Email', value: booking.email, href: `mailto:${booking.email}`, icon: 'email' },
+  { label: 'Teléfono', value: booking.phone, href: `tel:${booking.phone.replace(/\s/g, '')}`, icon: 'phone' },
+];
+
+// Enough copies to cover the widest card; the track is two identical
+// halves so the loop has no seam
+const TICKER_COPIES = 4;
+---
+
+<article class:list={['presentation-card', className]} aria-label={`Contacto de booking: ${booking.name}, ${booking.agency}`}>
+  <div class="presentation-card__body">
+    <header class="presentation-card__header">
+      <span class="presentation-card__logo" aria-hidden="true">
+        <Icon name="lemonims" size={28} />
+      </span>
+      <div class="presentation-card__person">
+        <h3 class="presentation-card__name">{booking.name}</h3>
+        <ul class="presentation-card__tags">
+          <Tag as="li">{booking.role}</Tag>
+          <Tag as="li">{booking.agency}</Tag>
+        </ul>
+      </div>
+      <span class="presentation-card__status">
+        <span class="presentation-card__dot" aria-hidden="true"></span>
+        {status}
+      </span>
+    </header>
+
+    <div class="presentation-card__footer">
+      <ul class="presentation-card__contact">
+        {contactLinks.map((link) => (
+          <li>
+            <a href={link.href} class="presentation-card__contact-link">
+              <Icon name={link.icon} size={18} />
+              <span class="visually-hidden">{link.label}: </span>
+              {link.value}
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <ul class="presentation-card__social" aria-label={`${booking.agency} en redes`}>
+        {lemonimsSocial.map((link) => (
+          <li>
+            <a
+              href={link.href}
+              class="presentation-card__social-link"
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={`${booking.agency} en ${link.label} ${a11y.newTab}`}
+            >
+              <Icon name={link.icon} size={18} />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <div class="presentation-card__ticker" aria-hidden="true">
+    <div class="presentation-card__ticker-track">
+      {Array.from({ length: TICKER_COPIES * 2 }, () => (
+        <span class="presentation-card__ticker-item">
+          {ticker}
+          <Icon name="lightning" size={14} />
+        </span>
+      ))}
+    </div>
+  </div>
+</article>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+  @use '../../styles/base/mixins' as *;
+
+  // Component tokens
+  $dot-size: 0.375rem;
+  $pulse-scale: 2.4;
+  $pulse-opacity: 0.8;
+  $pulse-duration: 1.8s;
+  $ticker-duration: 28s; // one full loop: slow enough to read
+  $social-size: 2.25rem; // icon buttons, same height as a sm button
+  $logo-tile-size: 3rem; // 48px, the mark (28px) sits centered inside
+  // The mark leans left (its weight is on the kicking leg): nudged right so
+  // it reads centered
+  $logo-optical-shift: 0.125rem;
+
+  .presentation-card {
+    display: flex;
+    flex-direction: column;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    border: 1px solid $glass-on-light-border;
+    background-color: $color-surface-light;
+    color: $color-text-on-light;
+  }
+
+  // No padding of its own: header and footer pad themselves, so the
+  // divider between them runs edge to edge.
+  // --presentation-padding-y / -x: inner padding per breakpoint (more room
+  // at the sides on desktop)
+  .presentation-card__body {
+    --presentation-padding-y: #{$space-2};
+    --presentation-padding-x: #{$space-2};
+
+    display: flex;
+    flex-direction: column;
+
+    @include tablet {
+      --presentation-padding-y: #{$space-2-5};
+      --presentation-padding-x: #{$space-2-5};
+    }
+
+    @include desktop {
+      --presentation-padding-x: #{$space-3};
+    }
+  }
+
+  // ---------- Header: logo + person + status ----------
+  // Phones: status drops under the person; from 480px it sits top right
+  // Phones: a stacked profile (logo and status on top, the person below).
+  // From tablet: one row, logo, person, status top right.
+  .presentation-card__header {
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      'logo status'
+      'person person';
+    justify-content: space-between;
+    align-items: center;
+    gap: $space-2 $space-1-5;
+    padding: var(--presentation-padding-y) var(--presentation-padding-x);
+
+    @include tablet {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      grid-template-areas: 'logo person status';
+      justify-content: stretch;
+      align-items: start;
+    }
+  }
+
+  // Blue tile with the lime mark in the middle
+  .presentation-card__logo {
+    grid-area: logo;
+    align-self: start;
+    display: grid;
+    place-items: center;
+    width: $logo-tile-size;
+    aspect-ratio: 1;
+    border-radius: $radius-md;
+    background-color: $color-lemonims-blue;
+    color: $color-lemonims-lime;
+
+    :global(svg) {
+      translate: $logo-optical-shift 0;
+    }
+  }
+
+  .presentation-card__person {
+    grid-area: person;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    min-width: 0;
+  }
+
+  .presentation-card__name {
+    font-size: $text-xl;
+    font-weight: $font-semibold;
+    line-height: $leading-tight;
+  }
+
+  .presentation-card__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-0-5;
+    list-style: none;
+  }
+
+  .presentation-card__status {
+    grid-area: status;
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: $space-0-75;
+    padding: $space-0-5 $space-1;
+    border: 1px solid $glass-on-light-border;
+    border-radius: $radius-pill;
+    font-size: $text-xs;
+    font-weight: $font-medium;
+    white-space: nowrap;
+  }
+
+  // Lime dot with a ring that keeps expanding and fading, like an "on air" light
+  .presentation-card__dot {
+    position: relative;
+    width: $dot-size;
+    aspect-ratio: 1;
+    border-radius: $radius-pill;
+    background-color: $color-lemonims-lime;
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background-color: inherit;
+      animation: presentation-pulse $pulse-duration $ease-out infinite;
+    }
+  }
+
+  @keyframes presentation-pulse {
+    from {
+      opacity: $pulse-opacity;
+      scale: 1;
+    }
+
+    to {
+      opacity: 0;
+      scale: $pulse-scale;
+    }
+  }
+
+  // ---------- Footer: email + phone, profiles ----------
+  .presentation-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-1-5 $space-2;
+    padding: var(--presentation-padding-y) var(--presentation-padding-x);
+    border-top: 1px solid $glass-on-light-border;
+  }
+
+  .presentation-card__contact {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-1 $space-2-5;
+    list-style: none;
+  }
+
+  .presentation-card__contact-link {
+    @include focus-ring(2px, $color-focus-ring-on-light);
+    @include transition(color);
+
+    display: inline-flex;
+    align-items: center;
+    gap: $space-0-75;
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    color: inherit;
+    text-decoration: none;
+
+    @media (hover: hover) {
+      &:hover {
+        color: $color-lemonims-blue;
+      }
+    }
+  }
+
+  .presentation-card__social {
+    display: flex;
+    gap: $space-0-75;
+    list-style: none;
+  }
+
+  .presentation-card__social-link {
+    @include focus-ring(2px, $color-focus-ring-on-light);
+    @include transition(background-color, border-color, color);
+
+    display: grid;
+    place-items: center;
+    width: $social-size;
+    aspect-ratio: 1;
+    border: 1px solid $glass-on-light-border;
+    border-radius: $radius-pill;
+    color: inherit;
+
+    @media (hover: hover) {
+      &:hover {
+        border-color: $color-border-light;
+        background-color: $glass-on-light-bg-hover;
+      }
+    }
+  }
+
+  // ---------- Ticker ----------
+  .presentation-card__ticker {
+    overflow: hidden;
+    padding-block: $space-0-75;
+    background-color: $color-lemonims-lime;
+    color: $color-lemonims-dark;
+  }
+
+  .presentation-card__ticker-track {
+    display: flex;
+    width: max-content;
+    animation: presentation-ticker $ticker-duration linear infinite;
+  }
+
+  .presentation-card__ticker-item {
+    display: inline-flex;
+    align-items: center;
+    gap: $space-1-5;
+    padding-right: $space-1-5;
+    font-size: $text-xs;
+    font-weight: $font-semibold;
+    white-space: nowrap;
+  }
+
+  // Half the track = one set of copies: the second half takes the first's place
+  @keyframes presentation-ticker {
+    to {
+      translate: -50% 0;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .presentation-card__dot::after,
+    .presentation-card__ticker-track {
+      animation: none;
+    }
+  }
+</style>

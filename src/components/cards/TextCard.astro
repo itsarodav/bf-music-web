@@ -1,0 +1,111 @@
+---
+// Ready-to-use text with its actions (shadcn/Vercel card): a small label
+// with a quiet copy button on top, the text, and a footer bar with
+// the actions (slot "footer"). The footer runs edge to edge: the card has
+// no padding of its own, each part pads itself.
+// Used in the press kit for the one-liner (lead size) and the short bio.
+import CopyButton from '../ui/CopyButton.astro';
+
+interface Props {
+  label: string;
+  /** Accessible name and tooltip of the copy button */
+  copyLabel?: string;
+  text: string;
+  /** id of the text, for the copy button */
+  textId: string;
+  /** Larger text (the one-liner) */
+  lead?: boolean;
+  class?: string;
+}
+
+const { label, copyLabel = `Copiar ${label.toLowerCase()}`, text, textId, lead = false, class: className } = Astro.props;
+const hasFooter = Astro.slots.has('footer');
+---
+
+<div class:list={['text-card', className]}>
+  <div class="text-card__body">
+    <div class="text-card__header">
+      <span class="text-card__label">{label}</span>
+      <CopyButton target={textId} label={copyLabel} />
+    </div>
+    <p id={textId} class:list={['text-card__text', { 'text-card__text--lead': lead }]}>{text}</p>
+  </div>
+
+  {hasFooter && (
+    <div class="text-card__footer">
+      <slot name="footer" />
+    </div>
+  )}
+</div>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+
+  // --text-card-padding: inner padding per breakpoint
+  .text-card {
+    --text-card-padding: #{$space-2};
+
+    border: 1px solid $glass-on-light-border;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    background-color: $color-surface-light;
+    color: $color-text-on-light;
+
+    @include tablet {
+      --text-card-padding: #{$space-3};
+
+      border-radius: $radius-2xl;
+    }
+  }
+
+  .text-card__body {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    padding: var(--text-card-padding);
+  }
+
+  // Label left, copy button right (the button's box overhangs a little so
+  // its icon lines up with the text edge)
+  .text-card__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    margin-block: (-$space-0-5);
+    margin-right: (-$space-1);
+  }
+
+  .text-card__label {
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    color: $color-text-on-light-muted;
+  }
+
+  .text-card__text {
+    font-size: $text-base;
+    line-height: $leading-relaxed;
+    text-wrap: pretty;
+  }
+
+  .text-card__text--lead {
+    font-size: $text-lg;
+    font-weight: $font-medium;
+    line-height: $leading-snug;
+
+    @include tablet {
+      font-size: $text-xl;
+    }
+  }
+
+  // Bar for the actions, full width, split off by the divider
+  .text-card__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: $space-1;
+    padding: $space-1-5 var(--text-card-padding);
+    border-top: 1px solid $glass-on-light-border;
+  }
+</style>

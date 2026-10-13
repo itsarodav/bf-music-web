@@ -1,0 +1,30 @@
+---
+// Small outlined chip, transparent: release type and year, file size, live
+// formations, booking role. Never separated by dots: tags sit side by side.
+import type { HTMLAttributes } from 'astro/types';
+
+interface Props extends HTMLAttributes<'span'> {
+  as?: 'span' | 'li' | 'time';
+  datetime?: string;
+}
+
+const { as: Tag = 'span', class: className, ...rest } = Astro.props;
+---
+
+<Tag class:list={['tag', className]} {...rest}><slot /></Tag>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+
+  .tag {
+    display: inline-block;
+    padding-inline: $space-1;
+    border: 1px solid $glass-on-light-border;
+    border-radius: $radius-pill;
+    font-size: $text-xs;
+    font-weight: $font-semibold;
+    line-height: $leading-normal;
+    color: $color-text-on-light-muted;
+    white-space: nowrap;
+  }
+</style>

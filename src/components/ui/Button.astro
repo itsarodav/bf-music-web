@@ -218,6 +218,22 @@ const linkProps = href
   .btn--on-light {
     @include focus-ring($color: $color-focus-ring-on-light);
 
+    // Solid ink pill: the one main action of a light page (press kit ZIP)
+    &.btn--primary {
+      background: $color-ink;
+      border-color: $color-ink;
+      box-shadow: $shadow-button;
+      color: $color-text-on-dark;
+
+      @media (hover: hover) {
+        &:hover {
+          background: $color-graphite;
+          border-color: $color-graphite;
+          box-shadow: $shadow-button;
+        }
+      }
+    }
+
     // Solid white pill with the soft ink outline
     &.btn--secondary {
       background: $color-surface-light;

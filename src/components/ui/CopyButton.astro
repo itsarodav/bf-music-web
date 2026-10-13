@@ -1,0 +1,114 @@
+---
+// Small icon button that copies another element's text (`target`: its id)
+// to the clipboard, e.g. the one-liner or the short bio for a festival
+// programme. Quiet on purpose (shadcn style): a ghost square with the copy
+// icon that turns into a check for a moment; screen readers hear the label
+// and the confirmation. Hidden until the script knows the clipboard works,
+// so it never shows a dead button.
+import Icon from './Icon.astro';
+
+interface Props {
+  target: string;
+  /** Accessible name and tooltip */
+  label?: string;
+  class?: string;
+}
+
+const { target, label = 'Copiar texto', class: className } = Astro.props;
+---
+
+<span class:list={['copy-button', className]} data-copy-button hidden>
+  <button type="button" class="copy-button__button" aria-label={label} title={label} data-copy-target={target}>
+    <Icon name="copy" size={16} class="copy-button__icon copy-button__icon--copy" />
+    <Icon name="check" size={16} class="copy-button__icon copy-button__icon--check" />
+  </button>
+  <span class="visually-hidden" aria-live="polite" data-copy-status></span>
+</span>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/mixins' as *;
+
+  $size: 2rem; // 32px
+
+  .copy-button {
+    display: inline-flex;
+  }
+
+  .copy-button__button {
+    @include focus-ring(2px, $color-focus-ring-on-light);
+    @include transition(background-color, border-color, color);
+
+    display: grid;
+    place-items: center;
+    width: $size;
+    aspect-ratio: 1;
+    border: 1px solid transparent;
+    border-radius: $radius-sm;
+    background: none;
+    color: $color-text-on-light-muted;
+    cursor: pointer;
+
+    @media (hover: hover) {
+      &:hover {
+        border-color: $glass-on-light-border;
+        background-color: $color-surface-light;
+        color: $color-text-on-light;
+      }
+    }
+
+    // Both icons share the cell; the check replaces the copy icon once copied
+    > :global(.copy-button__icon) {
+      grid-area: 1 / 1;
+    }
+
+    > :global(.copy-button__icon--check) {
+      visibility: hidden;
+    }
+
+    &.is-copied {
+      color: $color-text-on-light;
+
+      > :global(.copy-button__icon--copy) {
+        visibility: hidden;
+      }
+
+      > :global(.copy-button__icon--check) {
+        visibility: visible;
+      }
+    }
+  }
+</style>
+
+<script>
+  const COPIED_FOR = 1500;
+
+  document.querySelectorAll<HTMLElement>('[data-copy-button]').forEach((wrapper) => {
+    if (!navigator.clipboard) return;
+    wrapper.hidden = false;
+
+    const button = wrapper.querySelector<HTMLButtonElement>('[data-copy-target]');
+    const status = wrapper.querySelector<HTMLElement>('[data-copy-status]');
+    if (!button || !status) return;
+
+    let timer: number | undefined;
+
+    button.addEventListener('click', async () => {
+      const source = document.getElementById(button.dataset.copyTarget ?? '');
+      if (!source) return;
+
+      try {
+        await navigator.clipboard.writeText(source.innerText.trim());
+        button.classList.add('is-copied');
+        status.textContent = 'Texto copiado';
+        window.clearTimeout(timer);
+        timer = window.setTimeout(() => {
+          button.classList.remove('is-copied');
+          status.textContent = '';
+        }, COPIED_FOR);
+      } catch {
+        status.textContent = 'No se ha podido copiar el texto';
+      }
+    });
+  });
+</script>

@@ -1,0 +1,132 @@
+---
+// YouTube video behind a "facade": a local poster with a play button. The
+// real player (youtube-nocookie, autoplaying) is only loaded on click, so
+// the page carries no YouTube scripts or cookies until someone asks for it.
+// Without JS the button is a plain link to the video on YouTube.
+import Icon from '../ui/Icon.astro';
+import { a11y } from '../../data/site';
+
+interface Props {
+  youtubeId: string;
+  title: string;
+  poster: string;
+  class?: string;
+}
+
+const { youtubeId, title, poster, class: className } = Astro.props;
+const watchUrl = `https://www.youtube.com/watch?v=${youtubeId}`;
+const embedUrl = `https://www.youtube-nocookie.com/embed/${youtubeId}?autoplay=1&rel=0`;
+---
+
+<div class:list={['youtube-facade', className]} data-youtube-facade data-embed={embedUrl} data-title={title}>
+  <a href={watchUrl} class="youtube-facade__trigger" target="_blank" rel="noopener noreferrer" data-youtube-trigger>
+    <img src={poster} alt="" class="youtube-facade__poster" loading="lazy" decoding="async" />
+    <span class="youtube-facade__play" aria-hidden="true">
+      <Icon name="play" size={28} />
+    </span>
+    <span class="visually-hidden">Reproducir «{title}» <span data-youtube-hint>{a11y.newTab}</span></span>
+  </a>
+</div>
+
+<style lang="scss">
+  @use 'sass:list';
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+  @use '../../styles/base/mixins' as *;
+
+  $ratio: list.slash(16, 9);
+  $play-size: 4rem; // 64px
+  $poster-hover-scale: 1.03;
+  $play-hover-scale: 1.08;
+
+  .youtube-facade {
+    position: relative;
+    aspect-ratio: $ratio;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    background-color: $color-placeholder-on-light;
+    isolation: isolate;
+
+    @include desktop {
+      border-radius: $radius-2xl;
+    }
+
+    :global(iframe) {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+  }
+
+  .youtube-facade__trigger {
+    @include focus-ring(-4px);
+
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    border-radius: inherit;
+    cursor: pointer;
+  }
+
+  .youtube-facade__poster {
+    @include transition(scale);
+
+    position: absolute;
+    inset: 0;
+    z-index: $z-behind;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition-duration: $duration-slower;
+  }
+
+  .youtube-facade__play {
+    @include glass('dark', $blur-md);
+    @include transition(scale, background-color);
+
+    display: grid;
+    place-items: center;
+    width: $play-size;
+    aspect-ratio: 1;
+    border-radius: $radius-pill;
+    color: $color-text-on-dark;
+  }
+
+  @media (hover: hover) {
+    .youtube-facade__trigger:hover {
+      .youtube-facade__poster {
+        scale: $poster-hover-scale;
+      }
+
+      .youtube-facade__play {
+        scale: $play-hover-scale;
+      }
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-youtube-facade]').forEach((facade) => {
+    const trigger = facade.querySelector<HTMLAnchorElement>('[data-youtube-trigger]');
+    if (!trigger) return;
+
+    // With JS it plays right here, so it no longer opens a new tab
+    trigger.removeAttribute('target');
+    facade.querySelector('[data-youtube-hint]')?.remove();
+
+    trigger.addEventListener('click', (event) => {
+      event.preventDefault();
+      const iframe = document.createElement('iframe');
+      iframe.src = facade.dataset.embed ?? '';
+      iframe.title = facade.dataset.title ?? '';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.referrerPolicy = 'strict-origin-when-cross-origin';
+      iframe.allowFullscreen = true;
+      trigger.replaceWith(iframe);
+      iframe.focus();
+    });
+  });
+</script>

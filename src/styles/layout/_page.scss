@@ -4,28 +4,37 @@
 
 $page-min-height: 70vh; // keeps contact + footer below the fold on short pages
 
-// Inner pages (bio, música, film scoring, press kit): light surface, same
-// insets and centered reading column as the legal pages
+// Inner pages (bio, música, film scoring, press kit): light surface. Phones
+// and tablet use the full width on the page gutter (lined up with the
+// navbar); from desktop the content sits on a centered reading column.
 .page {
+  @include page-gutter;
+
   min-height: $page-min-height;
-  padding: calc(#{$navbar-height-mobile} + #{$space-6}) $section-inset-mobile $space-10;
+  padding-block: calc(#{$navbar-height-mobile} + #{$space-6}) $space-10;
   color: $color-text-on-light;
   background-color: $color-surface-light;
 
   @include tablet {
-    padding: $page-offset-top-tablet $section-inset-tablet $space-12;
+    padding-block: $page-offset-top-tablet $space-12;
   }
 }
 
+// Gap between the page title and its content: a touch more on phones and
+// tablet (28px / 36px) than on desktop (32px)
 .page__inner {
   display: flex;
   flex-direction: column;
-  gap: $space-4;
-  max-width: $reading-max-width;
+  gap: $space-3 + $space-0-5;
   margin-inline: auto;
 
   @include tablet {
-    gap: $space-6;
+    gap: $space-4 + $space-0-5;
+  }
+
+  @include desktop {
+    gap: $space-4;
+    max-width: $reading-max-width;
   }
 }
 
@@ -87,12 +96,12 @@ $page-min-height: 70vh; // keeps contact + footer below the fold on short pages
 }
 
 .page__subtitle {
-  font-family: $font-display;
-  font-size: $text-3xl;
-  font-weight: $font-regular;
+  font-size: $text-xl;
+  font-weight: $font-semibold;
   line-height: $leading-tight;
+  letter-spacing: $tracking-tight;
 
   @include tablet {
-    font-size: $text-4xl;
+    font-size: $text-2xl;
   }
 }

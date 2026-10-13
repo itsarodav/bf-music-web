@@ -1,0 +1,76 @@
+---
+// Button for a file in /public. Available: a real download (saved with its
+// clean file name). Not yet: a disabled button (screen readers also hear
+// "Próximamente"), never a broken link. Long labels may wrap on phones.
+import Button from './Button.astro';
+import type { ResolvedDownload } from '../../data/downloads';
+
+type ButtonProps = Parameters<typeof Button>[0];
+
+interface Props {
+  download: ResolvedDownload;
+  /** Visible text; defaults to the download's label */
+  label?: string;
+  variant?: ButtonProps['variant'];
+  size?: ButtonProps['size'];
+  fullWidth?: boolean;
+  /** Show the file weight inside the button, lighter: "SVG 10 KB" */
+  showSize?: boolean;
+  class?: string;
+}
+
+const {
+  download,
+  label = download.label,
+  variant = 'secondary',
+  size = 'md',
+  fullWidth,
+  showSize = false,
+  class: className,
+} = Astro.props;
+---
+
+{download.href ? (
+  <Button
+    href={download.href}
+    variant={variant}
+    size={size}
+    surface="light"
+    icon="download"
+    fullWidth={fullWidth}
+    class={className}
+    attrs={{ download: download.filename }}
+  >
+    {label}
+    {showSize && download.size && <span class="download-button__size">{download.size}</span>}
+  </Button>
+) : (
+  <Button
+    variant={variant}
+    size={size}
+    surface="light"
+    icon="download"
+    disabled
+    fullWidth={fullWidth}
+    class:list={['download-button--soon', className]}
+  >
+    {label}<span class="visually-hidden"> (próximamente)</span>
+  </Button>
+)}
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+
+  .download-button__size {
+    margin-left: $space-0-75;
+    font-weight: $font-regular;
+    color: $color-text-on-light-muted;
+  }
+
+  :global(.btn.download-button--soon) {
+    white-space: normal;
+    text-align: center;
+    line-height: $leading-tight;
+    padding-block: $space-0-75;
+  }
+</style>

@@ -1,0 +1,286 @@
+---
+// Press kit sub-navigation, with an anchor per section (the one in view is
+// highlighted) and the ZIP button at the end, so the full download is always
+// one tap away (on phones the anchors scroll sideways). Two states:
+// - Floating: a rounded bar on the reading column, below the header.
+// - Docked: once scrolled up to the navbar, it morphs (GSAP) into a second
+//   full-width bar right under it, with its own bottom line and the content
+//   on the page gutter, like the navbar. Scrolling back up to the header
+//   morphs it back. With reduced motion the switch is instant.
+import DownloadButton from '../ui/DownloadButton.astro';
+import type { ResolvedDownload } from '../../data/downloads';
+
+interface Props {
+  sections: { id: string; label: string }[];
+  zip: ResolvedDownload;
+}
+
+const { sections, zip } = Astro.props;
+---
+
+<div class="press-nav" data-press-nav>
+  <div class="press-nav__inner">
+    <nav class="press-nav__nav" aria-label="Secciones del press kit">
+      <ul class="press-nav__list" data-press-nav-list>
+        {sections.map((section) => (
+          <li>
+            <a href={`#${section.id}`} class="press-nav__link" data-press-nav-link>
+              {section.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <DownloadButton download={zip} label="ZIP" variant="primary" size="sm" class="press-nav__zip" />
+  </div>
+</div>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+  @use '../../styles/base/mixins' as *;
+
+  $link-height: 2.25rem; // same as the sm button next to it
+  $float-gap: $space-2; // air between the navbar and the floating bar
+
+  .press-nav {
+    // --press-nav-top: navbar height, measured by the script below.
+    // --press-nav-gap: air under the navbar, animated to 0 when docking
+    --press-nav-gap: #{$float-gap};
+
+    position: sticky;
+    top: calc(var(--press-nav-top, #{$navbar-height-mobile}) + var(--press-nav-gap));
+    z-index: $z-base;
+    border: 1px solid $glass-on-light-border;
+    border-radius: $radius-pill;
+    background-color: $color-surface-light;
+  }
+
+  // Links and button are pills too
+  .press-nav__inner {
+    display: flex;
+    align-items: center;
+    gap: $space-1;
+    padding: $space-1 $space-1-5;
+  }
+
+  .press-nav__nav {
+    flex: 1;
+    min-width: 0;
+  }
+
+  // Phones: one row that scrolls sideways, without a visible scrollbar
+  .press-nav__list {
+    display: flex;
+    gap: $space-0-5;
+    overflow-x: auto;
+    scrollbar-width: none;
+    list-style: none;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+
+  .press-nav__link {
+    @include focus-ring(-2px, $color-focus-ring-on-light);
+    @include transition(background-color, border-color, color);
+
+    display: inline-flex;
+    align-items: center;
+    min-height: $link-height;
+    padding-inline: $space-1-5;
+    // Transparent until active, so the outline never shifts the layout
+    border: 1px solid transparent;
+    border-radius: $radius-pill;
+    font-size: $text-sm;
+    font-weight: $font-medium;
+    white-space: nowrap;
+    text-decoration: none;
+    color: $color-text-on-light-muted;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: $glass-on-light-bg-hover;
+        color: $color-text-on-light;
+      }
+    }
+
+    // Outlined, not filled: a filled pill would read as the primary button
+    &.is-active {
+      border-color: $color-border-light;
+      background-color: $color-surface-light;
+      color: $color-text-on-light;
+    }
+  }
+
+  .press-nav__inner :global(.press-nav__zip) {
+    flex-shrink: 0;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+
+  const nav = document.querySelector<HTMLElement>('[data-press-nav]');
+  const navbar = document.querySelector<HTMLElement>('.navbar__bar');
+
+  if (nav) {
+    const root = document.documentElement;
+
+    // Stick right under the navbar (its height changes with the breakpoint
+    // and when it compacts on scroll), and keep anchored sections clear of both
+    const syncOffsets = () => {
+      const navbarHeight = navbar?.offsetHeight ?? 0;
+      nav.style.setProperty('--press-nav-top', `${navbarHeight}px`);
+      root.style.setProperty('--press-anchor-offset', `${navbarHeight + nav.offsetHeight}px`);
+    };
+    syncOffsets();
+    const resize = new ResizeObserver(syncOffsets);
+    if (navbar) resize.observe(navbar);
+    resize.observe(nav);
+
+    // Highlight the section in view
+    const list = nav.querySelector<HTMLElement>('[data-press-nav-list]');
+    const links = [...nav.querySelectorAll<HTMLAnchorElement>('[data-press-nav-link]')];
+    const sections = links
+      .map((link) => document.getElementById(link.hash.slice(1)))
+      .filter((section): section is HTMLElement => section !== null);
+
+    const setActive = (id: string) => {
+      links.forEach((link) => {
+        const active = link.hash === `#${id}`;
+        link.classList.toggle('is-active', active);
+        if (active) {
+          link.setAttribute('aria-current', 'true');
+          // Bring it into view in the sideways list (phones), without
+          // moving the page
+          if (list) {
+            const left = link.offsetLeft - (list.clientWidth - link.offsetWidth) / 2;
+            list.scrollTo({ left, behavior: 'smooth' });
+          }
+        } else {
+          link.removeAttribute('aria-current');
+        }
+      });
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) setActive(entry.target.id);
+        });
+      },
+      // A band across the upper part of the screen: the section crossing it is "current"
+      { rootMargin: '-30% 0px -60% 0px' },
+    );
+    sections.forEach((section) => observer.observe(section));
+
+    // ---------- Floating ↔ docked ----------
+    const inner = nav.querySelector<HTMLElement>('.press-nav__inner');
+    const column = nav.parentElement;
+    const header = nav.previousElementSibling;
+
+    if (inner && column && header) {
+      const DURATION = 0.4;
+      const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const transparent = 'rgba(0, 0, 0, 0)';
+
+      // Floating values, read once from CSS so the way back lands exactly there
+      const navStyle = getComputedStyle(nav);
+      const innerStyle = getComputedStyle(inner);
+      const floatGap = parseFloat(navStyle.top) - (navbar?.offsetHeight ?? 0);
+      const borderColor = navStyle.borderTopColor;
+      const innerPadding = innerStyle.paddingLeft;
+      gsap.set(nav, { '--press-nav-gap': `${floatGap}px` });
+
+      let docked = false;
+
+      // Docked geometry: from the column out to the viewport edges, content on
+      // the navbar gutter. Recomputed on resize.
+      const dockedProps = () => {
+        const { left, right } = column.getBoundingClientRect();
+        const gutter = navbar ? getComputedStyle(navbar).paddingLeft : innerPadding;
+        return {
+          nav: {
+            '--press-nav-gap': '0px',
+            marginLeft: -left,
+            marginRight: -(document.documentElement.clientWidth - right),
+            borderRadius: 0,
+            borderTopColor: transparent,
+            borderLeftColor: transparent,
+            borderRightColor: transparent,
+            // Exact edges: the column can sit on half pixels
+            autoRound: false,
+          },
+          inner: { paddingLeft: gutter, paddingRight: gutter },
+        };
+      };
+
+      const dock = (animate: boolean) => {
+        const props = dockedProps();
+        const duration = animate && !reducedMotion.matches ? DURATION : 0;
+        // Start the corners from a real radius (not the 999px pill) so they
+        // flatten smoothly
+        gsap.set(nav, { borderRadius: nav.offsetHeight / 2 });
+        gsap.to(nav, { ...props.nav, duration, ease: 'power3.out', overwrite: true });
+        gsap.to(inner, { ...props.inner, duration, ease: 'power3.out', overwrite: true });
+      };
+
+      const undock = (animate: boolean) => {
+        const duration = animate && !reducedMotion.matches ? DURATION : 0;
+        gsap.to(nav, {
+          '--press-nav-gap': `${floatGap}px`,
+          marginLeft: 0,
+          marginRight: 0,
+          borderRadius: nav.offsetHeight / 2,
+          borderTopColor: borderColor,
+          borderLeftColor: borderColor,
+          borderRightColor: borderColor,
+          duration,
+          ease: 'power3.out',
+          overwrite: true,
+          // Back to the stylesheet (pill radius included)
+          onComplete: () => gsap.set(nav, { clearProps: 'marginLeft,marginRight,borderRadius,borderTopColor,borderLeftColor,borderRightColor' }),
+        });
+        gsap.to(inner, {
+          paddingLeft: innerPadding,
+          paddingRight: innerPadding,
+          duration,
+          ease: 'power3.out',
+          overwrite: true,
+          onComplete: () => gsap.set(inner, { clearProps: 'paddingLeft,paddingRight' }),
+        });
+      };
+
+      // Docked while the bar's place in the page (right under the header)
+      // has scrolled up to its floating spot under the navbar
+      const update = (animate = true) => {
+        const rowGap = parseFloat(getComputedStyle(column).rowGap) || 0;
+        const naturalTop = header.getBoundingClientRect().bottom + rowGap;
+        const shouldDock = naturalTop <= (navbar?.offsetHeight ?? 0) + floatGap;
+        if (shouldDock === docked) return;
+        docked = shouldDock;
+        nav.toggleAttribute('data-docked', docked);
+        if (docked) dock(animate);
+        else undock(animate);
+      };
+
+      // Cheap check (two rect reads), so straight on scroll: the tweens
+      // themselves only start when the state flips
+      window.addEventListener('scroll', () => update(), { passive: true });
+
+      // Width changes move the column edges: re-place the docked bar at once
+      window.addEventListener('resize', () => {
+        if (!docked) return;
+        const props = dockedProps();
+        gsap.set(nav, props.nav);
+        gsap.set(inner, props.inner);
+      });
+
+      // Landing mid-page (reload, anchor link): take the right state, no animation
+      update(false);
+    }
+  }
+</script>
