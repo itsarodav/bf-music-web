@@ -35,6 +35,10 @@ body.is-menu-open {
   color: $color-youtube;
 }
 
+.icon--brand-apple-music {
+  color: $color-apple-music;
+}
+
 // Skip link: hidden until focused
 .skip-link {
   @include visually-hidden;

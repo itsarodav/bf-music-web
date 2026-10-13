@@ -22,10 +22,13 @@ interface Props {
   href: string;
   video?: LoopVideo;
   narrow?: boolean;
+  /** 3 when the card sits under a section heading (música's "Vídeo musical") */
+  headingLevel?: 2 | 3;
   class?: string;
 }
 
-const { title, href, video, narrow = false, class: className } = Astro.props;
+const { title, href, video, narrow = false, headingLevel = 2, class: className } = Astro.props;
+const Heading = `h${headingLevel}` as const;
 ---
 
 <article class:list={['video-card', { 'video-card--narrow': narrow }, className]}>
@@ -40,7 +43,7 @@ const { title, href, video, narrow = false, class: className } = Astro.props;
   </div>
 
   <div class="video-card__footer">
-    <h2 class="video-card__title">{title}</h2>
+    <Heading class="video-card__title">{title}</Heading>
 
     {/* Full button, and the logo-only one for narrow cards on desktop
         (only one is ever displayed, so screen readers get one link) */}

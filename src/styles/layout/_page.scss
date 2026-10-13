@@ -71,3 +71,28 @@ $page-min-height: 70vh; // keeps contact + footer below the fold on short pages
 .page__text {
   color: $color-text-on-light-muted;
 }
+
+// Sub-section inside a page ("Vídeo musical" in música): its own heading,
+// set apart from the blocks above
+.page__section {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+  margin-top: $space-4;
+
+  @include tablet {
+    gap: $space-3;
+    margin-top: $space-6;
+  }
+}
+
+.page__subtitle {
+  font-family: $font-display;
+  font-size: $text-3xl;
+  font-weight: $font-regular;
+  line-height: $leading-tight;
+
+  @include tablet {
+    font-size: $text-4xl;
+  }
+}

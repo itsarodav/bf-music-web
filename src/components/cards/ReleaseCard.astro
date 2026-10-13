@@ -1,0 +1,335 @@
+---
+// Release (album, EP or single) in the style of the Spotify embed, built
+// in-house: no iframe, no third-party JS or cookies. Cover, title, type and
+// year tags, buttons to the platforms, and the tracklist when there's more than one
+// song. Each track row links straight to that song on Spotify (programmers who
+// only want to hear one track get there in one tap); on hover the number turns
+// into the Spotify logo, like the embed.
+//
+// Phones: cover next to the title, buttons below sharing the full width.
+// From 480px: the buttons move up next to the cover, under the title.
+import { Image } from 'astro:assets';
+import Button from '../ui/Button.astro';
+import Icon from '../ui/Icon.astro';
+import { a11y } from '../../data/site';
+import { breakpoints } from '../../data/breakpoints';
+import type { Release } from '../../data/releases';
+
+interface Props {
+  release: Release;
+  class?: string;
+}
+
+const { release, class: className } = Astro.props;
+const { title, type, releaseDate, cover, coverAlt, links, tracks } = release;
+
+const titleId = `release-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+const showTracks = tracks.length > 1;
+
+// Durations floored to the second, like Spotify shows them
+const toSeconds = (ms: number) => Math.floor(ms / 1000);
+
+// 4:05
+const formatDuration = (ms: number) => {
+  const seconds = toSeconds(ms);
+  return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')}`;
+};
+
+const year = releaseDate.slice(0, 4);
+---
+
+<article class:list={['release-card', className]} aria-labelledby={titleId}>
+  <header class="release-card__header">
+    <div class="release-card__cover">
+      <Image
+        src={cover}
+        alt={coverAlt}
+        widths={[96, 136, 192, 272]}
+        sizes={`(min-width: ${breakpoints.tablet}px) 136px, 96px`}
+      />
+    </div>
+
+    <div class="release-card__info">
+      <h2 id={titleId} class="release-card__title">{title}</h2>
+      <p class="release-card__meta">
+        <span class="release-card__tag">{type}</span>
+        <time class="release-card__tag" datetime={releaseDate}>{year}</time>
+      </p>
+    </div>
+
+    <div class="release-card__actions">
+      <Button
+        href={links.spotify}
+        external
+        variant="secondary"
+        surface="light"
+        size="sm"
+        icon={{ name: 'spotify', brand: true }}
+      >
+        Spotify
+      </Button>
+      <Button
+        href={links.appleMusic}
+        external
+        variant="secondary"
+        surface="light"
+        size="sm"
+        icon={{ name: 'apple-music', brand: true }}
+      >
+        Apple Music
+      </Button>
+    </div>
+  </header>
+
+  {showTracks && (
+    <ol class="release-card__tracks" aria-label={`Canciones de ${title}`}>
+      {tracks.map((track, index) => (
+        <li>
+          <a
+            class="release-card__track"
+            href={track.spotify}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Escuchar «${track.title}» en Spotify, ${formatDuration(track.durationMs)} ${a11y.newTab}`}
+          >
+            <span class="release-card__track-number" aria-hidden="true">
+              <span class="release-card__track-index">{index + 1}</span>
+              <Icon name="spotify" brand size={20} class="release-card__track-icon" />
+            </span>
+            <span class="release-card__track-info">
+              <span class="release-card__track-title">{track.title}</span>
+              {track.featuring && (
+                <span class="release-card__track-featuring">con {track.featuring.join(', ')}</span>
+              )}
+            </span>
+            <span class="release-card__track-duration">{formatDuration(track.durationMs)}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  )}
+</article>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+  @use '../../styles/base/mixins' as *;
+
+  // Component tokens: cover size per breakpoint (keep the `sizes` attribute above in sync)
+  $cover-size-phone: clamp(5rem, 24vw, 6rem); // 80px → 96px
+  $cover-size-tablet: 8.5rem; // 136px
+  $track-number-width: 1.5rem;
+
+  // The card has no padding of its own: header and tracklist each pad
+  // themselves, so the divider between them runs edge to edge.
+  // --release-card-padding: inner padding per breakpoint
+  .release-card {
+    --release-card-padding: #{$space-1-5};
+
+    display: flex;
+    flex-direction: column;
+    border: 1px solid $glass-on-light-border;
+    border-radius: $radius-xl;
+    background-color: $glass-on-light-bg;
+    color: $color-text-on-light;
+    // Reset the page body's long-form reading text
+    font-size: $text-base;
+    line-height: $leading-snug;
+
+    @include mobile {
+      --release-card-padding: #{$space-2};
+    }
+
+    @include tablet {
+      --release-card-padding: #{$space-2-5};
+
+      border-radius: $radius-2xl;
+    }
+  }
+
+  // ---------- Header ----------
+  // Phones: cover + info on one row, buttons below at full width
+  .release-card__header {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'cover info'
+      'actions actions';
+    align-items: center;
+    gap: $space-2 $space-1-5;
+    padding: var(--release-card-padding);
+
+    // From 480px: buttons under the title, next to the cover
+    @include mobile {
+      grid-template-areas:
+        'cover info'
+        'cover actions';
+      align-items: end;
+      gap: $space-1-5 $space-2;
+    }
+
+    @include tablet {
+      gap: $space-2 $space-2-5;
+    }
+  }
+
+  .release-card__cover {
+    grid-area: cover;
+    width: $cover-size-phone;
+    aspect-ratio: 1;
+    border-radius: $radius-md;
+    overflow: hidden;
+    background-color: $color-placeholder-on-light; // while the image loads
+
+    :global(img) {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @include tablet {
+      width: $cover-size-tablet;
+    }
+  }
+
+  .release-card__info {
+    grid-area: info;
+    display: flex;
+    flex-direction: column;
+    gap: $space-1;
+    min-width: 0;
+  }
+
+  // Small outlined tags: type (Álbum, Single) and year
+  .release-card__tag {
+    padding-inline: $space-1;
+    border: 1px solid $glass-on-light-border;
+    border-radius: $radius-pill;
+    font-size: $text-xs;
+    font-weight: $font-semibold;
+    line-height: $leading-normal;
+    color: $color-text-on-light-muted;
+  }
+
+  .release-card__title {
+    font-size: $text-xl;
+    font-weight: $font-semibold;
+    line-height: $leading-tight;
+    text-wrap: balance;
+
+    @include tablet {
+      font-size: $text-2xl;
+    }
+  }
+
+  .release-card__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-0-5;
+  }
+
+  // Phones: buttons share the full width, and stack on the narrowest
+  // screens rather than clip "Apple Music"
+  .release-card__actions {
+    grid-area: actions;
+    display: flex;
+    flex-wrap: wrap;
+    gap: $space-1;
+
+    :global(.btn) {
+      flex: 1 1 auto;
+    }
+
+    @include mobile {
+      align-self: start;
+
+      :global(.btn) {
+        flex: 0 0 auto;
+      }
+    }
+  }
+
+  // ---------- Tracklist ----------
+  .release-card__tracks {
+    display: flex;
+    flex-direction: column;
+    // Rows pad themselves ($space-1), so their content lines up with the header's
+    padding: $space-1 calc(var(--release-card-padding) - #{$space-1});
+    border-top: 1px solid $glass-on-light-border;
+    list-style: none;
+  }
+
+  // The whole row is the link
+  .release-card__track {
+    @include focus-ring(0, $color-focus-ring-on-light);
+    @include transition(background-color);
+
+    display: grid;
+    grid-template-columns: $track-number-width minmax(0, 1fr) auto;
+    align-items: center;
+    gap: $space-1-5;
+    padding: $space-1;
+    border-radius: $radius-sm;
+    color: inherit;
+    text-decoration: none;
+    -webkit-tap-highlight-color: transparent;
+
+    &:active {
+      background-color: $glass-on-light-bg-hover;
+    }
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: $glass-on-light-bg-hover;
+      }
+    }
+  }
+
+  .release-card__track-number,
+  .release-card__track-duration {
+    font-size: $text-sm;
+    font-variant-numeric: tabular-nums;
+    color: $color-text-on-light-muted;
+  }
+
+  // Number and Spotify logo share the cell: the logo replaces the number
+  // on hover and keyboard focus
+  .release-card__track-number {
+    display: grid;
+    place-items: center;
+
+    > :global(*) {
+      grid-area: 1 / 1;
+    }
+  }
+
+  .release-card__track-number :global(.release-card__track-icon) {
+    visibility: hidden;
+  }
+
+  .release-card__track:focus-visible,
+  .release-card__track:hover {
+    .release-card__track-index {
+      visibility: hidden;
+    }
+
+    .release-card__track-number :global(.release-card__track-icon) {
+      visibility: visible;
+    }
+  }
+
+  .release-card__track-info {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+  }
+
+  .release-card__track-title {
+    font-weight: $font-medium;
+  }
+
+  .release-card__track-featuring {
+    font-size: $text-sm;
+    color: $color-text-on-light-muted;
+  }
+</style>
