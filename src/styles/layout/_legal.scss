@@ -4,10 +4,11 @@
 
 $legal-link-underline-offset: 3px;
 
-// Legal pages (terms, privacy): readable long-form text on the dark page
+// Legal pages (terms, privacy): readable long-form text on a light surface
 .legal {
   padding: calc(#{$navbar-height-mobile} + #{$space-6}) $section-inset-mobile $space-10;
-  color: $color-text-on-dark;
+  color: $color-text-on-light;
+  background-color: $color-surface-light;
 
   @include tablet {
     padding: $page-offset-top-tablet $section-inset-tablet $space-12;
@@ -43,11 +44,11 @@ $legal-link-underline-offset: 3px;
 .legal__updated {
   margin-top: $space-2;
   font-size: $text-sm;
-  color: $color-text-on-dark-muted;
+  color: $color-text-on-light-muted;
 }
 
 .legal__body {
-  color: $color-text-on-dark-muted;
+  color: $color-text-on-light-muted;
   line-height: $leading-relaxed;
 
   h2 {
@@ -56,7 +57,7 @@ $legal-link-underline-offset: 3px;
     font-size: $text-xl;
     font-weight: $font-medium;
     line-height: $leading-tight;
-    color: $color-text-on-dark;
+    color: $color-text-on-light;
   }
 
   p + p,
@@ -75,15 +76,15 @@ $legal-link-underline-offset: 3px;
   }
 
   a {
-    @include focus-ring;
+    @include focus-ring($color: $color-focus-ring-on-light);
 
-    color: $color-text-on-dark;
+    color: $color-text-on-light;
     text-decoration: underline;
     text-underline-offset: $legal-link-underline-offset;
   }
 
   strong {
     font-weight: $font-medium;
-    color: $color-text-on-dark;
+    color: $color-text-on-light;
   }
 }

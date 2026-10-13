@@ -1,0 +1,19 @@
+---
+// Inner page (bio, música, film scoring, press kit): title plus content in the
+// slot, on the same centered reading column as the legal pages. Without
+// content it shows "Próximamente."
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<section class="page" aria-labelledby="page-title" data-nav-theme="light">
+  <div class="page__inner">
+    <h1 id="page-title" class="page__title">{title}</h1>
+    <div class="page__body">
+      <slot><p class="page__text">Próximamente.</p></slot>
+    </div>
+  </div>
+</section>

@@ -26,6 +26,7 @@ $color-text-on-light-muted: rgba($color-ink, 0.72);
 $color-text-on-light-subtle: rgba($color-ink, 0.5); // platform logo next to the date
 $color-border-light: rgba($color-ink, 0.28);
 $color-placeholder-on-light: rgba($color-ink, 0.06); // media box while the image loads
+$color-placeholder-media: rgba($color-ink, 0.12); // empty media slot (collage) until the photo arrives
 
 // Credits bar
 $color-surface-dark: $color-ink;

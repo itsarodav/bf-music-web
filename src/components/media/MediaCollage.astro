@@ -1,0 +1,251 @@
+---
+// Collage of three square (1:1) pieces, slightly rotated and overlapping.
+// Phones: the first two side by side on top, the third below, centered.
+// Tablet+: one row, the third piece in the middle and on top.
+// Pass items in reading order; the third is the featured one (e.g. the video).
+// An image without `src` renders a colored placeholder until the photo arrives.
+// The video autoplays (muted, looped) only while on screen, and never with
+// reduced motion (the poster shows instead). Entrance animation: GSAP, once.
+import { Image } from 'astro:assets';
+import Icon from '../ui/Icon.astro';
+import NewTabHint from '../ui/NewTabHint.astro';
+import { breakpoints } from '../../data/breakpoints';
+
+export interface CollageImage {
+  type: 'image';
+  src?: ImageMetadata;
+  alt?: string;
+}
+
+export interface CollageVideo {
+  type: 'video';
+  /** In order of preference (webm first) */
+  sources: { src: string; type: string }[];
+  poster: string;
+  /** Accessible name: what the video shows (or where the link goes) */
+  label: string;
+  /** Optional link, opens in a new tab */
+  href?: string;
+}
+
+export type CollageItem = CollageImage | CollageVideo;
+
+interface Props {
+  items: [CollageItem, CollageItem, CollageItem];
+  class?: string;
+}
+
+const { items, class: className } = Astro.props;
+
+// Each piece is ~48% of the column on phones and ~36% from tablet
+const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
+---
+
+<div class:list={['media-collage', className]} data-media-collage>
+  {items.map((item) => (
+    <div class="media-collage__item" data-media-collage-item>
+      {item.type === 'image' ? (
+        item.src ? (
+          <Image src={item.src} alt={item.alt ?? ''} widths={[260, 400, 520, 780]} sizes={imageSizes} loading="lazy" />
+        ) : (
+          <div class="media-collage__placeholder" aria-hidden="true"></div>
+        )
+      ) : (
+        (() => {
+          const video = (
+            <video muted loop playsinline preload="none" poster={item.poster} aria-hidden="true" data-media-collage-video>
+              {item.sources.map((source) => <source src={source.src} type={source.type} />)}
+            </video>
+          );
+
+          return item.href ? (
+            <a href={item.href} class="media-collage__link" target="_blank" rel="noopener noreferrer">
+              {video}
+              <span class="media-collage__play" aria-hidden="true">
+                <Icon name="play" size={16} />
+              </span>
+              <span class="visually-hidden">{item.label}</span>
+              <NewTabHint />
+            </a>
+          ) : (
+            <>
+              {video}
+              <span class="visually-hidden">{item.label}</span>
+            </>
+          );
+        })()
+      )}
+    </div>
+  ))}
+</div>
+
+<style lang="scss">
+  @use 'sass:list';
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+  @use '../../styles/base/mixins' as *;
+
+  // Component tokens. Each piece is placed with % of the collage: x and size
+  // are % of its width, y is % of its height (the collage keeps an aspect
+  // ratio, so the pieces stay square and in place at any width).
+  $collage-ratio-mobile: list.slash(10, 9); // two on top, one below (tight stack)
+  $collage-ratio-tablet: 2; // one row
+
+  $item-size-mobile: 48%;
+  $item-size-tablet: 36%;
+
+  // Slot: (x, y, rotation) per breakpoint
+  $slots-mobile: (
+    1: (4%, 2%, -4deg),
+    2: (48%, 6%, 3.5deg),
+    3: (26%, 43%, -2deg),
+  );
+  $slots-tablet: (
+    1: (0%, 20%, -5deg),
+    2: (64%, 16%, 4.5deg),
+    3: (32%, 6%, 3deg),
+  );
+
+  $play-size: 2.5rem; // 40px glass badge, same as the Short cards
+  $play-optical-offset: 2px; // nudges the triangle right so it looks centered
+  $item-hover-scale: 1.03;
+
+  .media-collage {
+    position: relative;
+    width: 100%;
+    aspect-ratio: $collage-ratio-mobile;
+
+    @include tablet {
+      aspect-ratio: $collage-ratio-tablet;
+    }
+  }
+
+  .media-collage__item {
+    @include transition(scale);
+
+    position: absolute;
+    width: $item-size-mobile;
+    aspect-ratio: 1;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    background-color: $color-placeholder-on-light; // while the media loads
+    box-shadow: $shadow-collage;
+    // Keeps the rounded clip on the video in Safari
+    isolation: isolate;
+
+    @each $slot, $pos in $slots-mobile {
+      &:nth-child(#{$slot}) {
+        left: list.nth($pos, 1);
+        top: list.nth($pos, 2);
+        rotate: list.nth($pos, 3);
+      }
+    }
+
+    // The featured piece sits on top of the other two
+    &:nth-child(3) {
+      z-index: $z-base;
+    }
+
+    @include tablet {
+      width: $item-size-tablet;
+
+      @each $slot, $pos in $slots-tablet {
+        &:nth-child(#{$slot}) {
+          left: list.nth($pos, 1);
+          top: list.nth($pos, 2);
+          rotate: list.nth($pos, 3);
+        }
+      }
+    }
+
+    @include desktop {
+      border-radius: $radius-2xl;
+    }
+
+    :global(img),
+    video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  .media-collage__placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: $color-placeholder-media;
+  }
+
+  .media-collage__link {
+    @include focus-ring(-4px, $color-focus-ring);
+
+    position: relative;
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .media-collage__play {
+    @include glass('dark', $blur-md);
+
+    position: absolute;
+    right: $space-1-5;
+    bottom: $space-1-5;
+    display: grid;
+    place-items: center;
+    width: $play-size;
+    height: $play-size;
+    border-radius: $radius-pill;
+    color: $color-text-on-dark;
+
+    :global(svg) {
+      margin-left: $play-optical-offset;
+    }
+  }
+
+  // Hover: the piece leans out a little (the linked video invites the click)
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .media-collage__item:hover {
+      scale: $item-hover-scale;
+    }
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap';
+  import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+  gsap.registerPlugin(ScrollTrigger);
+
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  document.querySelectorAll<HTMLElement>('[data-media-collage]').forEach((collage) => {
+    // Video: plays only while on screen (saves battery), poster otherwise
+    if (!reducedMotion) {
+      collage.querySelectorAll<HTMLVideoElement>('[data-media-collage-video]').forEach((video) => {
+        new IntersectionObserver(([entry]) => {
+          if (entry.isIntersecting) video.play().catch(() => {});
+          else video.pause();
+        }).observe(video);
+      });
+    }
+
+    // Entrance: the pieces rise and settle one after another, short and quick
+    // so it never holds the scroll back. Rotation lives in CSS (`rotate`),
+    // so GSAP's transform only adds the lift on top.
+    if (!reducedMotion) {
+      gsap.from(collage.querySelectorAll('[data-media-collage-item]'), {
+        autoAlpha: 0,
+        y: 32,
+        scale: 0.94,
+        duration: 0.6,
+        ease: 'power3.out',
+        stagger: 0.08,
+        clearProps: 'transform,opacity,visibility',
+        scrollTrigger: { trigger: collage, start: 'top 85%', once: true },
+      });
+    }
+  });
+</script>

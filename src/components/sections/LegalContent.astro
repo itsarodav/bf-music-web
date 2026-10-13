@@ -8,7 +8,7 @@ interface Props {
 const { title, lastUpdated } = Astro.props;
 ---
 
-<article class="legal" aria-labelledby="legal-title">
+<article class="legal" aria-labelledby="legal-title" data-nav-theme="light">
   <header class="legal__header">
     <h1 id="legal-title" class="legal__title">{title}</h1>
     <p class="legal__updated">Última actualización: {lastUpdated}</p>

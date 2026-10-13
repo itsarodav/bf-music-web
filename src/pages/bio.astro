@@ -1,8 +1,27 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import PagePlaceholder from '../components/sections/PagePlaceholder.astro';
+import PageContent from '../components/sections/PageContent.astro';
+import MediaCollage from '../components/media/MediaCollage.astro';
+import { helenaLoop } from '../data/media';
+import bioStudio from '../assets/images/bio-studio.jpg';
+import bioPiano from '../assets/images/bio-piano.jpg';
 ---
 
 <Layout title="Bio">
-  <PagePlaceholder title="Bio" />
+  <PageContent title="Biografía">
+    <p>
+      Crece en el seno de una familia muy musical, donde despierta su pasión por la música clásica al mismo tiempo
+      que aprende a leer y escribir sus primeras notas. En la adolescencia descubre el piano, un flechazo que la lleva
+      a completar su formación clásica antes de adentrarse en el jazz y la música moderna, especialidad en la que se
+      gradúa por el <em>Conservatorio Superior del Liceu de Barcelona</em>.
+    </p>
+
+    <MediaCollage
+      items={[
+        { type: 'image', src: bioStudio, alt: 'Blanca Ferrer sonríe sentada en un estudio de grabación' },
+        { type: 'image', src: bioPiano, alt: 'Blanca Ferrer toca el piano en casa' },
+        helenaLoop,
+      ]}
+    />
+  </PageContent>
 </Layout>
