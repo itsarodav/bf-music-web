@@ -14,6 +14,20 @@ $hero-origin-phone: 50% 92%; // lower origin: she rises further above the name a
 $hero-card-width-tablet: 16.5rem; // 264px, vertical card
 $hero-card-width-desktop: 25rem; // 400px, horizontal card
 
+// Intro (home only, see intro-reveal mixin): the photo settles from a slight zoom
+// while the name rises word by word, then the card follows
+$hero-intro-zoom: 1.06;
+$hero-intro-zoom-duration: 2.4s;
+$hero-intro-title-offset: $space-6;
+$hero-intro-title-duration: 1.1s;
+$hero-intro-title-delay: 0.3s;
+$hero-intro-title-stagger: 0.12s; // per word, --word-index is set in Hero.astro
+// The name is the LCP element: it fades in fast and from the start, the rise keeps the timing
+$hero-intro-title-fade: 0.4s;
+$hero-intro-card-offset: $space-3;
+$hero-intro-card-duration: 0.9s;
+$hero-intro-card-delay: 0.7s;
+
 // Sticky: it stays pinned while the next section (statement) scrolls over it.
 .hero {
   position: sticky;
@@ -42,11 +56,23 @@ $hero-card-width-desktop: 25rem; // 400px, horizontal card
 }
 
 // ---------- Background ----------
+@keyframes hero-intro-zoom {
+  from {
+    transform: scale($hero-intro-zoom);
+  }
+}
+
 .hero__media {
   position: absolute;
   inset: 0;
   z-index: $z-behind;
   overflow: hidden;
+
+  @media (prefers-reduced-motion: no-preference) {
+    .has-intro & {
+      animation: hero-intro-zoom $hero-intro-zoom-duration $ease-out-cubic backwards;
+    }
+  }
 
   picture {
     display: block;
@@ -168,6 +194,14 @@ $hero-card-width-desktop: 25rem; // 400px, horizontal card
 .hero__title-word {
   display: inline-block;
 
+  @include intro-reveal(
+    $hero-intro-title-offset,
+    $hero-intro-title-duration,
+    calc(#{$hero-intro-title-delay} + var(--word-index) * #{$hero-intro-title-stagger}),
+    $hero-intro-title-fade,
+    calc(var(--word-index) * #{$hero-intro-title-stagger})
+  );
+
   @include tablet {
     display: block;
   }
@@ -178,6 +212,8 @@ $hero-card-width-desktop: 25rem; // 400px, horizontal card
 }
 
 .hero__card {
+  @include intro-reveal($hero-intro-card-offset, $hero-intro-card-duration, $hero-intro-card-delay);
+
   width: 100%;
 
   @include tablet {

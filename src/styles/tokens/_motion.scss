@@ -7,3 +7,5 @@ $duration-slower: 900ms; // slow zoom on media hover
 // Easings
 $ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 $ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+$ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1); // GSAP power2.out
+$ease-out-quart: cubic-bezier(0.25, 1, 0.5, 1); // GSAP power3.out

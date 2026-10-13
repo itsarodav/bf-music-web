@@ -19,6 +19,11 @@ $navbar-toggle-line-gap: 6px;
 // Outer lines travel to the middle one to form the X
 $navbar-toggle-line-shift: $navbar-toggle-line-gap + $navbar-toggle-line-thickness;
 
+// Home intro: the bar drops in just after the hero photo starts settling
+$navbar-intro-offset: -$space-1-5;
+$navbar-intro-duration: 0.8s;
+$navbar-intro-delay: 0.2s;
+
 // Fixed on every breakpoint. Two state classes, set in Navbar.astro:
 // - .is-scrolled: tablet+ compacts the bar (less padding, smaller logo offset).
 // - .navbar--light: over sections marked data-nav-theme="light" the bar turns
@@ -35,6 +40,7 @@ $navbar-toggle-line-shift: $navbar-toggle-line-gap + $navbar-toggle-line-thickne
 
 .navbar__bar {
   @include transition(padding);
+  @include intro-reveal($navbar-intro-offset, $navbar-intro-duration, $navbar-intro-delay);
 
   position: relative;
   z-index: $z-navbar-bar; // above the mobile menu overlay

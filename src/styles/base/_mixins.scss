@@ -65,6 +65,23 @@
   }
 }
 
+// Home intro (only while <html> has .has-intro, see Layout): fades the element
+// in from $offset away from its place. Pure CSS so it runs from the first paint
+// without waiting for JS: the hero name counts as LCP right away.
+// The fade can be shorter than the rise ($fade, $fade-delay): Chrome only counts
+// text for LCP once its fade-in has finished.
+// `backwards` fill: nothing (no transform) is left behind once it has landed.
+@mixin intro-reveal($offset, $duration, $delay: 0s, $fade: $duration, $fade-delay: $delay) {
+  @media (prefers-reduced-motion: no-preference) {
+    .has-intro & {
+      --intro-offset: #{$offset};
+      animation:
+        intro-fade $fade $ease-out-quart $fade-delay backwards,
+        intro-rise $duration $ease-out-quart $delay backwards;
+    }
+  }
+}
+
 // Animated underline: grows from the left on hover, stays visible
 // on the current page. Element must be inline-block/flex.
 @mixin link-underline($offset: 0) {

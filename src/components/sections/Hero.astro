@@ -30,25 +30,29 @@ const portrait = {
   // Capped at 1440: enough for 3x phones without the weight of the full 1800px crop
   widths: [640, 960, 1280, 1440],
   sizes: `${media.belowTablet} 95vh, (max-aspect-ratio: 3/4) 83vh, 110vw`,
-  quality: 55,
+  // 45: no visible loss on the leaves or the face (checked side by side with 55),
+  // about a third lighter, and the photo sits under the vignette anyway
+  quality: 45,
 };
 const landscape = {
   widths: [960, 1280, 1600, 1920, 2240, 2560],
   sizes: '(max-aspect-ratio: 4/3) 147vh, 110vw',
-  quality: 55,
+  quality: 45,
 };
+// JPG only reaches browsers without AVIF/WebP: it keeps a higher quality, JPG degrades sooner
+const FALLBACK_QUALITY = 55;
 
 const [portraitAvif, portraitWebp, landscapeAvif, landscapeWebp, fallback] = await Promise.all([
   getImage({ src: backgroundPortrait, widths: portrait.widths, format: 'avif', quality: portrait.quality }),
   getImage({ src: backgroundPortrait, widths: portrait.widths, format: 'webp', quality: portrait.quality }),
   getImage({ src: background, widths: landscape.widths, format: 'avif', quality: landscape.quality }),
   getImage({ src: background, widths: landscape.widths, format: 'webp', quality: landscape.quality }),
-  getImage({ src: background, width: 1920, format: 'jpg', quality: landscape.quality }),
+  getImage({ src: background, width: 1920, format: 'jpg', quality: FALLBACK_QUALITY }),
 ]);
 ---
 
 <section class="hero" aria-labelledby="hero-title" data-hero>
-  <div class="hero__media" data-hero-media>
+  <div class="hero__media">
     <picture>
       <source media={PORTRAIT_MEDIA} type="image/avif" srcset={portraitAvif.srcSet.attribute} sizes={portrait.sizes} />
       <source media={PORTRAIT_MEDIA} type="image/webp" srcset={portraitWebp.srcSet.attribute} sizes={portrait.sizes} />
@@ -72,43 +76,15 @@ const [portraitAvif, portraitWebp, landscapeAvif, landscapeWebp, fallback] = awa
     <h1 id="hero-title" class="hero__title">
       {titleWords.map((word, index) => (
         <>
-          <span class="hero__title-word" data-reveal="title">{word}</span>
+          <span class="hero__title-word" style={`--word-index: ${index}`}>{word}</span>
           {index < titleWords.length - 1 && ' '}
         </>
       ))}
     </h1>
 
-    <div class="hero__card" data-reveal="card">
+    <div class="hero__card">
       <MusicCard {...card} />
     </div>
   </div>
 </section>
 
-<script>
-  import { gsap } from 'gsap';
-
-  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-  if (!reducedMotion) {
-    gsap
-      .timeline({ defaults: { ease: 'power3.out' } })
-      .fromTo('[data-hero-media]', { scale: 1.06 }, { scale: 1, duration: 2.4, ease: 'power2.out' }, 0)
-      // clearProps: no leftover transform on the fixed bar once it has landed
-      .fromTo(
-        '[data-reveal="navbar"]',
-        { autoAlpha: 0, y: -12 },
-        { autoAlpha: 1, y: 0, duration: 0.8, clearProps: 'transform' },
-        0.2,
-      )
-      .fromTo(
-        '[data-reveal="title"]',
-        { autoAlpha: 0, y: 48 },
-        { autoAlpha: 1, y: 0, duration: 1.1, stagger: 0.12 },
-        0.3,
-      )
-      .fromTo('[data-reveal="card"]', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 0.9 }, 0.7);
-  }
-
-  // Elements start hidden via .has-intro (see Layout); GSAP has taken over now.
-  document.documentElement.classList.remove('has-intro');
-</script>

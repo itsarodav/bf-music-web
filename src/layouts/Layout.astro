@@ -8,7 +8,7 @@ import { site } from '../data/site';
 interface Props {
   title?: string;
   description?: string;
-  /** Hide hero elements until the GSAP intro takes over (avoids a flash) */
+  /** Plays the CSS intro of the home hero (navbar, photo, name, card) */
   heroIntro?: boolean;
 }
 
@@ -20,7 +20,7 @@ const ogImageUrl = new URL(site.ogImage, Astro.site);
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang="es" class:list={{ 'has-intro': heroIntro }}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -56,16 +56,6 @@ const ogImageUrl = new URL(site.ogImage, Astro.site);
       href="https://fonts.googleapis.com/css2?family=Diphylleia&family=Geist:ital,wght@0,100..900;1,700&display=swap"
       rel="stylesheet"
     />
-
-    {heroIntro && (
-      <script is:inline>
-        if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-          document.documentElement.classList.add('has-intro');
-          // Safety net: never keep content hidden if the intro script fails
-          setTimeout(() => document.documentElement.classList.remove('has-intro'), 3000);
-        }
-      </script>
-    )}
   </head>
   <body>
     <a href="#main" class="skip-link">Saltar al contenido</a>

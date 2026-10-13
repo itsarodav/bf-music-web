@@ -59,9 +59,17 @@ body.is-menu-open {
   }
 }
 
-// Hero intro: hidden until GSAP sets the starting state (see Layout + Hero)
+// Home intro, used through the intro-reveal mixin (navbar bar, hero name and card).
 // Never animate a transform on .navbar itself: it would become the containing
 // block of the fixed mobile menu and clip it to the bar's height.
-.has-intro [data-reveal] {
-  opacity: 0;
+@keyframes intro-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes intro-rise {
+  from {
+    transform: translateY(var(--intro-offset));
+  }
 }
