@@ -25,8 +25,9 @@ $text-menu: clamp(2.5rem, 11vw, 3.5rem); // 40–56px
 // Fluid display sizes (hero name)
 $text-display-mobile: clamp(3rem, 15.5vw, 5.5rem);    // 48–88px, fills ~90% width
 $text-display-tablet: clamp(6.5rem, 17vw, 9rem);      // 104–144px (two lines)
-$text-display-desktop: clamp(5rem, 8vw, 8.5rem);       // 80–136px (one line, next to the card)
-$text-display-wide: clamp(8.5rem, 9.5vw, 12rem);      // 136–192px
+// Desktop: steeper slope, capped at 1024px by the room left next to the card (one line)
+$text-display-desktop: clamp(5.5rem, 9.86vw - 0.8rem, 9.5rem); // 88px @1024 → 129px @1439
+$text-display-wide: clamp(9.5rem, 10.625vw, 13.5rem); // 152–216px
 
 // Statement (bio intro on the home page)
 $text-statement-mobile: clamp(1.875rem, 8.6vw, 2.25rem); // 30–36px

@@ -16,19 +16,27 @@ $credits-divider-height: 1.25rem;
   background-color: $color-surface-light;
 }
 
+// Phones and tablet: sitemap | legal side by side, logos below.
+// Desktop: one row, logos in the bottom-right corner.
 .footer__main {
-  display: flex;
-  flex-direction: column;
-  gap: $space-4;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
+  gap: $space-3;
   @include page-gutter;
 
   padding-block: $space-4 $space-6;
 
   @include tablet {
+    gap: $space-4;
+    padding-block: $space-14;
+  }
+
+  @include desktop {
+    display: flex;
     flex-direction: row;
     align-items: flex-start;
     gap: $space-12;
-    padding-block: $space-14;
   }
 }
 
@@ -58,8 +66,11 @@ $credits-divider-height: 1.25rem;
   align-items: center;
   gap: $space-2;
 
-  // Pushed to the bottom-right corner from tablet up
-  @include tablet {
+  // Full row below the two link columns
+  grid-column: 1 / -1;
+
+  // Pushed to the bottom-right corner on desktop
+  @include desktop {
     align-self: flex-end;
     margin-left: auto;
   }

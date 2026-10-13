@@ -1,9 +1,9 @@
 ---
 // Full-screen statement (home: the central sentence of her bio).
-// Scroll-driven: the white panel rises over the hero, which stays pinned and
-// recedes behind it; then the panel sticks while the words fill in one by one,
-// rests with the full sentence, and stays pinned while the next section rises
-// over it. Distances live in _statement.scss (--statement-read/-hold).
+// The white panel rises over the hero (scroll-driven), which stays pinned and
+// recedes behind it. Once the panel is pinned, the words fill in one by one on
+// their own (time-based); the panel then holds still for a stretch of scroll
+// while the next section rises over it. The hold lives in _statement.scss.
 // Words are split here, at build time.
 type Part = string | { em: string };
 
@@ -68,22 +68,21 @@ const tokens = parts.flatMap((part) => {
       },
     });
 
-    // 2. Reading: the sentence shows as a ghost, then each word fills in with
-    //    the scroll. Scrubbed with a short lag so it feels smooth, not mechanical.
-    gsap
-      .timeline({
-        // Reading distance comes from CSS (it changes per breakpoint); the rest
-        // of the section is the hold and the next section's entrance
-        scrollTrigger: {
-          trigger: section,
-          start: 'top 35%',
-          end: () => {
-            const read = parseFloat(getComputedStyle(section).getPropertyValue('--statement-read'));
-            return `+=${(read / 100) * window.innerHeight}`;
-          },
-          scrub: 0.6,
-        },
-      })
-      .fromTo(words, { opacity: 0.14 }, { opacity: 1, duration: 1, stagger: 0.35, ease: 'power1.inOut' });
+    // 2. Reading: the sentence shows as a ghost, then the words fill in one by
+    //    one (~1.5s) once the panel is pinned. Not tied to the scroll: if it is
+    //    covered early it just finishes at its own pace (no sudden flash).
+    //    Leaving back up to the hero resets it, so it plays again on return.
+    const reading = gsap.fromTo(
+      words,
+      { opacity: 0.14 },
+      { opacity: 1, duration: 0.5, stagger: { amount: 1 }, ease: 'power1.out', paused: true },
+    );
+
+    ScrollTrigger.create({
+      trigger: section,
+      start: 'top top',
+      onEnter: () => reading.play(),
+      onLeaveBack: () => reading.pause(0),
+    });
   }
 </script>

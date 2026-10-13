@@ -3,33 +3,26 @@
 @use '../base/mixins' as *;
 
 // Full-screen statement on a white panel (see Statement.astro).
-// With motion, the section is taller than the screen and the panel sticks,
-// so the scroll distance drives the word-by-word reveal. It sits above the
-// pinned hero, which shows through the panel's rounded corners on entry.
+// It sits above the pinned hero, which shows through the panel's rounded
+// corners on entry. With motion, the section is taller than the screen and
+// the panel sticks: the sentence fills in on its own (time-based, not scrubbed)
+// as soon as the panel is pinned, then rests before the next section rises.
 //
-// Scroll choreography, in % of the screen height. Tune it here only: the
-// script reads --statement-read, and the section height follows from both.
-// - read: scroll distance over which the words fill in (it starts while the
-//   panel is still rising, when its top reaches 35% of the screen)
-// - hold: the full sentence rests, nothing moves
+// Scroll choreography, in % of the screen height:
+// - hold: the panel stays pinned and still, a pause before the next section
 // Then one more screen while the next section (latest Shorts) rises over the
 // pinned panel. Scrolling is never locked: a fast swipe just goes faster.
-// Height = read + hold + 165: the 100 of the pinned panel itself, plus the
-// 100 the next section takes to rise, minus the 35 already read on entry.
+// Height = hold + 200: the 100 of the pinned panel itself, plus the 100 the
+// next section takes to rise.
 .statement {
-  --statement-read: 180; // longer on phones: one swipe covers more screen
-  --statement-hold: 60;
+  --statement-hold: 80;
 
   position: relative;
   z-index: $z-base;
 
   @media (prefers-reduced-motion: no-preference) {
-    height: calc((var(--statement-read) + var(--statement-hold) + 165) * 1vh);
-    height: calc((var(--statement-read) + var(--statement-hold) + 165) * 1svh);
-  }
-
-  @include tablet {
-    --statement-read: 155;
+    height: calc((var(--statement-hold) + 200) * 1vh);
+    height: calc((var(--statement-hold) + 200) * 1svh);
   }
 }
 

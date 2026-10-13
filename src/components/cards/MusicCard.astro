@@ -81,9 +81,11 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
   $cover-size-phone: 5.25rem; // 84px
   $cover-size-mobile: 7rem; // 112px
   $cover-size-tablet: 7.5rem; // 120px
-  $cover-size-desktop: 6.5rem; // 104px
-  // Fluid copy on phones, so the short text keeps to two lines at any width
-  $text-size-phone: clamp(0.75rem, 3.9vw, 0.9375rem); // 12px → 15px
+  // Desktop: matches the height of text (3 lines) + buttons, so the cover fills the
+  // card's full inner height. Re-check if the copy grows.
+  $cover-size-desktop: 7.25rem; // 116px
+  // Fluid copy on phones (below 480px)
+  $text-size-phone: clamp(0.875rem, 4.2vw, 1rem); // 14px → 16px
 
   .music-card {
     @include glass('dark', $blur-xl);
