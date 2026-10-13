@@ -1,11 +1,12 @@
 ---
-// Grid of looping video cards (Film Scoring).
-// Phones and tablet: one column, every card 16:9.
-// Desktop: a repeating pattern of five, on a 5-column grid:
+// Grid of looping video cards (Film Scoring), every card 16:9.
+// Phones: one column.
+// From tablet: a pyramid of six on a 6-column grid, repeating if more come:
 //   row 1: one card across the full width
-//   row 2: wide (60%) + narrow (40%)
-//   row 3: narrow (40%) + wide (60%)
-// The narrow cards stretch to the height of their wide neighbour (see VideoCard).
+//   row 2: two cards, half each
+//   row 3: three cards, a third each (compact: logo-only YouTube button)
+// Only the first card of each group autoplays on devices with a mouse; the
+// others play on hover (touch devices play every loop in view).
 import VideoCard, { type LoopVideo } from '../cards/VideoCard.astro';
 
 export interface VideoGridItem {
@@ -23,14 +24,14 @@ interface Props {
 
 const { items, label, class: className } = Astro.props;
 
-// Positions 3 and 4 of each group of five take the narrow column
-const isNarrow = (index: number) => [2, 3].includes(index % 5);
+// Positions 4, 5 and 6 of each group of six make the third row
+const isCompact = (index: number) => index % 6 >= 3;
 ---
 
 <ul class:list={['video-grid', className]} aria-label={label}>
   {items.map((item, index) => (
     <li class="video-grid__item">
-      <VideoCard {...item} narrow={isNarrow(index)} />
+      <VideoCard {...item} compact={isCompact(index)} hoverPlay={index % 6 !== 0} />
     </li>
   ))}
 </ul>
@@ -39,45 +40,42 @@ const isNarrow = (index: number) => [2, 3].includes(index % 5);
   @use '../../styles/tokens' as *;
   @use '../../styles/base/breakpoints' as *;
 
-  // Component tokens: 5 columns split 3 + 2 (60 / 40)
-  $grid-columns: 5;
-  $span-wide: 3;
-  $span-narrow: 2;
+  // Component tokens: 6 columns split 6 / 3 + 3 / 2 + 2 + 2
+  $grid-columns: 6;
+  $span-full: 6;
+  $span-half: 3;
+  $span-third: 2;
 
   .video-grid {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: $space-5;
+    list-style: none;
 
-    @include desktop {
+    @include tablet {
       grid-template-columns: repeat($grid-columns, minmax(0, 1fr));
       gap: $space-5 $space-2;
     }
   }
 
-  @include desktop {
+  @include tablet {
     .video-grid__item {
-      // Row 1 (and every 5th card after it): full width
-      &:nth-child(5n + 1) {
-        grid-column: 1 / -1;
+      // Row 1: full width
+      &:nth-child(6n + 1) {
+        grid-column: span $span-full;
       }
 
-      // Row 2: wide + narrow
-      &:nth-child(5n + 2) {
-        grid-column: span $span-wide;
+      // Row 2: halves
+      &:nth-child(6n + 2),
+      &:nth-child(6n + 3) {
+        grid-column: span $span-half;
       }
 
-      &:nth-child(5n + 3) {
-        grid-column: span $span-narrow;
-      }
-
-      // Row 3: narrow + wide
-      &:nth-child(5n + 4) {
-        grid-column: span $span-narrow;
-      }
-
-      &:nth-child(5n + 5) {
-        grid-column: span $span-wide;
+      // Row 3: thirds
+      &:nth-child(6n + 4),
+      &:nth-child(6n + 5),
+      &:nth-child(6n + 6) {
+        grid-column: span $span-third;
       }
     }
   }

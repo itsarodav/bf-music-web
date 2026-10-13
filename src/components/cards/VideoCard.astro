@@ -4,10 +4,12 @@
 // The loop plays (muted) only while on screen, never with reduced motion.
 // Without `video` it shows a colored placeholder until the loop arrives.
 //
-// `narrow`: the card takes the small column of a VideoGrid row on desktop.
-// There it stretches to the height of its 16:9 neighbour (the grid row sets
-// it), so the box ends up a little wider than square, and the button shrinks
-// to the YouTube logo so the title has room.
+// `compact`: the card sits in a narrow column (third row of the Film Scoring
+// grid, from tablet). There the button shrinks to the YouTube logo so the
+// title has room; on phones, where the card is full width, it keeps its text.
+//
+// `hoverPlay`: on devices with a mouse the loop plays only while hovering the
+// card (or with keyboard focus inside it). Touch devices still play it in view.
 import Button from '../ui/Button.astro';
 
 export interface LoopVideo {
@@ -21,17 +23,18 @@ interface Props {
   /** The full video on YouTube */
   href: string;
   video?: LoopVideo;
-  narrow?: boolean;
+  compact?: boolean;
+  hoverPlay?: boolean;
   /** 3 when the card sits under a section heading (música's "Vídeo musical") */
   headingLevel?: 2 | 3;
   class?: string;
 }
 
-const { title, href, video, narrow = false, headingLevel = 2, class: className } = Astro.props;
+const { title, href, video, compact = false, hoverPlay = false, headingLevel = 2, class: className } = Astro.props;
 const Heading = `h${headingLevel}` as const;
 ---
 
-<article class:list={['video-card', { 'video-card--narrow': narrow }, className]}>
+<article class:list={['video-card', { 'video-card--compact': compact }, className]} data-video-card data-hover-play={hoverPlay || undefined}>
   <div class="video-card__media">
     {video ? (
       <video muted loop playsinline preload="none" poster={video.poster} aria-hidden="true" data-video-card-video>
@@ -45,7 +48,7 @@ const Heading = `h${headingLevel}` as const;
   <div class="video-card__footer">
     <Heading class="video-card__title">{title}</Heading>
 
-    {/* Full button, and the logo-only one for narrow cards on desktop
+    {/* Full button, and the logo-only one for compact cards from tablet
         (only one is ever displayed, so screen readers get one link) */}
     <Button
       href={href}
@@ -58,7 +61,7 @@ const Heading = `h${headingLevel}` as const;
     >
       Ver en YouTube
     </Button>
-    {narrow && (
+    {compact && (
       <Button
         href={href}
         external
@@ -67,7 +70,7 @@ const Heading = `h${headingLevel}` as const;
         size="sm"
         icon="youtube"
         ariaLabel={`Ver «${title}» en YouTube`}
-        class="video-card__action video-card__action--compact"
+        class="video-card__action video-card__action--icon"
       />
     )}
   </div>
@@ -77,7 +80,6 @@ const Heading = `h${headingLevel}` as const;
   @use 'sass:list';
   @use '../../styles/tokens' as *;
   @use '../../styles/base/breakpoints' as *;
-  @use '../../styles/base/mixins' as *;
 
   $media-ratio: list.slash(16, 9);
 
@@ -136,26 +138,26 @@ const Heading = `h${headingLevel}` as const;
     flex-shrink: 0;
   }
 
-  .video-card__footer :global(.video-card__action--compact) {
+  .video-card__footer :global(.video-card__action--icon) {
     display: none;
   }
 
-  @include desktop {
-    // Fills the grid row (as tall as the wide card next to it): the box
-    // takes whatever height the footer leaves
-    .video-card--narrow {
-      height: 100%;
-
+  // Compact from tablet: logo-only button, smaller radius to match the card size
+  @include tablet {
+    .video-card--compact {
       .video-card__media {
-        flex: 1;
-        aspect-ratio: auto;
+        border-radius: $radius-lg;
+      }
+
+      .video-card__footer {
+        gap: $space-1;
       }
 
       .video-card__footer :global(.video-card__action--full) {
         display: none;
       }
 
-      .video-card__footer :global(.video-card__action--compact) {
+      .video-card__footer :global(.video-card__action--icon) {
         display: inline-flex;
       }
     }
@@ -163,7 +165,17 @@ const Heading = `h${headingLevel}` as const;
 </style>
 
 <script>
-  import { autoplayInView } from '../../scripts/autoplay-in-view';
+  import { autoplayInView, canHover, playOnHover } from '../../scripts/autoplay-in-view';
 
-  autoplayInView(document.querySelectorAll<HTMLVideoElement>('[data-video-card-video]'));
+  const inView: HTMLVideoElement[] = [];
+  const hover = canHover();
+
+  document.querySelectorAll<HTMLElement>('[data-video-card]').forEach((card) => {
+    const video = card.querySelector<HTMLVideoElement>('[data-video-card-video]');
+    if (!video) return;
+    if (hover && card.hasAttribute('data-hover-play')) playOnHover(card, video);
+    else inView.push(video);
+  });
+
+  autoplayInView(inView);
 </script>
