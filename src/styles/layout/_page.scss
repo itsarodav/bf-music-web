@@ -61,6 +61,13 @@ $page-min-height: 70vh; // keeps contact + footer below the fold on short pages
   }
 }
 
+// Consecutive paragraphs of one block: paragraph spacing, not the block gap
+.page__prose {
+  display: flex;
+  flex-direction: column;
+  gap: $space-2;
+}
+
 .page__text {
   color: $color-text-on-light-muted;
 }

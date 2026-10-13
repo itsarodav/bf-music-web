@@ -5,6 +5,9 @@ import MediaCollage from '../components/media/MediaCollage.astro';
 import { helenaLoop } from '../data/media';
 import bioStudio from '../assets/images/bio-studio.jpg';
 import bioPiano from '../assets/images/bio-piano.jpg';
+import bioGarden from '../assets/images/bio-garden.jpg';
+import bioStudioWall from '../assets/images/bio-studio-wall.jpg';
+import bioConcert from '../assets/images/bio-concert.jpg';
 ---
 
 <Layout title="Bio">
@@ -21,6 +24,28 @@ import bioPiano from '../assets/images/bio-piano.jpg';
         { type: 'image', src: bioStudio, alt: 'Blanca Ferrer sonríe sentada en un estudio de grabación' },
         { type: 'image', src: bioPiano, alt: 'Blanca Ferrer toca el piano en casa' },
         helenaLoop,
+      ]}
+    />
+
+    <div class="page__prose">
+      <p>
+        Su curiosidad sonora se extiende más allá del piano, cultivando un profundo interés por instrumentos como el
+        órgano y el clave. Esta fascinación por la riqueza del timbre y la textura armónica influye directamente en su
+        lenguaje compositivo, donde la tradición y la frescura dialogan con naturalidad.
+      </p>
+      <p>
+        Desde entonces, ha sido reconocida en certámenes como el concurso de composición <em>FeminaJazz (Madrid, 2021)</em>.
+        Actualmente lidera su propio proyecto musical, con el que publicará <em>su primer álbum, Sokal Affair</em>,
+        consolidándose como una voz propia dentro del panorama actual.
+      </p>
+    </div>
+
+    <MediaCollage
+      mirror
+      items={[
+        { type: 'image', src: bioGarden, alt: 'Blanca Ferrer sonríe en un jardín, bajo un limonero' },
+        { type: 'image', src: bioStudioWall, alt: 'Blanca Ferrer aplaude en un estudio de grabación' },
+        { type: 'image', src: bioConcert, alt: 'Blanca Ferrer sentada en el escenario junto a un arpa, durante un concierto' },
       ]}
     />
   </PageContent>

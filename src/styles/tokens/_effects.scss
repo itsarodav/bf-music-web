@@ -15,6 +15,8 @@ $shadow-button: 0 2px 8px rgba($color-shadow, 0.12);
 $shadow-panel-rise: 0 -24px 64px -40px rgba($color-shadow, 0.45); // upwards only: panel scrolling over the previous section
 // Photos laid over each other (media collage): short, soft drop plus a tight contact shadow
 $shadow-collage: 0 6px 16px -6px rgba($color-shadow, 0.16), 0 1px 3px rgba($color-shadow, 0.06);
+// Featured (middle) piece: same short drop, plus darker side shadows so it lifts off the two below
+$shadow-collage-featured: -6px 0 12px -6px rgba($color-shadow, 0.3), 6px 0 12px -6px rgba($color-shadow, 0.3), 0 6px 16px -6px rgba($color-shadow, 0.2), 0 1px 3px rgba($color-shadow, 0.08);
 $shadow-text: 0 2px 24px rgba($color-shadow, 0.25);
 
 // Opacity

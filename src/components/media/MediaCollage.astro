@@ -32,16 +32,19 @@ export type CollageItem = CollageImage | CollageVideo;
 
 interface Props {
   items: [CollageItem, CollageItem, CollageItem];
+  /** Flip the composition left-right (positions and rotations), so two
+   *  collages on one page don't repeat */
+  mirror?: boolean;
   class?: string;
 }
 
-const { items, class: className } = Astro.props;
+const { items, mirror = false, class: className } = Astro.props;
 
 // Each piece is ~48% of the column on phones and ~36% from tablet
 const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
 ---
 
-<div class:list={['media-collage', className]} data-media-collage>
+<div class:list={['media-collage', { 'media-collage--mirror': mirror }, className]} data-media-collage>
   {items.map((item) => (
     <div class="media-collage__item" data-media-collage-item>
       {item.type === 'image' ? (
@@ -81,6 +84,7 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
 
 <style lang="scss">
   @use 'sass:list';
+  @use 'sass:map';
   @use '../../styles/tokens' as *;
   @use '../../styles/base/breakpoints' as *;
   @use '../../styles/base/mixins' as *;
@@ -106,9 +110,33 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
     3: (32%, 6%, 3deg),
   );
 
+  // Mirrored, tablet+: the middle piece drops lower than in the normal
+  // layout, so the change between two collages reads clearly
+  $mirror-featured-drop-tablet: 16%;
+
   $play-size: 2.5rem; // 40px glass badge, same as the Short cards
   $play-optical-offset: 2px; // nudges the triangle right so it looks centered
   $item-hover-scale: 1.03;
+
+  // Places each piece in its slot. Mirrored: the x is measured from the other
+  // side and the rotation flips, so the piece lands in its reflection.
+  @mixin place-slots($slots, $size, $mirror: false) {
+    @each $slot, $pos in $slots {
+      $x: list.nth($pos, 1);
+      $rotation: list.nth($pos, 3);
+
+      @if $mirror {
+        $x: 100% - $size - $x;
+        $rotation: -1 * $rotation;
+      }
+
+      &:nth-child(#{$slot}) {
+        left: $x;
+        top: list.nth($pos, 2);
+        rotate: $rotation;
+      }
+    }
+  }
 
   .media-collage {
     position: relative;
@@ -133,29 +161,18 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
     // Keeps the rounded clip on the video in Safari
     isolation: isolate;
 
-    @each $slot, $pos in $slots-mobile {
-      &:nth-child(#{$slot}) {
-        left: list.nth($pos, 1);
-        top: list.nth($pos, 2);
-        rotate: list.nth($pos, 3);
-      }
-    }
+    @include place-slots($slots-mobile, $item-size-mobile);
 
-    // The featured piece sits on top of the other two
+    // The featured piece sits on top of the other two, with deeper side shadows
     &:nth-child(3) {
       z-index: $z-base;
+      box-shadow: $shadow-collage-featured;
     }
 
     @include tablet {
       width: $item-size-tablet;
 
-      @each $slot, $pos in $slots-tablet {
-        &:nth-child(#{$slot}) {
-          left: list.nth($pos, 1);
-          top: list.nth($pos, 2);
-          rotate: list.nth($pos, 3);
-        }
-      }
+      @include place-slots($slots-tablet, $item-size-tablet);
     }
 
     @include desktop {
@@ -168,6 +185,18 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
       width: 100%;
       height: 100%;
       object-fit: cover;
+    }
+  }
+
+  .media-collage--mirror .media-collage__item {
+    @include place-slots($slots-mobile, $item-size-mobile, true);
+
+    @include tablet {
+      @include place-slots($slots-tablet, $item-size-tablet, true);
+
+      &:nth-child(3) {
+        top: list.nth(map.get($slots-tablet, 3), 2) + $mirror-featured-drop-tablet;
+      }
     }
   }
 
