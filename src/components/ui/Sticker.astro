@@ -1,0 +1,45 @@
+---
+// Die-cut sticker look for small SVG doodles (Flower, Sparkle): the shape is
+// drawn twice, first as a thick white silhouette (the paper border, rounded
+// all around) and then in color on top, with a small drop shadow.
+// Pass the shape in the default slot, drawn in a 48×48 box. Its parts must
+// fill with `var(--sticker-fill, <their color>)` so the border copy can paint
+// them all white. Decorative only (hidden from screen readers). It fills the
+// parent's width and stays square.
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+const shape = await Astro.slots.render('default');
+---
+
+<svg class:list={['sticker', className]} viewBox="-4 -4 56 56" aria-hidden="true" focusable="false">
+  <g class="sticker__border" set:html={shape} />
+  <g set:html={shape} />
+</svg>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+
+  // Component tokens (SVG user units: the shape box is 48, so ~1 unit per px
+  // at the usual sticker sizes). The viewBox adds 4 units around the shape so
+  // the border never gets cut.
+  $border-width: 6; // stroke centered on the edge: ~3 units of white outside
+
+  .sticker {
+    display: block;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    filter: $filter-sticker-shadow;
+  }
+
+  .sticker__border {
+    --sticker-fill: #{$color-sticker-border};
+
+    stroke: $color-sticker-border;
+    stroke-width: $border-width;
+    stroke-linejoin: round;
+  }
+</style>

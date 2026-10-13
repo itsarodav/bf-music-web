@@ -20,10 +20,14 @@ import bioConcert from '../assets/images/bio-concert.jpg';
     </p>
 
     <MediaCollage
+      stickers={[
+        { kind: 'flower', tone: 'peach', spot: 'seam' },
+        { kind: 'flower', tone: 'yellow', spot: 'corner' },
+      ]}
       items={[
         { type: 'image', src: bioStudio, alt: 'Blanca Ferrer sonríe sentada en un estudio de grabación' },
         { type: 'image', src: bioPiano, alt: 'Blanca Ferrer toca el piano en casa' },
-        helenaLoop,
+        { ...helenaLoop, tooltip: 'Grabado en el estudio 🎹' },
       ]}
     />
 
@@ -42,10 +46,21 @@ import bioConcert from '../assets/images/bio-concert.jpg';
 
     <MediaCollage
       mirror
+      stickers={[
+        { kind: 'sparkle', spot: 'shine' },
+        { kind: 'sparkle', spot: 'shine-sm' },
+        { kind: 'flower', tone: 'fuchsia', spot: 'edge' },
+      ]}
       items={[
         { type: 'image', src: bioGarden, alt: 'Blanca Ferrer sonríe en un jardín, bajo un limonero' },
         { type: 'image', src: bioStudioWall, alt: 'Blanca Ferrer aplaude en un estudio de grabación' },
-        { type: 'image', src: bioConcert, alt: 'Blanca Ferrer sentada en el escenario junto a un arpa, durante un concierto' },
+        {
+          type: 'image',
+          src: bioConcert,
+          alt: 'Blanca Ferrer sentada en el escenario junto a un arpa, durante un concierto',
+          tooltip: 'Concierto con verticlave 🎶',
+          tooltipPlacement: 'bottom',
+        },
       ]}
     />
   </PageContent>

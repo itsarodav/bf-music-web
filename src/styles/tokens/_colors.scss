@@ -7,6 +7,11 @@ $color-graphite: #404142; // long-form statements and navbar over light sections
 $color-warm-black: #0A0806; // overlays that dim the photo without going cold
 $color-warm-ink: #14100C; // glass tint, keeps white text legible over the photo
 $color-charcoal: #0C0C0C; // mobile menu overlay
+$color-fuchsia: #E0127A; // hot pink accent, 4.6:1 with white text (WCAG AA)
+$color-sunflower: #FFD93D; // flower petals (bio collage)
+$color-golden: #FFC814; // sparkles: a more intense take on sunflower
+$color-tangerine: #FF7A1F; // flower center
+$color-peach: #FFB27A; // soft orange flower petals
 
 // Brand colors (third-party platforms), applied with .icon--brand-* (base/_global)
 $color-spotify: #1ED760;
@@ -75,6 +80,26 @@ $overlay-hero-recede: rgba($color-warm-black, 0.45); // hero behind the rising s
 $overlay-statement-recede: rgba($color-warm-black, 0.22); // statement behind the rising Shorts panel
 $overlay-media-bottom: rgba($color-black, 0.32); // bottom of a video thumbnail, under the play badge
 $overlay-menu: rgba($color-charcoal, 0.55);
+
+// Stickers (tooltip, flowers, sparkles): die-cut paper border
+$color-sticker-border: $color-white;
+
+// Tooltip (callout over media, e.g. "Grabado en el estudio")
+$color-tooltip-bg: $color-fuchsia;
+$color-tooltip-text: $color-white;
+
+// Flower doodle (bio collage)
+$color-flower-petal: $color-sunflower;
+$color-flower-center: $color-tangerine;
+// Peach variant: soft orange petals around the tooltip's fuchsia
+$color-flower-peach-petal: $color-peach;
+$color-flower-peach-center: $color-fuchsia;
+// Fuchsia variant: tooltip-fuchsia petals around a sunflower center
+$color-flower-fuchsia-petal: $color-fuchsia;
+$color-flower-fuchsia-center: $color-sunflower;
+
+// Sparkle doodle (bio collage)
+$color-sparkle: $color-golden;
 
 // Focus
 $color-focus-ring: rgba($color-white, 0.9);

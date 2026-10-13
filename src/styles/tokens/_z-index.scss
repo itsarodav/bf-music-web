@@ -1,6 +1,7 @@
 // Stacking order
 $z-behind: -1; // backgrounds and shades inside their section
 $z-base: 1;
+$z-raised: 2; // above a $z-base sibling (flower over the collage pieces)
 $z-navbar: 100;
 $z-skip-link: 1000;
 

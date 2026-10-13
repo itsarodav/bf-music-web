@@ -1,0 +1,64 @@
+---
+// Flower sticker: six petals around a round center, with the white die-cut
+// border and shadow of Sticker.
+// `tone`: 'yellow' (sunflower petals, orange center), 'peach' (soft orange
+// petals, fuchsia center, same as the tooltip) or 'fuchsia' (fuchsia petals,
+// sunflower center).
+import Sticker from './Sticker.astro';
+
+export type FlowerTone = 'yellow' | 'peach' | 'fuchsia';
+
+interface Props {
+  tone?: FlowerTone;
+  class?: string;
+}
+
+const { tone = 'yellow', class: className } = Astro.props;
+
+// One petal drawn pointing up, repeated around the center every 60°
+const petalAngles = [0, 60, 120, 180, 240, 300];
+---
+
+<Sticker class={className}>
+  <g class={`flower flower--${tone}`}>
+    {petalAngles.map((angle) => (
+      <ellipse class="flower__petal" cx="24" cy="12.5" rx="6.5" ry="10.5" transform={`rotate(${angle} 24 24)`} />
+    ))}
+    <circle class="flower__center" cx="24" cy="24" r="6.5" />
+  </g>
+</Sticker>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+
+  // var(--sticker-fill): Sticker paints the border copy white with it
+  .flower--yellow {
+    .flower__petal {
+      fill: var(--sticker-fill, #{$color-flower-petal});
+    }
+
+    .flower__center {
+      fill: var(--sticker-fill, #{$color-flower-center});
+    }
+  }
+
+  .flower--peach {
+    .flower__petal {
+      fill: var(--sticker-fill, #{$color-flower-peach-petal});
+    }
+
+    .flower__center {
+      fill: var(--sticker-fill, #{$color-flower-peach-center});
+    }
+  }
+
+  .flower--fuchsia {
+    .flower__petal {
+      fill: var(--sticker-fill, #{$color-flower-fuchsia-petal});
+    }
+
+    .flower__center {
+      fill: var(--sticker-fill, #{$color-flower-fuchsia-center});
+    }
+  }
+</style>

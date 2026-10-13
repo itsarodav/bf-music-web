@@ -17,6 +17,11 @@ $shadow-panel-rise: 0 -24px 64px -40px rgba($color-shadow, 0.45); // upwards onl
 $shadow-collage: 0 6px 16px -6px rgba($color-shadow, 0.16), 0 1px 3px rgba($color-shadow, 0.06);
 // Featured (middle) piece: same short drop, plus darker side shadows so it lifts off the two below
 $shadow-collage-featured: -6px 0 12px -6px rgba($color-shadow, 0.3), 6px 0 12px -6px rgba($color-shadow, 0.3), 0 6px 16px -6px rgba($color-shadow, 0.2), 0 1px 3px rgba($color-shadow, 0.08);
+// Sticker look (tooltip, flower and sparkle doodles): white die-cut border
+// plus a small shadow hugging the shape. A filter, not box-shadow, so it
+// follows the real silhouette (petals, the tooltip's arrow).
+$sticker-border-width: 3px;
+$filter-sticker-shadow: drop-shadow(0 1px 1px rgba($color-shadow, 0.26)) drop-shadow(0 2px 4px rgba($color-shadow, 0.16));
 $shadow-text: 0 2px 24px rgba($color-shadow, 0.25);
 
 // Opacity

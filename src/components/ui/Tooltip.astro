@@ -1,0 +1,104 @@
+---
+// Always-visible callout with a sticker look: solid fuchsia pill with a white
+// die-cut border and small shadow, white semibold text and an arrow (bordered
+// too) pointing at what it describes.
+// Place it inside a positioned parent, centered on one of its edges:
+// `placement="top"` sits above the top edge, arrow pointing down (e.g.
+// "Grabado en el estudio" over the Helena loop); "bottom" overlaps the
+// bottom edge, arrow pointing up. It stacks above its siblings (z-index).
+import type { HTMLAttributes } from 'astro/types';
+
+export type TooltipPlacement = 'top' | 'bottom';
+
+interface Props extends HTMLAttributes<'span'> {
+  placement?: TooltipPlacement;
+}
+
+const { placement = 'top', class: className, ...rest } = Astro.props;
+---
+
+<span class:list={['tooltip', `tooltip--${placement}`, className]} {...rest}><slot /></span>
+
+<style lang="scss">
+  @use 'sass:math';
+  @use '../../styles/tokens' as *;
+
+  // Component tokens
+  $arrow-width: 0.875rem; // 14px fuchsia base, 45° sides: 7px deep
+  // The white border triangle: each 45° side pushed out by the border width
+  $arrow-border-offset: $sticker-border-width * math.sqrt(2);
+  // How far the white tip hangs past the pill's outer edge
+  // (rem and px mixed, so calc)
+  $arrow-depth: calc(#{math.div($arrow-width, 2)} + #{$arrow-border-offset - $sticker-border-width});
+  $arrow-shape-down: polygon(0 0, 100% 0, 50% 100%);
+  $arrow-shape-up: polygon(50% 0, 0 100%, 100% 100%);
+  // Below the parent it overlaps the bottom edge like a sticker stuck on it:
+  // the arrow and the top of the pill sit over the parent
+  $overlap-bottom: $space-1-5;
+  // Above the parent only the arrow tip dips onto it
+  $overlap-top: $space-0-75; // 6px
+
+  .tooltip {
+    position: absolute;
+    left: 50%;
+    z-index: $z-base;
+    translate: -50% 0;
+    padding: $space-0-5 $space-1-5;
+    border: $sticker-border-width solid $color-sticker-border;
+    border-radius: $radius-pill;
+    background-color: $color-tooltip-bg;
+    filter: $filter-sticker-shadow;
+    font-size: $text-xs;
+    font-weight: $font-semibold;
+    line-height: $leading-normal;
+    color: $color-tooltip-text;
+    white-space: nowrap;
+    pointer-events: none;
+
+    // Arrow: two triangles hanging from the inner edge of the pill's border
+    // on the side facing the parent. The white one (::before) is the border,
+    // growing out of the pill's own; the fuchsia one (::after) sits on it and
+    // opens the pill's border in the middle, so pill and arrow read as one.
+    &::before,
+    &::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      translate: -50% 0;
+    }
+
+    &::before {
+      width: calc(#{$arrow-width} + #{2 * $arrow-border-offset});
+      height: calc(#{math.div($arrow-width, 2)} + #{$arrow-border-offset});
+      background-color: $color-sticker-border;
+    }
+
+    &::after {
+      width: $arrow-width;
+      height: math.div($arrow-width, 2);
+      background-color: $color-tooltip-bg;
+    }
+  }
+
+  // Above the parent, arrow pointing down
+  .tooltip--top {
+    bottom: calc(100% + #{$arrow-depth} - #{$overlap-top});
+
+    &::before,
+    &::after {
+      top: 100%;
+      clip-path: $arrow-shape-down;
+    }
+  }
+
+  // Below the parent, overlapping its edge, arrow pointing up
+  .tooltip--bottom {
+    top: calc(100% - #{$overlap-bottom});
+
+    &::before,
+    &::after {
+      bottom: 100%;
+      clip-path: $arrow-shape-up;
+    }
+  }
+</style>

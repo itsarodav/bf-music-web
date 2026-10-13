@@ -6,18 +6,32 @@
 // An image without `src` renders a colored placeholder until the photo arrives.
 // The video autoplays (muted, looped) only while on screen, and never with
 // reduced motion (the poster shows instead). Entrance animation: GSAP, once.
+// Any piece can carry a `tooltip`: an always-visible callout above or below
+// it (`tooltipPlacement`), kept
+// level even though the piece is rotated. `stickers` lays doodles (flowers,
+// sparkles) over the pieces; each one names a spot from $stickers below.
 import { Image } from 'astro:assets';
 import Icon from '../ui/Icon.astro';
 import NewTabHint from '../ui/NewTabHint.astro';
+import Tooltip, { type TooltipPlacement } from '../ui/Tooltip.astro';
+import Flower, { type FlowerTone } from '../ui/Flower.astro';
+import Sparkle from '../ui/Sparkle.astro';
 import { breakpoints } from '../../data/breakpoints';
 
-export interface CollageImage {
+interface CollageItemBase {
+  /** Callout on the piece (e.g. "Grabado en el estudio") */
+  tooltip?: string;
+  /** Above (default) or below the piece */
+  tooltipPlacement?: TooltipPlacement;
+}
+
+export interface CollageImage extends CollageItemBase {
   type: 'image';
   src?: ImageMetadata;
   alt?: string;
 }
 
-export interface CollageVideo {
+export interface CollageVideo extends CollageItemBase {
   type: 'video';
   /** In order of preference (webm first) */
   sources: { src: string; type: string }[];
@@ -30,15 +44,24 @@ export interface CollageVideo {
 
 export type CollageItem = CollageImage | CollageVideo;
 
+/** Spots defined in $stickers (position, size and tilt per breakpoint) */
+export type StickerSpot = 'seam' | 'corner' | 'edge' | 'shine' | 'shine-sm';
+
+export type CollageSticker =
+  | { kind: 'flower'; tone: FlowerTone; spot: StickerSpot }
+  | { kind: 'sparkle'; spot: StickerSpot };
+
 interface Props {
   items: [CollageItem, CollageItem, CollageItem];
   /** Flip the composition left-right (positions and rotations), so two
    *  collages on one page don't repeat */
   mirror?: boolean;
+  /** Doodles over the pieces, drawn above them */
+  stickers?: CollageSticker[];
   class?: string;
 }
 
-const { items, mirror = false, class: className } = Astro.props;
+const { items, mirror = false, stickers = [], class: className } = Astro.props;
 
 // Each piece is ~48% of the column on phones and ~36% from tablet
 const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
@@ -47,37 +70,45 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
 <div class:list={['media-collage', { 'media-collage--mirror': mirror }, className]} data-media-collage>
   {items.map((item) => (
     <div class="media-collage__item" data-media-collage-item>
-      {item.type === 'image' ? (
-        item.src ? (
-          <Image src={item.src} alt={item.alt ?? ''} widths={[260, 400, 520, 780]} sizes={imageSizes} loading="lazy" />
-        ) : (
-          <div class="media-collage__placeholder" aria-hidden="true"></div>
-        )
-      ) : (
-        (() => {
-          const video = (
-            <video muted loop playsinline preload="none" poster={item.poster} aria-hidden="true" data-media-collage-video>
-              {item.sources.map((source) => <source src={source.src} type={source.type} />)}
-            </video>
-          );
-
-          return item.href ? (
-            <a href={item.href} class="media-collage__link" target="_blank" rel="noopener noreferrer">
-              {video}
-              <span class="media-collage__play" aria-hidden="true">
-                <Icon name="play" size={16} />
-              </span>
-              <span class="visually-hidden">{item.label}</span>
-              <NewTabHint />
-            </a>
+      {item.tooltip && <Tooltip placement={item.tooltipPlacement} class="media-collage__tooltip">{item.tooltip}</Tooltip>}
+      <div class="media-collage__frame">
+        {item.type === 'image' ? (
+          item.src ? (
+            <Image src={item.src} alt={item.alt ?? ''} widths={[260, 400, 520, 780]} sizes={imageSizes} loading="lazy" />
           ) : (
-            <>
-              {video}
-              <span class="visually-hidden">{item.label}</span>
-            </>
-          );
-        })()
-      )}
+            <div class="media-collage__placeholder" aria-hidden="true"></div>
+          )
+        ) : (
+          (() => {
+            const video = (
+              <video muted loop playsinline preload="none" poster={item.poster} aria-hidden="true" data-media-collage-video>
+                {item.sources.map((source) => <source src={source.src} type={source.type} />)}
+              </video>
+            );
+  
+            return item.href ? (
+              <a href={item.href} class="media-collage__link" target="_blank" rel="noopener noreferrer">
+                {video}
+                <span class="media-collage__play" aria-hidden="true">
+                  <Icon name="play" size={16} />
+                </span>
+                <span class="visually-hidden">{item.label}</span>
+                <NewTabHint />
+              </a>
+            ) : (
+              <>
+                {video}
+                <span class="visually-hidden">{item.label}</span>
+              </>
+            );
+          })()
+        )}
+      </div>
+    </div>
+  ))}
+  {stickers.map((sticker) => (
+    <div class={`media-collage__sticker media-collage__sticker--${sticker.spot}`} data-media-collage-sticker>
+      {sticker.kind === 'flower' ? <Flower tone={sticker.tone} /> : <Sparkle />}
     </div>
   ))}
 </div>
@@ -118,6 +149,52 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
   $play-optical-offset: 2px; // nudges the triangle right so it looks centered
   $item-hover-scale: 1.03;
 
+  // Stickers: center (x, y) per breakpoint, same % system as the slots,
+  // measured on the collage as it renders (already mirrored, never flipped);
+  // size is % of the collage width; tilt so they look hand-placed.
+  // seam:   over the first photo and the featured piece, where they meet
+  // corner: half off the top edge of the second photo, near its outer corner
+  // edge:   half off the outer edge of the first photo (mirrored collage)
+  // shine, shine-sm: sparkle pair on the top outer corner of the second
+  //         photo (mirrored collage)
+  $stickers: (
+    seam: (
+      mobile: (27%, 50%),
+      tablet: (34%, 72%),
+      size-mobile: 9.5%,
+      size-tablet: 6.5%,
+      rotation: -12deg,
+    ),
+    corner: (
+      mobile: (89%, 7.5%),
+      tablet: (93%, 18%),
+      size-mobile: 8%,
+      size-tablet: 5%,
+      rotation: 18deg,
+    ),
+    edge: (
+      mobile: (95%, 42%),
+      tablet: (98.5%, 74%),
+      size-mobile: 11%,
+      size-tablet: 7.5%,
+      rotation: 14deg,
+    ),
+    shine: (
+      mobile: (10%, 5.5%),
+      tablet: (7%, 20.5%),
+      size-mobile: 9%,
+      size-tablet: 5.5%,
+      rotation: 0deg,
+    ),
+    shine-sm: (
+      mobile: (14.5%, 0%),
+      tablet: (10%, 15.5%),
+      size-mobile: 5%,
+      size-tablet: 3%,
+      rotation: 0deg,
+    ),
+  );
+
   // Places each piece in its slot. Mirrored: the x is measured from the other
   // side and the rotation flips, so the piece lands in its reflection.
   @mixin place-slots($slots, $size, $mirror: false) {
@@ -131,11 +208,18 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
       }
 
       &:nth-child(#{$slot}) {
+        --item-rotation: #{$rotation};
+
         left: $x;
         top: list.nth($pos, 2);
-        rotate: $rotation;
       }
     }
+  }
+
+  // Places a sticker's center
+  @mixin place-sticker($pos) {
+    left: list.nth($pos, 1);
+    top: list.nth($pos, 2);
   }
 
   .media-collage {
@@ -154,12 +238,10 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
     position: absolute;
     width: $item-size-mobile;
     aspect-ratio: 1;
+    rotate: var(--item-rotation);
     border-radius: $radius-xl;
-    overflow: hidden;
     background-color: $color-placeholder-on-light; // while the media loads
     box-shadow: $shadow-collage;
-    // Keeps the rounded clip on the video in Safari
-    isolation: isolate;
 
     @include place-slots($slots-mobile, $item-size-mobile);
 
@@ -178,6 +260,16 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
     @include desktop {
       border-radius: $radius-2xl;
     }
+  }
+
+  // Clips the media to the rounded corners. Lives inside the piece (not on it)
+  // so a tooltip can stick out above the edge.
+  .media-collage__frame {
+    height: 100%;
+    border-radius: inherit;
+    overflow: hidden;
+    // Keeps the rounded clip on the video in Safari
+    isolation: isolate;
 
     :global(img),
     video {
@@ -196,6 +288,33 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
 
       &:nth-child(3) {
         top: list.nth(map.get($slots-tablet, 3), 2) + $mirror-featured-drop-tablet;
+      }
+    }
+  }
+
+  // The tooltip undoes the piece's rotation so it always reads level
+  .media-collage__item :global(.media-collage__tooltip) {
+    rotate: calc(-1 * var(--item-rotation));
+  }
+
+  .media-collage__sticker {
+    position: absolute;
+    z-index: $z-raised;
+    translate: -50% -50%;
+    pointer-events: none;
+  }
+
+  @each $spot, $sticker in $stickers {
+    .media-collage__sticker--#{$spot} {
+      width: map.get($sticker, size-mobile);
+      rotate: map.get($sticker, rotation);
+
+      @include place-sticker(map.get($sticker, mobile));
+
+      @include tablet {
+        width: map.get($sticker, size-tablet);
+
+        @include place-sticker(map.get($sticker, tablet));
       }
     }
   }
@@ -259,7 +378,7 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
     // so it never holds the scroll back. Rotation lives in CSS (`rotate`),
     // so GSAP's transform only adds the lift on top.
     if (!reducedMotion) {
-      gsap.from(collage.querySelectorAll('[data-media-collage-item]'), {
+      gsap.from(collage.querySelectorAll('[data-media-collage-item], [data-media-collage-sticker]'), {
         autoAlpha: 0,
         y: 32,
         scale: 0.94,
