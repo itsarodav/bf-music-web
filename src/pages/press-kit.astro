@@ -24,9 +24,9 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
     <!-- Header: one-liner + the one main action -->
     <TextCard label="Presentación" copyLabel="Copiar presentación" text={pressKit.oneLiner} textId="press-one-liner" lead>
       <div slot="footer" class="press-header__actions">
-        <DownloadButton download={downloads.zip} variant="primary" size="sm" class="press-header__zip" />
         <DownloadButton download={downloads.dossier} label="Dossier PDF" size="sm" />
         <DownloadButton download={downloads.pressRelease} size="sm" />
+        <DownloadButton download={downloads.zip} variant="primary" size="sm" class="press-header__zip" />
       </div>
     </TextCard>
 
@@ -77,14 +77,13 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
 
     <!-- 5. Live -->
     <section id={id['En directo']} class="page__section press-section" aria-labelledby="press-live-title">
-      <h2 id="press-live-title" class="page__subtitle">{live.title}</h2>
-      <p class="page__text">{live.text}</p>
-      <div class="press-live__actions">
-        <DownloadButton download={downloads.rider} label="Rider técnico (PDF)" />
-        <Button href={live.repertoire.href} variant="tertiary" surface="light" icon="arrow-right" iconPosition="end">
-          {live.repertoire.label}
-        </Button>
+      <div class="press-section__header">
+        <h2 id="press-live-title" class="page__subtitle">{live.title}</h2>
+        <DownloadButton download={downloads.rider} label="Rider técnico" size="sm" />
       </div>
+      <p class="page__text">
+        {live.text} {live.repertoire.before} <a href={live.repertoire.href} class="press-link">{live.repertoire.label}</a>.
+      </p>
       <!-- Booking contact, right where a programmer decides to book -->
       <PresentationCard status={contact.status} ticker={contact.ticker} />
     </section>
@@ -94,6 +93,9 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
 <style lang="scss">
   @use '../styles/tokens' as *;
   @use '../styles/base/breakpoints' as *;
+  @use '../styles/base/mixins' as *;
+
+  $link-underline-offset: 0.2em;
 
   // Anchored sections land below the navbar + sub-nav (offset set by PressKitNav)
   .press-section {
@@ -127,7 +129,8 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
   }
 
   // ---------- Header ----------
-  // Phones: the ZIP button takes its own row, the other two share the next
+  // Secondary buttons first, the primary (ZIP) last, on the right.
+  // Phones: the two secondaries share a row, the ZIP takes the full row below
   .press-header__actions {
     display: flex;
     flex-wrap: wrap;
@@ -149,6 +152,10 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
       > :global(.press-header__zip) {
         flex: 0 0 auto;
       }
+
+      > :global(.press-header__zip) {
+        margin-left: auto;
+      }
     }
   }
 
@@ -166,11 +173,22 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
   }
 
   // ---------- Live ----------
-  .press-live__actions {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: $space-1 $space-2;
+  // Link inside running text: ink and underlined, so it reads as a link
+  .press-link {
+    @include focus-ring(2px, $color-focus-ring-on-light);
+    @include transition(text-decoration-color);
+
+    color: $color-text-on-light;
+    font-weight: $font-medium;
+    text-decoration: underline;
+    text-decoration-color: $color-border-light;
+    text-underline-offset: $link-underline-offset;
+
+    @media (hover: hover) {
+      &:hover {
+        text-decoration-color: currentColor;
+      }
+    }
   }
 
   // Short button labels on phones, so the button fits next to its title

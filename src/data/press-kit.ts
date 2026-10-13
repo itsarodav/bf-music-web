@@ -159,7 +159,8 @@ export const pressKit = {
     title: 'En directo',
     // Draft, to confirm with Blanca
     text: 'Un proyecto propio de Blanca Ferrer que sube al escenario en formato trío.',
-    repertoire: { label: 'Música y repertorio', href: '/musica' },
+    // Sentence after the text, with the link inside
+    repertoire: { before: 'Descubre su', label: 'música y repertorio', href: '/musica' },
   },
 
   contact: {

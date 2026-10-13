@@ -4,8 +4,9 @@
 // one tap away (on phones the anchors scroll sideways). Two states:
 // - Floating: a rounded bar on the reading column, below the header.
 // - Docked: once scrolled up to the navbar, it morphs (GSAP) into a second
-//   full-width bar right under it, with its own bottom line and the content
-//   on the page gutter, like the navbar. Scrolling back up to the header
+//   full-width bar right under it, with its own bottom line; its content
+//   stays on the page column (the gutter on phones and tablet, the centered
+//   max width on desktop). Scrolling back up to the header
 //   morphs it back. With reduced motion the switch is instant.
 import DownloadButton from '../ui/DownloadButton.astro';
 import type { ResolvedDownload } from '../../data/downloads';
@@ -197,16 +198,18 @@ const { sections, zip } = Astro.props;
 
       let docked = false;
 
-      // Docked geometry: from the column out to the viewport edges, content on
-      // the navbar gutter. Recomputed on resize.
+      // Docked geometry: the bar from the column out to the viewport edges,
+      // its content padded back in to the column (same edges as the page
+      // content: the gutter on phones and tablet, the max width on desktop).
+      // Recomputed on resize.
       const dockedProps = () => {
         const { left, right } = column.getBoundingClientRect();
-        const gutter = navbar ? getComputedStyle(navbar).paddingLeft : innerPadding;
+        const rightInset = document.documentElement.clientWidth - right;
         return {
           nav: {
             '--press-nav-gap': '0px',
             marginLeft: -left,
-            marginRight: -(document.documentElement.clientWidth - right),
+            marginRight: -rightInset,
             borderRadius: 0,
             borderTopColor: transparent,
             borderLeftColor: transparent,
@@ -214,7 +217,7 @@ const { sections, zip } = Astro.props;
             // Exact edges: the column can sit on half pixels
             autoRound: false,
           },
-          inner: { paddingLeft: gutter, paddingRight: gutter },
+          inner: { paddingLeft: left, paddingRight: rightInset, autoRound: false },
         };
       };
 
