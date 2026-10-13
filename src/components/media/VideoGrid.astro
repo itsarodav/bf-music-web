@@ -1,0 +1,84 @@
+---
+// Grid of looping video cards (Film Scoring).
+// Phones and tablet: one column, every card 16:9.
+// Desktop: a repeating pattern of five, on a 5-column grid:
+//   row 1: one card across the full width
+//   row 2: wide (60%) + narrow (40%)
+//   row 3: narrow (40%) + wide (60%)
+// The narrow cards stretch to the height of their wide neighbour (see VideoCard).
+import VideoCard, { type LoopVideo } from '../cards/VideoCard.astro';
+
+export interface VideoGridItem {
+  title: string;
+  href: string;
+  video?: LoopVideo;
+}
+
+interface Props {
+  items: VideoGridItem[];
+  /** Accessible name of the list */
+  label: string;
+  class?: string;
+}
+
+const { items, label, class: className } = Astro.props;
+
+// Positions 3 and 4 of each group of five take the narrow column
+const isNarrow = (index: number) => [2, 3].includes(index % 5);
+---
+
+<ul class:list={['video-grid', className]} aria-label={label}>
+  {items.map((item, index) => (
+    <li class="video-grid__item">
+      <VideoCard {...item} narrow={isNarrow(index)} />
+    </li>
+  ))}
+</ul>
+
+<style lang="scss">
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+
+  // Component tokens: 5 columns split 3 + 2 (60 / 40)
+  $grid-columns: 5;
+  $span-wide: 3;
+  $span-narrow: 2;
+
+  .video-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: $space-5;
+
+    @include desktop {
+      grid-template-columns: repeat($grid-columns, minmax(0, 1fr));
+      gap: $space-5 $space-2;
+    }
+  }
+
+  @include desktop {
+    .video-grid__item {
+      // Row 1 (and every 5th card after it): full width
+      &:nth-child(5n + 1) {
+        grid-column: 1 / -1;
+      }
+
+      // Row 2: wide + narrow
+      &:nth-child(5n + 2) {
+        grid-column: span $span-wide;
+      }
+
+      &:nth-child(5n + 3) {
+        grid-column: span $span-narrow;
+      }
+
+      // Row 3: narrow + wide
+      &:nth-child(5n + 4) {
+        grid-column: span $span-narrow;
+      }
+
+      &:nth-child(5n + 5) {
+        grid-column: span $span-wide;
+      }
+    }
+  }
+</style>

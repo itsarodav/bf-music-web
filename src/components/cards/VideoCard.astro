@@ -1,0 +1,166 @@
+---
+// Looping video with its title below and a "Ver en YouTube" button at the
+// other end of the same line. Only the button is a link: the video is visual.
+// The loop plays (muted) only while on screen, never with reduced motion.
+// Without `video` it shows a colored placeholder until the loop arrives.
+//
+// `narrow`: the card takes the small column of a VideoGrid row on desktop.
+// There it stretches to the height of its 16:9 neighbour (the grid row sets
+// it), so the box ends up a little wider than square, and the button shrinks
+// to the YouTube logo so the title has room.
+import Button from '../ui/Button.astro';
+
+export interface LoopVideo {
+  /** In order of preference (webm first) */
+  sources: { src: string; type: string }[];
+  poster: string;
+}
+
+interface Props {
+  title: string;
+  /** The full video on YouTube */
+  href: string;
+  video?: LoopVideo;
+  narrow?: boolean;
+  class?: string;
+}
+
+const { title, href, video, narrow = false, class: className } = Astro.props;
+---
+
+<article class:list={['video-card', { 'video-card--narrow': narrow }, className]}>
+  <div class="video-card__media">
+    {video ? (
+      <video muted loop playsinline preload="none" poster={video.poster} aria-hidden="true" data-video-card-video>
+        {video.sources.map((source) => <source src={source.src} type={source.type} />)}
+      </video>
+    ) : (
+      <div class="video-card__placeholder" aria-hidden="true"></div>
+    )}
+  </div>
+
+  <div class="video-card__footer">
+    <h2 class="video-card__title">{title}</h2>
+
+    {/* Full button, and the logo-only one for narrow cards on desktop
+        (only one is ever displayed, so screen readers get one link) */}
+    <Button
+      href={href}
+      external
+      variant="secondary"
+      surface="light"
+      size="sm"
+      icon="youtube"
+      class="video-card__action video-card__action--full"
+    >
+      Ver en YouTube
+    </Button>
+    {narrow && (
+      <Button
+        href={href}
+        external
+        variant="secondary"
+        surface="light"
+        size="sm"
+        icon="youtube"
+        ariaLabel={`Ver «${title}» en YouTube`}
+        class="video-card__action video-card__action--compact"
+      />
+    )}
+  </div>
+</article>
+
+<style lang="scss">
+  @use 'sass:list';
+  @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
+  @use '../../styles/base/mixins' as *;
+
+  $media-ratio: list.slash(16, 9);
+
+  .video-card {
+    display: flex;
+    flex-direction: column;
+    gap: $space-1-5;
+    min-width: 0;
+    color: $color-text-on-light;
+  }
+
+  .video-card__media {
+    position: relative;
+    aspect-ratio: $media-ratio;
+    border-radius: $radius-xl;
+    overflow: hidden;
+    background-color: $color-placeholder-on-light; // while the poster loads
+    // Keeps the rounded clip on the video in Safari
+    isolation: isolate;
+
+    video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    @include desktop {
+      border-radius: $radius-2xl;
+    }
+  }
+
+  .video-card__placeholder {
+    width: 100%;
+    height: 100%;
+    background-color: $color-placeholder-media;
+  }
+
+  .video-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: $space-2;
+    padding-inline: $space-0-5;
+  }
+
+  .video-card__title {
+    min-width: 0;
+    font-size: $text-base;
+    font-weight: $font-medium;
+    line-height: $leading-snug;
+    text-wrap: pretty;
+  }
+
+  .video-card__footer :global(.video-card__action) {
+    flex-shrink: 0;
+  }
+
+  .video-card__footer :global(.video-card__action--compact) {
+    display: none;
+  }
+
+  @include desktop {
+    // Fills the grid row (as tall as the wide card next to it): the box
+    // takes whatever height the footer leaves
+    .video-card--narrow {
+      height: 100%;
+
+      .video-card__media {
+        flex: 1;
+        aspect-ratio: auto;
+      }
+
+      .video-card__footer :global(.video-card__action--full) {
+        display: none;
+      }
+
+      .video-card__footer :global(.video-card__action--compact) {
+        display: inline-flex;
+      }
+    }
+  }
+</style>
+
+<script>
+  import { autoplayInView } from '../../scripts/autoplay-in-view';
+
+  autoplayInView(document.querySelectorAll<HTMLVideoElement>('[data-video-card-video]'));
+</script>

@@ -1,8 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
 import PageContent from '../components/sections/PageContent.astro';
+import VideoGrid from '../components/media/VideoGrid.astro';
+import { filmScoringProjects } from '../data/film-scoring';
 ---
 
 <Layout title="Film Scoring">
-  <PageContent title="Film Scoring" />
+  <PageContent title="Film Scoring">
+    <p>
+      Un espacio para sus exploraciones en la <em>composición para imagen</em>: piezas y propuestas propias en las que imagina
+      cómo la música puede acompañar una escena, sostener una emoción o darle a una historia su propio pulso.
+    </p>
+
+    <VideoGrid items={filmScoringProjects} label="Proyectos de composición para imagen" />
+  </PageContent>
 </Layout>

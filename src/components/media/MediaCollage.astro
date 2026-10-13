@@ -245,21 +245,15 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
 <script>
   import { gsap } from 'gsap';
   import { ScrollTrigger } from 'gsap/ScrollTrigger';
+  import { autoplayInView } from '../../scripts/autoplay-in-view';
 
   gsap.registerPlugin(ScrollTrigger);
 
   const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   document.querySelectorAll<HTMLElement>('[data-media-collage]').forEach((collage) => {
-    // Video: plays only while on screen (saves battery), poster otherwise
-    if (!reducedMotion) {
-      collage.querySelectorAll<HTMLVideoElement>('[data-media-collage-video]').forEach((video) => {
-        new IntersectionObserver(([entry]) => {
-          if (entry.isIntersecting) video.play().catch(() => {});
-          else video.pause();
-        }).observe(video);
-      });
-    }
+    // Video: plays only while on screen, poster otherwise
+    autoplayInView(collage.querySelectorAll<HTMLVideoElement>('[data-media-collage-video]'));
 
     // Entrance: the pieces rise and settle one after another, short and quick
     // so it never holds the scroll back. Rotation lives in CSS (`rotate`),
