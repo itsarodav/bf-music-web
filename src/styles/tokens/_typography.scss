@@ -1,6 +1,8 @@
 // Typography
-$font-primary: 'Geist', system-ui, -apple-system, 'Segoe UI', sans-serif;
-$font-display: 'Diphylleia', Georgia, serif;
+// Families and fallbacks are configured in astro.config.mjs (fonts) and
+// loaded in Layout.astro; these variables already include the fallbacks.
+$font-primary: var(--font-geist);
+$font-display: var(--font-diphylleia);
 
 // Font sizes
 $text-xs: 0.75rem;    // 12px

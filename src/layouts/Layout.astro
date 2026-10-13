@@ -1,4 +1,5 @@
 ---
+import { Font } from 'astro:assets';
 import '../styles/main.scss';
 import Navbar from '../components/navigation/Navbar.astro';
 import Contact from '../components/sections/Contact.astro';
@@ -49,13 +50,10 @@ const ogImageUrl = new URL(site.ogImage, Astro.site);
     <meta name="twitter:description" content={description} />
     <meta name="twitter:image" content={ogImageUrl} />
 
-    <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Diphylleia&family=Geist:ital,wght@0,100..900;1,700&display=swap"
-      rel="stylesheet"
-    />
+    <!-- Fonts (self-hosted, see astro.config.mjs). Preload only what every page
+         paints first: the display face (hero name, page titles) and upright Geist. -->
+    <Font cssVariable="--font-diphylleia" preload={[{ subset: 'latin' }]} />
+    <Font cssVariable="--font-geist" preload={[{ style: 'normal', subset: 'latin' }]} />
   </head>
   <body>
     <a href="#main" class="skip-link">Saltar al contenido</a>
