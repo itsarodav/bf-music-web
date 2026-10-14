@@ -117,7 +117,11 @@ const paletteVars = `--cover-color-primary: ${palette.primary}; --cover-color-se
   // shifts a little across it (tilted toward the light), then a band of
   // light crosses it.
   $disc-size: 92%; // of the cover, so its edge hides behind the case
-  $disc-peek: -48%; // almost half the CD out
+  // How far it comes out: less on phones and tablets, where it would get
+  // close to the name above; almost half the CD on desktop
+  $disc-peek-mobile: -30%;
+  $disc-peek-tablet: -38%;
+  $disc-peek-desktop: -48%;
   $disc-shadow: drop-shadow(0 2px 6px rgba($color-shadow, 0.35));
   $disc-tilt: 35deg; // how far the reflections shift as it comes out
   $disc-tilt-duration: 1.2s;
@@ -392,7 +396,7 @@ const paletteVars = `--cover-color-primary: ${palette.primary}; --cover-color-se
   // plays once by itself after the intro (.is-presenting, see the script).
   @mixin disc-out {
     .music-card__disc {
-      translate: 0 $disc-peek;
+      translate: 0 var(--disc-peek);
     }
 
     .music-card__disc-face::before {
@@ -433,6 +437,15 @@ const paletteVars = `--cover-color-primary: ${palette.primary}; --cover-color-se
       aspect-ratio: 1;
       filter: $disc-shadow;
       transition: translate $duration-slow $ease-out-back;
+      --disc-peek: #{$disc-peek-mobile};
+
+      @include tablet {
+        --disc-peek: #{$disc-peek-tablet};
+      }
+
+      @include desktop {
+        --disc-peek: #{$disc-peek-desktop};
+      }
     }
 
     .music-card__disc-face {
