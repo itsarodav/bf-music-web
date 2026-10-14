@@ -6,8 +6,15 @@ $navbar-logo-size: 2.625rem; // 42px
 $navbar-logo-size-tablet: 3rem; // 48px
 // The BF SVG has ~21% built-in padding on the left
 $navbar-logo-svg-inset: 0.214;
-// Tablet+: the logo sits a bit higher than the links (its SVG has padding on top)
-$navbar-logo-raise: $space-0-5;
+
+// Logo hover: the album cover's colors flow across the logo in a loop while
+// hovered, no glow. One tile is two logos wide and starts and ends on the
+// same blue, so moving it by exactly one tile (200%) loops without a seam.
+// Horizontal on purpose: a diagonal tile doesn't line up with the next one.
+$navbar-logo-gradient-angle: 90deg;
+$navbar-logo-gradient-size: 200% 100%;
+$navbar-logo-gradient-loop: 200% 0;
+$navbar-logo-gradient-duration: 3s; // per loop, calm enough to read as a shimmer
 
 // Hamburger
 $navbar-toggle-size: 2.75rem; // 44px, minimum touch target
@@ -24,12 +31,11 @@ $navbar-intro-offset: -$space-1-5;
 $navbar-intro-duration: 0.8s;
 $navbar-intro-delay: 0.2s;
 
-// Fixed on every breakpoint. Two state classes, set in Navbar.astro:
-// - .is-scrolled: tablet+ compacts the bar (less padding, smaller logo offset).
-//   .navbar--light compacts it too, so only the hero gets the tall bar.
+// Fixed on every breakpoint, same height on every page (64px on phones,
+// 68px on tablet+). One state class, set in Navbar.astro:
 // - .navbar--light: over sections marked data-nav-theme="light" the bar turns
 //   solid white with a hairline and text/logo switch to graphite.
-// Over the hero it stays transparent with white content, scrolled or not.
+// Over the hero it stays transparent with white content.
 // The theme swap is instant on purpose (colors, background, border): it
 // happens as the white panel's edge crosses the bar, and fading some parts
 // but not others left white lines on a still-white bar for a moment.
@@ -40,7 +46,6 @@ $navbar-intro-delay: 0.2s;
 }
 
 .navbar__bar {
-  @include transition(padding);
   @include intro-reveal($navbar-intro-offset, $navbar-intro-duration, $navbar-intro-delay);
 
   position: relative;
@@ -55,26 +60,12 @@ $navbar-intro-delay: 0.2s;
   border-bottom: 1px solid transparent;
 
   @include tablet {
-    align-items: flex-start;
-    height: auto;
-    // Extra bottom padding makes up for the logo's raised offset, so the bar
-    // keeps its height (97px over the hero, 65px compact)
-    padding-block: $space-3 calc(#{$space-3} + #{$navbar-logo-raise});
-
-    // Compact once scrolled, and always over light sections: the tall bar is
-    // only for the transparent state over the hero, a white bar growing at
-    // the top of the other pages reads as extra bottom padding
-    .is-scrolled &,
-    .navbar--light & {
-      align-items: center;
-      padding-block: $space-1;
-    }
+    height: $navbar-height-tablet;
   }
 }
 
 .navbar__logo {
   @include focus-ring;
-  @include transition(margin);
 
   --logo-size: #{$navbar-logo-size};
 
@@ -92,14 +83,64 @@ $navbar-intro-delay: 0.2s;
 
   @include tablet {
     --logo-size: #{$navbar-logo-size-tablet};
+  }
+}
 
-    // Optical alignment with the links
-    margin-top: calc(-1 * #{$navbar-logo-raise});
+// The colors live in a layer masked by the logo's own SVG (--logo-mask, set
+// in Navbar.astro), so the gradient fills the real shape. Hover only on
+// devices with a mouse; phones keep the plain logo.
+.navbar__logo {
+  position: relative;
+}
 
-    .is-scrolled &,
-    .navbar--light & {
-      margin-top: 0;
+.navbar__logo-icon {
+  @include transition(opacity);
+}
+
+.navbar__logo-gradient {
+  @include transition(opacity);
+
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  pointer-events: none;
+  background: linear-gradient(
+      $navbar-logo-gradient-angle,
+      $color-cover-blue,
+      $color-cover-lilac,
+      $color-cover-pink,
+      $color-cover-coral,
+      $color-cover-red,
+      $color-cover-coral,
+      $color-cover-pink,
+      $color-cover-lilac,
+      $color-cover-blue
+    )
+    0 0 / #{$navbar-logo-gradient-size} repeat-x;
+  -webkit-mask: var(--logo-mask) center / contain no-repeat;
+  mask: var(--logo-mask) center / contain no-repeat;
+}
+
+@media (hover: hover) {
+  .navbar__logo:hover {
+    .navbar__logo-icon {
+      opacity: 0;
     }
+
+    .navbar__logo-gradient {
+      opacity: 1;
+      animation: navbar-logo-flow $navbar-logo-gradient-duration linear infinite;
+
+      @media (prefers-reduced-motion: reduce) {
+        animation: none;
+      }
+    }
+  }
+}
+
+@keyframes navbar-logo-flow {
+  to {
+    background-position: $navbar-logo-gradient-loop;
   }
 }
 

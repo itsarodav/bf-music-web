@@ -3,6 +3,7 @@ import Icon from '../ui/Icon.astro';
 import MobileMenu from './MobileMenu.astro';
 import { navLinks, getCurrentPath } from '../../data/navigation';
 import { site } from '../../data/site';
+import logoUrl from '../../icons/logo-bf.svg?url';
 
 const currentPath = getCurrentPath(Astro.url);
 const isCurrent = (href: string) => href === currentPath;
@@ -10,8 +11,10 @@ const isCurrent = (href: string) => href === currentPath;
 
 <header class="navbar" data-navbar>
   <div class="navbar__bar">
-    <a href="/" class="navbar__logo" aria-label={`${site.name}, inicio`}>
+    <a href="/" class="navbar__logo" aria-label={`${site.name}, inicio`} style={`--logo-mask: url(${JSON.stringify(logoUrl)})`}>
       <Icon name="logo-bf" size={88} class="navbar__logo-icon" />
+      <!-- Hover: the album cover's colors, cut to the logo's shape -->
+      <span class="navbar__logo-gradient" aria-hidden="true"></span>
     </a>
 
     <nav class="navbar__nav" aria-label="Principal">
@@ -54,11 +57,10 @@ const isCurrent = (href: string) => href === currentPath;
     // The line where the bar meets the content (its bottom edge)
     const barHeight = () => navbar.querySelector<HTMLElement>('.navbar__bar')?.offsetHeight ?? 64;
 
-    // Both states are checked live against the real layout (not positions
-    // cached on load), so they're right after a reload mid-page, a resize or a
-    // section changing height:
-    // - is-scrolled: compact bar as soon as the page leaves the top
-    // - navbar--light: any light section sits under the bar's bottom edge
+    // Checked live against the real layout (not positions cached on load), so
+    // it's right after a reload mid-page, a resize or a section changing
+    // height: navbar--light while any light section sits under the bar's
+    // bottom edge
     const lightSections = [...document.querySelectorAll<HTMLElement>('[data-nav-theme="light"]')];
     let frame = 0;
 
@@ -69,7 +71,6 @@ const isCurrent = (href: string) => href === currentPath;
         const { top, bottom } = section.getBoundingClientRect();
         return top <= line && bottom > line;
       });
-      navbar.classList.toggle('is-scrolled', window.scrollY > 8);
       navbar.classList.toggle('navbar--light', light);
     };
 
