@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import Button from '../ui/Button.astro';
 import { breakpoints } from '../../data/breakpoints';
+import { getCoverPalette } from '../../lib/cover-palette';
 
 export interface MusicCardAction {
   label: string;
@@ -30,48 +31,62 @@ interface Props {
 }
 
 const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class: className } = Astro.props;
+
+// The glow behind the card takes the cover's two most vivid colors
+const palette = await getCoverPalette(cover);
+const paletteVars = `--cover-color-primary: ${palette.primary}; --cover-color-secondary: ${palette.secondary};`;
 ---
 
-<article class:list={['music-card', `music-card--${layout}`, className]}>
-  <div class="music-card__cover">
-    <Image
-      src={cover}
-      alt={coverAlt}
-      widths={[120, 240, 360]}
-      sizes={`(min-width: ${breakpoints.tablet}px) 120px, (min-width: ${breakpoints.mobile}px) 112px, 84px`}
-      loading="eager"
-    />
-  </div>
+<div class:list={['music-card-wrap', className]} style={paletteVars} data-music-card>
+  <span class="music-card__glow" aria-hidden="true"></span>
 
-  <div class="music-card__content">
-    {textShort ? (
-      <p class="music-card__text">
-        <span class="music-card__text-short">{textShort}</span>
-        <span class="music-card__text-full">{text}</span>
-      </p>
-    ) : (
-      <p class="music-card__text">{text}</p>
-    )}
+  <article class:list={['music-card', `music-card--${layout}`]}>
+    <div class="music-card__cover">
+      <span class="music-card__disc" aria-hidden="true">
+        <span class="music-card__disc-face"><span class="music-card__disc-spin"></span></span>
+      </span>
+      <Image
+        src={cover}
+        alt={coverAlt}
+        widths={[120, 240, 360]}
+        sizes={`(min-width: ${breakpoints.tablet}px) 120px, (min-width: ${breakpoints.mobile}px) 112px, 84px`}
+        loading="eager"
+      />
+    </div>
 
-    {actions.length > 0 && (
-      <div class="music-card__actions">
-        {actions.map((action) => (
-          <Button
-            href={action.href}
-            external
-            variant={action.variant ?? 'primary'}
-            size={{ base: 'md', tablet: 'sm' }}
-            icon={action.icon ? { name: action.icon, brand: action.brandIcon } : undefined}
-          >
-            {action.label}
-          </Button>
-        ))}
-      </div>
-    )}
-  </div>
-</article>
+    <div class="music-card__content">
+      {textShort ? (
+        <p class="music-card__text">
+          <span class="music-card__text-short">{textShort}</span>
+          <span class="music-card__text-full">{text}</span>
+        </p>
+      ) : (
+        <p class="music-card__text">{text}</p>
+      )}
+
+      {actions.length > 0 && (
+        <div class="music-card__actions">
+          {actions.map((action) => (
+            <Button
+              href={action.href}
+              external
+              variant={action.variant ?? 'primary'}
+              size={{ base: 'md', tablet: 'sm' }}
+              icon={action.icon ? { name: action.icon, brand: action.brandIcon } : undefined}
+            >
+              {action.label}
+            </Button>
+          ))}
+        </div>
+      )}
+    </div>
+  </article>
+</div>
 
 <style lang="scss">
+  @use 'sass:color';
+  @use 'sass:string';
+  @use 'sass:math';
   @use '../../styles/tokens' as *;
   @use '../../styles/base/breakpoints' as *;
   @use '../../styles/base/mixins' as *;
@@ -87,6 +102,109 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
   // Fluid copy on phones (below 480px)
   $text-size-phone: clamp(0.875rem, 4.2vw, 1rem); // 14px → 16px
 
+  // Glow: the cover's two colors (--cover-color-*, set from the cover at
+  // build time) blurred behind the glass, which picks them up as a tint.
+  // Off at rest (plain glass): it fades in on hover, as the CD comes out.
+  $glow-alpha: 0.45;
+  $glow-blur: $blur-lg; // how far the color spills past the card
+  $glow-opacity: 0.55;
+
+  // CD (hover devices from tablet): slides up out of the cover like a disc
+  // pulled from its case. Drawn like the data side of a real one: mirror
+  // silver lit in sectors, a thin rainbow where it catches the light, faint
+  // tracks, a clear plastic hub around the hole and a bright rim. Like a
+  // real CD the reflections don't spin with it: as it comes out the light
+  // shifts a little across it (tilted toward the light), then a band of
+  // light crosses it.
+  $disc-size: 92%; // of the cover, so its edge hides behind the case
+  $disc-peek: -48%; // almost half the CD out
+  $disc-shadow: drop-shadow(0 2px 6px rgba($color-shadow, 0.35));
+  $disc-tilt: 35deg; // how far the reflections shift as it comes out
+  $disc-tilt-duration: 1.2s;
+  $disc-spin: 1.6s; // per turn
+  // Radii as % of the disc's radius (closest-side gradients), real CD
+  // proportions: 15mm hole, clear hub to ~36mm, data from ~46mm
+  $disc-hole: 12.5%;
+  $disc-hub-ring: 21%; // stacking ring on the clear hub
+  $disc-hub: 30%;
+  $disc-mirror: 38%; // mirror band where the data starts
+  $disc-rim: 97%;
+  // Silver
+  $disc-silver-light: #FBFCFD;
+  $disc-silver: #D6DADF;
+  $disc-silver-mid: #C9CED4;
+  $disc-silver-dark: #9EA5AD;
+  $disc-silver-shade: #A3A9B1;
+  $disc-silver-base: #EEF1F4;
+  $disc-edge-shade: rgba(#787D82, 0.5);
+  $disc-mirror-shade: rgba(#5A5F64, 0.25);
+  $disc-plastic: rgba($color-white, 0.22);
+  $disc-plastic-thin: rgba($color-white, 0.1);
+  $disc-plastic-edge: rgba($color-white, 0.5);
+  $disc-plastic-ring: rgba($color-white, 0.6);
+  $disc-mirror-band: rgba($color-white, 0.35);
+  $disc-rim-light: rgba($color-white, 0.7);
+  $disc-track-light: rgba($color-white, 0.06);
+  $disc-track-dark: rgba($color-shadow, 0.05);
+  // Rainbow: hue and lightness per band, one band every $disc-band-step
+  $disc-rainbow: (0 62%, 40 60%, 100 55%, 180 58%, 230 65%, 290 65%);
+  $disc-rainbow-alpha: 0.38;
+  $disc-rainbow-start: 205deg;
+  $disc-band-fade: 10deg;
+  $disc-band-step: 9deg;
+  // Spinning details: uneven data sectors and the hub's stamped code
+  $disc-data-start: 40%;
+  $disc-data-glint: rgba($color-white, 0.28);
+  $disc-data-glint-soft: rgba($color-white, 0.18);
+  $disc-data-shade: rgba($color-shadow, 0.1);
+  $disc-data-shade-soft: rgba($color-shadow, 0.08);
+  $disc-code-inner: 24%;
+  $disc-code-outer: 27%;
+  $disc-code-color: rgba($color-shadow, 0.6);
+  $disc-code-mark: 1.2deg; // one stamped character
+  $disc-code-gap: 1.8deg;
+
+  // Light sweep
+  $disc-sheen-angle: 115deg;
+  $disc-sheen-color: rgba($color-white, 0.75);
+  $disc-sheen-duration: 0.9s;
+  $disc-sheen-delay: $duration-base; // once the CD is mostly out
+  $disc-sheen-size: 300% 100%;
+  $disc-sheen-from: 110%;
+  $disc-sheen-to: -10%;
+
+  // One rainbow fan for the CD, starting at $from: fades in, the bands in
+  // order, fades out
+  @function disc-rainbow($from) {
+    $stops: 'transparent #{$from}';
+    $i: 0;
+    @each $hue, $lightness in $disc-rainbow {
+      $color: rgba(hsl($hue, 90%, $lightness), $disc-rainbow-alpha);
+      $stops: '#{$stops}, #{$color} #{$from + $disc-band-fade + $i * $disc-band-step}';
+      $i: $i + 1;
+    }
+
+    @return string.unquote('#{$stops}, transparent #{$from + $disc-band-fade * 2.4 + ($i - 1) * $disc-band-step}');
+  }
+
+  .music-card-wrap {
+    position: relative;
+    isolation: isolate;
+  }
+
+  .music-card__glow {
+    position: absolute;
+    inset: 0;
+    z-index: $z-behind;
+    border-radius: $radius-2xl;
+    background:
+      radial-gradient(ellipse at 20% 50%, rgb(var(--cover-color-primary) / #{$glow-alpha}), transparent 70%),
+      radial-gradient(ellipse at 80% 50%, rgb(var(--cover-color-secondary) / #{$glow-alpha}), transparent 70%);
+    filter: blur($glow-blur);
+    opacity: 0;
+    pointer-events: none;
+  }
+
   .music-card {
     @include glass('dark', $blur-xl);
 
@@ -101,19 +219,24 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
     }
   }
 
+  // The image rounds its own corners (no overflow: hidden here), so the
+  // CD can slide out of the cover. Isolated so the CD stays behind it.
   .music-card__cover {
+    position: relative;
+    isolation: isolate;
     flex-shrink: 0;
     // Always 1:1: never stretch to the content's height
     align-self: flex-start;
     width: $cover-size-phone;
     aspect-ratio: 1;
     border-radius: $radius-md;
-    overflow: hidden;
     box-shadow: $shadow-button;
 
     :global(img) {
+      display: block;
       width: 100%;
       height: 100%;
+      border-radius: inherit;
       object-fit: cover;
     }
 
@@ -128,6 +251,10 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
     @include desktop {
       width: $cover-size-desktop;
     }
+  }
+
+  .music-card__disc {
+    display: none;
   }
 
   .music-card__content {
@@ -258,4 +385,220 @@ const { cover, coverAlt, text, textShort, actions, layout = 'responsive', class:
       }
     }
   }
+
+  // ---------- Motion ----------
+  // The CD out of its case, with the cover's colors lit on the glass. Desktop
+  // (hover, tablet+): on hover only, a little surprise. Touch screens: it
+  // plays once by itself after the intro (.is-presenting, see the script).
+  @mixin disc-out {
+    .music-card__disc {
+      translate: 0 $disc-peek;
+    }
+
+    .music-card__disc-face::before {
+      rotate: $disc-tilt;
+    }
+
+    .music-card__disc-spin {
+      animation-play-state: running;
+    }
+
+    .music-card__disc-face::after {
+      animation: music-card-disc-sheen $disc-sheen-duration $ease-in-out $disc-sheen-delay;
+    }
+  }
+
+  @media (hover: hover) {
+    .music-card-wrap:hover .music-card__glow {
+      opacity: $glow-opacity;
+    }
+  }
+
+  @media (prefers-reduced-motion: no-preference) {
+    .music-card__glow {
+      transition: opacity $duration-slow $ease-out;
+    }
+
+    // CD, tucked behind the cover until it comes out. The outer span slides
+    // and casts the shadow; the face is cut round with its hole (a mask,
+    // which would clip a shadow on the same element). Face layers: ::before
+    // the still reflections, the spinning details, ::after the light sweep.
+    .music-card__disc {
+      position: absolute;
+      top: math.div(100% - $disc-size, 2);
+      left: math.div(100% - $disc-size, 2);
+      z-index: $z-behind;
+      display: block;
+      width: $disc-size;
+      aspect-ratio: 1;
+      filter: $disc-shadow;
+      transition: translate $duration-slow $ease-out-back;
+    }
+
+    .music-card__disc-face {
+      position: absolute;
+      inset: 0;
+      mask: radial-gradient(circle closest-side, transparent $disc-hole, #000 $disc-hole, #000 99.3%, transparent 100%);
+      // The clear hub (the data surface covers the rest)
+      background: radial-gradient(
+        circle closest-side,
+        $disc-plastic $disc-hole,
+        $disc-plastic-thin $disc-hub-ring - 1%,
+        $disc-plastic-edge $disc-hub-ring $disc-hub-ring + 0.8%,
+        $disc-plastic-thin $disc-hub-ring + 1.6% $disc-hub - 1.4%,
+        $disc-plastic-ring $disc-hub - 0.8% $disc-hub,
+        $disc-plastic $disc-hub + 0.5%
+      );
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+      }
+
+      // Data surface, top to bottom: rim, mirror band, tracks, rainbow
+      // (two opposite fans, where the light hits), sector-lit silver
+      &::before {
+        mask: radial-gradient(circle closest-side, transparent $disc-hub + 0.6%, #000 $disc-hub + 1%);
+        background:
+          radial-gradient(circle closest-side, transparent $disc-rim - 0.5%, $disc-rim-light $disc-rim + 1%, $disc-edge-shade 99.5%),
+          radial-gradient(circle closest-side, transparent $disc-hub + 1%, $disc-mirror-band $disc-hub + 1.5% $disc-mirror - 1.5%, $disc-mirror-shade $disc-mirror - 1% $disc-mirror, transparent $disc-mirror + 0.5%),
+          repeating-radial-gradient(circle closest-side, $disc-track-light 0 1px, $disc-track-dark 1px 2.5px),
+          conic-gradient(from $disc-rainbow-start, disc-rainbow(0deg), transparent 180deg, disc-rainbow(180deg)),
+          conic-gradient(
+            from 25deg,
+            $disc-silver-base,
+            $disc-silver-dark 10%,
+            $disc-silver-mid 18%,
+            $disc-silver-light 25%,
+            $disc-silver-shade 36%,
+            $disc-silver 44%,
+            $disc-silver-base 50%,
+            $disc-silver-dark 60%,
+            $disc-silver-mid 68%,
+            $disc-silver-light 75%,
+            $disc-silver-shade 86%,
+            $disc-silver 94%,
+            $disc-silver-base
+          );
+        transition: rotate $disc-tilt-duration $ease-out;
+      }
+
+      // Parked off the right edge until the CD comes out (::after paints
+      // over the spinning details)
+      &::after {
+        background: linear-gradient($disc-sheen-angle, transparent 40%, $disc-sheen-color 50%, transparent 60%) $disc-sheen-from 0 / $disc-sheen-size no-repeat;
+      }
+    }
+
+    .music-card__disc-spin {
+      position: absolute;
+      inset: 0;
+      animation: music-card-disc-spin $disc-spin linear infinite paused;
+
+      &::before,
+      &::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+      }
+
+      // Uneven data: a few lighter and darker sectors and a denser band
+      &::before {
+        mask: radial-gradient(circle closest-side, transparent $disc-data-start - 1%, #000 $disc-data-start, #000 $disc-rim - 1%, transparent $disc-rim - 0.5%);
+        background:
+          conic-gradient(
+            from 10deg,
+            transparent 0 4%,
+            $disc-data-glint 6%,
+            transparent 9% 21%,
+            $disc-data-shade 24% 31%,
+            transparent 34% 47%,
+            $disc-data-glint-soft 49%,
+            transparent 51% 63%,
+            $disc-data-shade-soft 66% 70%,
+            transparent 72% 84%,
+            $disc-data-glint 86% 87%,
+            transparent 89%
+          ),
+          radial-gradient(circle closest-side, transparent 70%, $disc-data-shade-soft 71% 82%, transparent 83%);
+      }
+
+      // Stamped code on the hub: a thin ring of marks in two runs
+      &::after {
+        mask:
+          radial-gradient(circle closest-side, transparent $disc-code-inner - 0.5%, #000 $disc-code-inner $disc-code-outer, transparent $disc-code-outer + 0.5%),
+          conic-gradient(#000 0 38%, transparent 38% 52%, #000 52% 81%, transparent 81%);
+        mask-composite: intersect;
+        background: repeating-conic-gradient($disc-code-color 0 $disc-code-mark, transparent $disc-code-mark $disc-code-mark + $disc-code-gap);
+      }
+    }
+
+    .music-card-wrap.is-presenting {
+      .music-card__glow {
+        opacity: $glow-opacity;
+      }
+
+      @include disc-out;
+    }
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    @include tablet {
+      .music-card:hover {
+        @include disc-out;
+      }
+    }
+  }
+
+  @keyframes music-card-disc-spin {
+    to {
+      rotate: 1turn;
+    }
+  }
+
+  @keyframes music-card-disc-sheen {
+    from {
+      background-position-x: $disc-sheen-from;
+    }
+
+    to {
+      background-position-x: $disc-sheen-to;
+    }
+  }
 </style>
+
+<script>
+  // Touch screens have no hover: the card shows its CD once by itself, a
+  // moment after it lands, then tucks it back. Desktop keeps it for hover.
+  // Timings mirror the hero intro in _hero.scss (card delay + duration).
+  const INTRO_LANDED_MS = 1800;
+  const NO_INTRO_DELAY_MS = 600;
+  const PRESENT_MS = 2800;
+
+  const touch = window.matchMedia('(hover: none)').matches;
+  const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (touch && !reducedMotion) {
+    const delay = document.documentElement.classList.contains('has-intro') ? INTRO_LANDED_MS : NO_INTRO_DELAY_MS;
+
+    document.querySelectorAll<HTMLElement>('[data-music-card]').forEach((card) => {
+      // Only once it's really on screen
+      const observer = new IntersectionObserver(
+        ([entry]) => {
+          if (!entry.isIntersecting) return;
+          observer.disconnect();
+
+          window.setTimeout(() => {
+            card.classList.add('is-presenting');
+            window.setTimeout(() => card.classList.remove('is-presenting'), PRESENT_MS);
+          }, delay);
+        },
+        { threshold: 0.6 },
+      );
+
+      observer.observe(card);
+    });
+  }
+</script>

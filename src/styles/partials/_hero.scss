@@ -184,10 +184,6 @@ $hero-intro-card-delay: 0.7s;
   @include desktop {
     font-size: $text-display-desktop;
   }
-
-  @include wide {
-    font-size: $text-display-wide;
-  }
 }
 
 // Each word is its own line on tablet, inline everywhere else
