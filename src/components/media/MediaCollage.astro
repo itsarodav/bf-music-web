@@ -148,6 +148,8 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
   $play-size: 2.5rem; // 40px glass badge, same as the Short cards
   $play-optical-offset: 2px; // nudges the triangle right so it looks centered
   $item-hover-scale: 1.03;
+  $tooltip-wiggle-tilt: 6deg; // widest swing, each one after it smaller
+  $tooltip-wiggle-duration: 700ms;
 
   // Stickers: center (x, y) per breakpoint, same % system as the slots,
   // measured on the collage as it renders (already mirrored, never flipped);
@@ -297,11 +299,11 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
     rotate: calc(-1 * var(--item-rotation));
   }
 
+  // Takes the pointer so the doodle can react on hover (Flower, Sparkle)
   .media-collage__sticker {
     position: absolute;
     z-index: $z-raised;
     translate: -50% -50%;
-    pointer-events: none;
   }
 
   @each $spot, $sticker in $stickers {
@@ -357,6 +359,35 @@ const imageSizes = `(min-width: ${breakpoints.tablet}px) 260px, 48vw`;
   @media (hover: hover) and (prefers-reduced-motion: no-preference) {
     .media-collage__item:hover {
       scale: $item-hover-scale;
+    }
+
+    // Its tooltip wiggles left and right once, like a message arriving.
+    // `transform`, so it adds to the tooltip's own rotate and translate.
+    .media-collage__item:hover :global(.media-collage__tooltip) {
+      animation: media-collage-tooltip-wiggle $tooltip-wiggle-duration $ease-in-out;
+    }
+  }
+
+  @keyframes media-collage-tooltip-wiggle {
+    0%,
+    100% {
+      transform: none;
+    }
+
+    15% {
+      transform: rotate(-1 * $tooltip-wiggle-tilt);
+    }
+
+    35% {
+      transform: rotate($tooltip-wiggle-tilt);
+    }
+
+    55% {
+      transform: rotate(-0.5 * $tooltip-wiggle-tilt);
+    }
+
+    75% {
+      transform: rotate(0.25 * $tooltip-wiggle-tilt);
     }
   }
 </style>

@@ -31,6 +31,27 @@ const petalAngles = [0, 60, 120, 180, 240, 300];
 <style lang="scss">
   @use '../../styles/tokens' as *;
 
+  // Component tokens
+  $spin-turn: 1turn;
+
+  // Hover: the flower gives one friendly turn around its center and settles
+  // with a small overshoot (and turns back when the pointer leaves). Both
+  // copies (border and color) spin together, the shadow stays put.
+  .flower {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    .flower {
+      transition: transform $duration-slower $ease-out-back;
+    }
+
+    :global(.sticker:hover) .flower {
+      transform: rotate($spin-turn);
+    }
+  }
+
   // var(--sticker-fill): Sticker paints the border copy white with it
   .flower--yellow {
     .flower__petal {

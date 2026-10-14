@@ -81,8 +81,11 @@ const { placement = 'top', class: className, ...rest } = Astro.props;
   }
 
   // Above the parent, arrow pointing down
+  // Any wiggle a parent adds pivots on the arrow tip, so the pill swings from
+  // the point it's pinned to
   .tooltip--top {
     bottom: calc(100% + #{$arrow-depth} - #{$overlap-top});
+    transform-origin: 50% 100%;
 
     &::before,
     &::after {
@@ -94,6 +97,7 @@ const { placement = 'top', class: className, ...rest } = Astro.props;
   // Below the parent, overlapping its edge, arrow pointing up
   .tooltip--bottom {
     top: calc(100% - #{$overlap-bottom});
+    transform-origin: 50% 0;
 
     &::before,
     &::after {

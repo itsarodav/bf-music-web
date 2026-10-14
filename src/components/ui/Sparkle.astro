@@ -21,6 +21,46 @@ const { class: className } = Astro.props;
 <style lang="scss">
   @use '../../styles/tokens' as *;
 
+  // Component tokens: one glint (grow and tilt, shrink back, settle), then a
+  // rest, repeated while hovered
+  $twinkle-cycle: 1.2s;
+  $twinkle-scale-peak: 1.3;
+  $twinkle-scale-dip: 0.85;
+  $twinkle-scale-settle: 1.08;
+  $twinkle-tilt-peak: 20deg;
+  $twinkle-tilt-dip: -8deg;
+
+  .sparkle {
+    transform-box: fill-box;
+    transform-origin: center;
+  }
+
+  @media (hover: hover) and (prefers-reduced-motion: no-preference) {
+    :global(.sticker:hover) .sparkle {
+      animation: sparkle-twinkle $twinkle-cycle $ease-in-out infinite;
+    }
+  }
+
+  @keyframes sparkle-twinkle {
+    0%,
+    60%,
+    100% {
+      transform: none;
+    }
+
+    20% {
+      transform: scale($twinkle-scale-peak) rotate($twinkle-tilt-peak);
+    }
+
+    38% {
+      transform: scale($twinkle-scale-dip) rotate($twinkle-tilt-dip);
+    }
+
+    50% {
+      transform: scale($twinkle-scale-settle);
+    }
+  }
+
   // var(--sticker-fill): Sticker paints the border copy white with it
   .sparkle {
     fill: var(--sticker-fill, #{$color-sparkle});
