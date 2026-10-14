@@ -26,6 +26,7 @@ $navbar-intro-delay: 0.2s;
 
 // Fixed on every breakpoint. Two state classes, set in Navbar.astro:
 // - .is-scrolled: tablet+ compacts the bar (less padding, smaller logo offset).
+//   .navbar--light compacts it too, so only the hero gets the tall bar.
 // - .navbar--light: over sections marked data-nav-theme="light" the bar turns
 //   solid white with a hairline and text/logo switch to graphite.
 // Over the hero it stays transparent with white content, scrolled or not.
@@ -60,7 +61,11 @@ $navbar-intro-delay: 0.2s;
     // keeps its height (97px over the hero, 65px compact)
     padding-block: $space-3 calc(#{$space-3} + #{$navbar-logo-raise});
 
-    .is-scrolled & {
+    // Compact once scrolled, and always over light sections: the tall bar is
+    // only for the transparent state over the hero, a white bar growing at
+    // the top of the other pages reads as extra bottom padding
+    .is-scrolled &,
+    .navbar--light & {
       align-items: center;
       padding-block: $space-1;
     }
@@ -91,7 +96,8 @@ $navbar-intro-delay: 0.2s;
     // Optical alignment with the links
     margin-top: calc(-1 * #{$navbar-logo-raise});
 
-    .is-scrolled & {
+    .is-scrolled &,
+    .navbar--light & {
       margin-top: 0;
     }
   }

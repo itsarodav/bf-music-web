@@ -16,6 +16,11 @@ body {
   background-color: $color-black;
 }
 
+::selection {
+  background-color: $color-selection-bg;
+  color: $color-selection-text;
+}
+
 // Prevent background scroll while the mobile menu is open
 body.is-menu-open {
   overflow: hidden;

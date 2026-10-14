@@ -88,6 +88,10 @@ $color-sticker-border: $color-white;
 $color-tooltip-bg: $color-fuchsia;
 $color-tooltip-text: $color-white;
 
+// Text selection: same fuchsia callout look as the tooltip
+$color-selection-bg: $color-tooltip-bg;
+$color-selection-text: $color-tooltip-text;
+
 // Flower doodle (bio collage)
 $color-flower-petal: $color-sunflower;
 $color-flower-center: $color-tangerine;
