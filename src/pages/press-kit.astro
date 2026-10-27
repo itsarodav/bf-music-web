@@ -14,6 +14,10 @@ import TextCard from '../components/cards/TextCard.astro';
 import Button from '../components/ui/Button.astro';
 import DownloadButton from '../components/ui/DownloadButton.astro';
 import { pressKit, downloads } from '../data/press-kit';
+import { SHOW_PRESS_KIT } from '../data/features';
+
+// Not published yet: production sends /press-kit to the home page
+if (!SHOW_PRESS_KIT) return Astro.redirect('/');
 
 const { watch, bio, photos, brand, live, contact } = pressKit;
 const id = Object.fromEntries(pressKit.sections.map((section) => [section.label, section.id]));

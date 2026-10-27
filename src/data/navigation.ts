@@ -1,3 +1,5 @@
+import { SHOW_PRESS_KIT } from './features';
+
 export interface NavLink {
   label: string;
   href: string;
@@ -7,11 +9,12 @@ export interface NavLink {
 export const getCurrentPath = (url: URL) => url.pathname.replace(/\/$/, '') || '/';
 
 // Main navigation. "Contacto" is a section rendered on every page,
-// so it is a same-page anchor rather than a route.
+// so it is a same-page anchor rather than a route. Press kit only shows
+// while it's enabled (see data/features).
 export const navLinks: NavLink[] = [
   { label: 'Bio', href: '/bio' },
   { label: 'Música', href: '/musica' },
-  { label: 'Press kit', href: '/press-kit' },
+  ...(SHOW_PRESS_KIT ? [{ label: 'Press kit', href: '/press-kit' }] : []),
   { label: 'Film Scoring', href: '/film-scoring' },
   { label: 'Contacto', href: '#contacto' },
 ];
