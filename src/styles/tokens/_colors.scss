@@ -95,10 +95,12 @@ $color-cover-lilac: #9AA8F2;
 $color-cover-pink: #F2A9C4;
 $color-cover-coral: #EE6A5A;
 $color-cover-red: #D8263C;
+// The apple's body (pinkish red), a touch deeper so white text passes AA (4.6:1)
+$color-cover-apple: #CE4356;
 
-// Text selection: same fuchsia callout look as the tooltip
-$color-selection-bg: $color-tooltip-bg;
-$color-selection-text: $color-tooltip-text;
+// Text selection: the apple from the 'Sokal Affair' cover, white text
+$color-selection-bg: $color-cover-apple;
+$color-selection-text: $color-white;
 
 // Flower doodle (bio collage)
 $color-flower-petal: $color-sunflower;
