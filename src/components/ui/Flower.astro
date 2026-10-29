@@ -30,9 +30,11 @@ const petalAngles = [0, 60, 120, 180, 240, 300];
 
 <style lang="scss">
   @use '../../styles/tokens' as *;
+  @use '../../styles/base/breakpoints' as *;
 
   // Component tokens
   $spin-turn: 1turn;
+  $idle-spin-duration: 24s; // one full turn: slow enough to feel ambient
 
   // Hover: the flower gives one friendly turn around its center and settles
   // with a small overshoot (and turns back when the pointer leaves). Both
@@ -49,6 +51,22 @@ const petalAngles = [0, 60, 120, 180, 240, 300];
 
     :global(.sticker:hover) .flower {
       transform: rotate($spin-turn);
+    }
+  }
+
+  // Mobile only: a slow, endless spin so the flowers feel alive without the
+  // hover. Uses `rotate` (not `transform`) so it never fights the hover turn.
+  @include below-tablet {
+    @media (prefers-reduced-motion: no-preference) {
+      .flower {
+        animation: flower-idle-spin $idle-spin-duration linear infinite;
+      }
+    }
+  }
+
+  @keyframes flower-idle-spin {
+    to {
+      rotate: $spin-turn;
     }
   }
 

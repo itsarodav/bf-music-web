@@ -5,6 +5,7 @@
 // rest show smaller and get 960 × 540.
 //
 // Needs ffmpeg: FFMPEG=/path/to/ffmpeg node scripts/build-film-scoring-loops.mjs
+// Pass slugs to rebuild only those: ... build-film-scoring-loops.mjs happiness
 import { execFileSync } from 'node:child_process';
 import { stat, unlink } from 'node:fs/promises';
 import sharp from 'sharp';
@@ -22,8 +23,9 @@ const QUALITY = { large: { x264: 28, vp9: 38 }, small: { x264: 31, vp9: 42 } };
 // crop: source area to keep before scaling (16:9), when the source needs it
 // quality: overrides the size-based CRF for one loop
 const loops = [
-  // Dense, grainy animation: compressed harder so it stays near the others
-  { slug: 'happiness', input: 'InMics_Round2_BlancaFerrandoSanchez.mp4', start: 22, size: [1280, 720], quality: { x264: 32, vp9: 46 } },
+  // Dense, grainy animation: compressed harder so it stays near the others.
+  // Red car sequence, the most colorful one with fewest rats up close
+  { slug: 'happiness', input: 'InMics_Round2_BlancaFerrandoSanchez.mp4', start: 111, size: [1280, 720], quality: { x264: 32, vp9: 46 } },
   // Letterboxed (1920 × 960 from y = 60): picture only, cut to 16:9
   { slug: 'bridgerton', input: 'bridgerton-07.mp4', start: 60, size: [960, 540], crop: '1706:960:107:60' },
   // Letterboxed with a burned-in timecode under the picture: keep the
@@ -36,8 +38,9 @@ const loops = [
 ];
 
 const kb = async (file) => `${((await stat(file)).size / 1024).toFixed(0)} KB`;
+const only = process.argv.slice(2);
 
-for (const { slug, input, start, size, crop, quality: override } of loops) {
+for (const { slug, input, start, size, crop, quality: override } of loops.filter(({ slug }) => !only.length || only.includes(slug))) {
   const [width, height] = size;
   const quality = override ?? (width >= 1280 ? QUALITY.large : QUALITY.small);
   const filters = [crop && `crop=${crop}`, `scale=${width}:${height}:force_original_aspect_ratio=increase`, `crop=${width}:${height}`, `fps=${FPS}`]
