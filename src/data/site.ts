@@ -22,6 +22,6 @@ export const legal = {
 
 // Credits bar (brand slogans, kept in English)
 export const credits = {
-  author: { label: 'arodav', href: 'https://github.com/itsarodav' },
+  author: { label: 'arodav', href: 'https://arodav.com/' },
   agency: { label: 'Lemonims', href: 'https://link.lemonims.com' },
 };
