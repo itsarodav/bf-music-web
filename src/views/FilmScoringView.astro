@@ -1,0 +1,17 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageContent from '../components/sections/PageContent.astro';
+import VideoGrid from '../components/media/VideoGrid.astro';
+import { filmScoringProjects } from '../data/film-scoring';
+import { getI18n } from '../i18n';
+
+const { t } = getI18n(Astro.url);
+---
+
+<Layout title={t('film.title')}>
+  <PageContent title={t('film.title')}>
+    <p set:html={t('film.intro')} />
+
+    <VideoGrid items={filmScoringProjects} label={t('film.gridLabel')} />
+  </PageContent>
+</Layout>

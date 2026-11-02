@@ -3,13 +3,15 @@
 @use '../base/mixins' as *;
 
 // Full-screen glass overlay. Hidden by default; GSAP animates
-// opacity/visibility (autoAlpha) and the items.
+// opacity/visibility (autoAlpha) and the items. Links and language tabs
+// sit at the bottom, in thumb reach.
 .mobile-menu {
   position: fixed;
   inset: 0;
   z-index: $z-navbar-menu;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  justify-content: flex-end;
   @include page-gutter;
 
   padding-top: calc(#{$navbar-height-mobile} + #{$space-4});
@@ -53,4 +55,11 @@
   &:active {
     opacity: $opacity-muted;
   }
+}
+
+// Language tabs, apart from the links by a hairline
+.mobile-menu__lang {
+  margin-top: $space-5;
+  padding-top: $space-4;
+  border-top: 1px solid $color-border-dark;
 }

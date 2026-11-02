@@ -1,0 +1,57 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageContent from '../components/sections/PageContent.astro';
+import MediaCollage from '../components/media/MediaCollage.astro';
+import { getHelenaLoop } from '../data/media';
+import { getI18n } from '../i18n';
+import bioStudio from '../assets/images/bio-studio.jpg';
+import bioPiano from '../assets/images/bio-piano.jpg';
+import bioGarden from '../assets/images/bio-garden.jpg';
+import bioStudioWall from '../assets/images/bio-studio-wall.jpg';
+import bioConcert from '../assets/images/bio-concert.jpg';
+
+const { t } = getI18n(Astro.url);
+---
+
+<Layout title={t('bio.title')}>
+  <PageContent title={t('bio.heading')}>
+    <p set:html={t('bio.intro')} />
+
+    <MediaCollage
+      stickers={[
+        { kind: 'flower', tone: 'peach', spot: 'seam' },
+        { kind: 'flower', tone: 'yellow', spot: 'corner' },
+      ]}
+      items={[
+        { type: 'image', src: bioStudio, alt: t('bio.collage.studioAlt') },
+        { type: 'image', src: bioPiano, alt: t('bio.collage.pianoAlt') },
+        { ...getHelenaLoop(t), tooltip: t('bio.collage.videoTooltip') },
+      ]}
+    />
+
+    <div class="page__prose">
+      <p set:html={t('bio.timbre')} />
+      <p set:html={t('bio.today')} />
+    </div>
+
+    <MediaCollage
+      mirror
+      stickers={[
+        { kind: 'sparkle', spot: 'shine' },
+        { kind: 'sparkle', spot: 'shine-sm' },
+        { kind: 'flower', tone: 'fuchsia', spot: 'edge' },
+      ]}
+      items={[
+        { type: 'image', src: bioGarden, alt: t('bio.collage.gardenAlt') },
+        { type: 'image', src: bioStudioWall, alt: t('bio.collage.studioWallAlt') },
+        {
+          type: 'image',
+          src: bioConcert,
+          alt: t('bio.collage.concertAlt'),
+          tooltip: t('bio.collage.concertTooltip'),
+          tooltipPlacement: 'bottom',
+        },
+      ]}
+    />
+  </PageContent>
+</Layout>

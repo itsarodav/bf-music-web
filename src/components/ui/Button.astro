@@ -2,7 +2,7 @@
 import type { HTMLAttributes } from 'astro/types';
 import Icon from './Icon.astro';
 import NewTabHint from './NewTabHint.astro';
-import { a11y } from '../../data/site';
+import { getI18n } from '../../i18n';
 import type { breakpoints } from '../../data/breakpoints';
 
 type Variant = 'primary' | 'secondary' | 'tertiary';
@@ -56,7 +56,8 @@ const {
 
 const iconConfig: IconConfig | undefined = typeof icon === 'string' ? { name: icon } : icon;
 const hasLabel = Astro.slots.has('default');
-const label = ariaLabel && external ? `${ariaLabel} ${a11y.newTab}` : ariaLabel;
+const { t } = getI18n(Astro.url);
+const label = ariaLabel && external ? `${ariaLabel} ${t('a11y.newTab')}` : ariaLabel;
 
 const sizeClasses =
   typeof size === 'string'

@@ -1,6 +1,8 @@
 ---
 // Tells screen readers that a link opens in a new tab. Place it inside the link.
-import { a11y } from '../../data/site';
+import { getI18n } from '../../i18n';
+
+const { t } = getI18n(Astro.url);
 ---
 
-<span class="visually-hidden"> {a11y.newTab}</span>
+<span class="visually-hidden"> {t('a11y.newTab')}</span>

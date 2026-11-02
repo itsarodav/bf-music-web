@@ -1,17 +1,21 @@
 ---
 // Long-form legal text (terms, privacy). Content goes in the slot as plain HTML.
+import { formatDate, getI18n } from '../../i18n';
+
 interface Props {
   title: string;
+  /** ISO date */
   lastUpdated: string;
 }
 
 const { title, lastUpdated } = Astro.props;
+const { locale, t } = getI18n(Astro.url);
 ---
 
 <article class="legal" aria-labelledby="legal-title" data-nav-theme="light">
   <header class="legal__header">
     <h1 id="legal-title" class="legal__title">{title}</h1>
-    <p class="legal__updated">Última actualización: {lastUpdated}</p>
+    <p class="legal__updated">{t('legal.lastUpdated', { date: formatDate(lastUpdated, locale) })}</p>
   </header>
 
   <div class="legal__body">

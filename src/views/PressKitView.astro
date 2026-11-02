@@ -2,7 +2,7 @@
 // Press kit: the front door for festival programmers and press, not the
 // whole archive (that's the ZIP). Each block fits one screen with one line of
 // text and one action at most, and links to /bio and /musica instead of
-// repeating them. All copy and files live in data/press-kit.
+// repeating them. Files and links live in data/press-kit, copy in i18n (press.*).
 import Layout from '../layouts/Layout.astro';
 import PageContent from '../components/sections/PageContent.astro';
 import PressKitNav from '../components/navigation/PressKitNav.astro';
@@ -13,31 +13,29 @@ import PresentationCard from '../components/cards/PresentationCard.astro';
 import TextCard from '../components/cards/TextCard.astro';
 import Button from '../components/ui/Button.astro';
 import DownloadButton from '../components/ui/DownloadButton.astro';
-import { pressKit, downloads } from '../data/press-kit';
-import { SHOW_PRESS_KIT } from '../data/features';
+import { getPressKit } from '../data/press-kit';
+import { getI18n } from '../i18n';
 
-// Not published yet: production sends /press-kit to the home page
-if (!SHOW_PRESS_KIT) return Astro.redirect('/');
-
-const { watch, bio, photos, brand, live, contact } = pressKit;
-const id = Object.fromEntries(pressKit.sections.map((section) => [section.label, section.id]));
+const { locale, t } = getI18n(Astro.url);
+const { pressKit, downloads } = getPressKit(locale);
+const { sections, watch, bio, photos, brand, live, contact } = pressKit;
 ---
 
-<Layout title="Press kit" description={pressKit.description}>
-  <PageContent title="Press kit">
+<Layout title={pressKit.title} description={pressKit.description}>
+  <PageContent title={pressKit.title}>
     <!-- Header: one-liner + the one main action -->
-    <TextCard label="Presentación" copyLabel="Copiar presentación" text={pressKit.oneLiner} textId="press-one-liner" lead>
+    <TextCard label={t('press.oneLinerLabel')} copyLabel={t('press.copyOneLiner')} text={pressKit.oneLiner} textId="press-one-liner" lead>
       <div slot="footer" class="press-header__actions">
-        <DownloadButton download={downloads.dossier} label="Dossier PDF" size="sm" />
+        <DownloadButton download={downloads.dossier} label={t('press.dossierButton')} size="sm" />
         <DownloadButton download={downloads.pressRelease} size="sm" />
         <DownloadButton download={downloads.zip} variant="primary" size="sm" class="press-header__zip" />
       </div>
     </TextCard>
 
-    <PressKitNav sections={pressKit.sections} zip={downloads.zip} />
+    <PressKitNav sections={Object.values(sections)} zip={downloads.zip} />
 
     <!-- 1. Watch and listen -->
-    <section id={id['Ver y escuchar']} class="page__section press-section" aria-labelledby="press-watch-title">
+    <section id={sections.watch.id} class="page__section press-section" aria-labelledby="press-watch-title">
       <div class="press-section__header">
         <h2 id="press-watch-title" class="page__subtitle">{watch.title}</h2>
         <Button href={watch.listen.href} external variant="secondary" surface="light" size="sm" icon={{ name: 'spotify', brand: true }}>
@@ -49,9 +47,9 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
     </section>
 
     <!-- 2. Short bio -->
-    <section id={id['Sobre Blanca']} class="page__section press-section" aria-labelledby="press-bio-title">
+    <section id={sections.bio.id} class="page__section press-section" aria-labelledby="press-bio-title">
       <h2 id="press-bio-title" class="page__subtitle">{bio.title}</h2>
-      <TextCard label="Bio corta" copyLabel="Copiar bio" text={bio.short} textId="press-bio-text">
+      <TextCard label={t('press.bio.label')} copyLabel={t('press.bio.copy')} text={bio.short} textId="press-bio-text">
         <Button slot="footer" href={bio.full.href} variant="secondary" surface="light" size="sm" icon="arrow-right" iconPosition="end">
           {bio.full.label}
         </Button>
@@ -59,16 +57,16 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
     </section>
 
     <!-- 3. Press photos -->
-    <section id={id['Fotos']} class="page__section press-section" aria-labelledby="press-photos-title">
+    <section id={sections.photos.id} class="page__section press-section" aria-labelledby="press-photos-title">
       <div class="press-section__header">
         <h2 id="press-photos-title" class="page__subtitle">{photos.title}</h2>
-        <DownloadButton download={photos.downloadAll} label="Descargar todas" size="sm" />
+        <DownloadButton download={photos.downloadAll} label={t('press.photos.downloadAll')} size="sm" />
       </div>
       <PressPhotoGrid items={photos.items} />
     </section>
 
     <!-- 4. Brand: no visible title (brief), named for the sub-nav and screen readers -->
-    <section id={id['Marca']} class="page__section press-section" aria-labelledby="press-brand-title">
+    <section id={sections.brand.id} class="page__section press-section" aria-labelledby="press-brand-title">
       <h2 id="press-brand-title" class="visually-hidden">{brand.title}</h2>
       <ul class="press-brand">
         {brand.items.map((item) => (
@@ -80,10 +78,10 @@ const id = Object.fromEntries(pressKit.sections.map((section) => [section.label,
     </section>
 
     <!-- 5. Live -->
-    <section id={id['En directo']} class="page__section press-section" aria-labelledby="press-live-title">
+    <section id={sections.live.id} class="page__section press-section" aria-labelledby="press-live-title">
       <div class="press-section__header">
         <h2 id="press-live-title" class="page__subtitle">{live.title}</h2>
-        <DownloadButton download={downloads.rider} label="Rider técnico" size="sm" />
+        <DownloadButton download={downloads.rider} label={t('press.live.rider')} size="sm" />
       </div>
       <p class="page__text">
         {live.text} {live.repertoire.before} <a href={live.repertoire.href} class="press-link">{live.repertoire.label}</a>.

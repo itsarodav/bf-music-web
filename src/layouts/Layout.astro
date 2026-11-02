@@ -5,6 +5,7 @@ import Navbar from '../components/navigation/Navbar.astro';
 import Contact from '../components/sections/Contact.astro';
 import Footer from '../components/footer/Footer.astro';
 import { site } from '../data/site';
+import { defaultLocale, getAlternates, getI18n } from '../i18n';
 
 interface Props {
   title?: string;
@@ -13,15 +14,19 @@ interface Props {
   heroIntro?: boolean;
 }
 
-const { title, description = site.description, heroIntro = false } = Astro.props;
+const { locale, routeId, t, meta } = getI18n(Astro.url);
+const { title, description = t('site.description'), heroIntro = false } = Astro.props;
 
-const pageTitle = title ? `${title} | ${site.name}` : `${site.name} | Pianista y compositora`;
-const canonicalUrl = new URL(Astro.url.pathname, Astro.site);
+const pageTitle = title ? `${title} | ${site.name}` : `${site.name} | ${t('site.tagline')}`;
+// The same page in every language: canonical, hreflang and og:locale
+const alternates = getAlternates(routeId).map((alternate) => ({ ...alternate, url: new URL(alternate.href, Astro.site) }));
+const canonicalUrl = alternates.find((alternate) => alternate.locale === locale)!.url;
+const defaultUrl = alternates.find((alternate) => alternate.locale === defaultLocale)!.url;
 const ogImageUrl = new URL(site.ogImage, Astro.site);
 ---
 
 <!doctype html>
-<html lang="es" class:list={{ 'has-intro': heroIntro }}>
+<html lang={meta.htmlLang} class:list={{ 'has-intro': heroIntro }}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -31,18 +36,23 @@ const ogImageUrl = new URL(site.ogImage, Astro.site);
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonicalUrl} />
+    {alternates.map((alternate) => <link rel="alternate" hreflang={alternate.htmlLang} href={alternate.url} />)}
+    <link rel="alternate" hreflang="x-default" href={defaultUrl} />
 
     <!-- Open Graph -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.name} />
-    <meta property="og:locale" content={site.locale} />
+    <meta property="og:locale" content={meta.ogLocale} />
+    {alternates
+      .filter((alternate) => alternate.locale !== locale)
+      .map((alternate) => <meta property="og:locale:alternate" content={alternate.ogLocale} />)}
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonicalUrl} />
     <meta property="og:image" content={ogImageUrl} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content={site.ogImageAlt} />
+    <meta property="og:image:alt" content={t('site.ogImageAlt')} />
 
     <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
@@ -56,7 +66,7 @@ const ogImageUrl = new URL(site.ogImage, Astro.site);
     <Font cssVariable="--font-geist" preload={[{ style: 'normal', subset: 'latin' }]} />
   </head>
   <body>
-    <a href="#main" class="skip-link">Saltar al contenido</a>
+    <a href="#main" class="skip-link">{t('a11y.skipToContent')}</a>
     <Navbar />
     <div class="page-wrapper" data-page>
       <main id="main">

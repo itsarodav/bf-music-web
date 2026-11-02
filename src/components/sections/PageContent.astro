@@ -2,18 +2,21 @@
 // Inner page (bio, música, film scoring, press kit): title plus content in the
 // slot, on the same centered reading column as the legal pages. Without
 // content it shows "Próximamente."
+import { getI18n } from '../../i18n';
+
 interface Props {
   title: string;
 }
 
 const { title } = Astro.props;
+const { t } = getI18n(Astro.url);
 ---
 
 <section class="page" aria-labelledby="page-title" data-nav-theme="light">
   <div class="page__inner">
     <h1 id="page-title" class="page__title">{title}</h1>
     <div class="page__body">
-      <slot><p class="page__text">Próximamente.</p></slot>
+      <slot><p class="page__text">{t('ui.comingSoon')}</p></slot>
     </div>
   </div>
 </section>

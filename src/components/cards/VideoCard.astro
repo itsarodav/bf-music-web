@@ -11,6 +11,7 @@
 // `hoverPlay`: on devices with a mouse the loop plays only while hovering the
 // card (or with keyboard focus inside it). Touch devices still play it in view.
 import Button from '../ui/Button.astro';
+import { getI18n } from '../../i18n';
 
 export interface LoopVideo {
   /** In order of preference (webm first) */
@@ -32,6 +33,7 @@ interface Props {
 
 const { title, href, video, compact = false, hoverPlay = false, headingLevel = 2, class: className } = Astro.props;
 const Heading = `h${headingLevel}` as const;
+const { t } = getI18n(Astro.url);
 ---
 
 <article class:list={['video-card', { 'video-card--compact': compact }, className]} data-video-card data-hover-play={hoverPlay || undefined}>
@@ -59,7 +61,7 @@ const Heading = `h${headingLevel}` as const;
       icon="youtube"
       class="video-card__action video-card__action--full"
     >
-      Ver en YouTube
+      {t('ui.watchOnYoutube')}
     </Button>
     {compact && (
       <Button
@@ -69,7 +71,7 @@ const Heading = `h${headingLevel}` as const;
         surface="light"
         size="sm"
         icon="youtube"
-        ariaLabel={`Ver «${title}» en YouTube`}
+        ariaLabel={t('ui.watchTitleOnYoutube', { title })}
         class="video-card__action video-card__action--icon"
       />
     )}

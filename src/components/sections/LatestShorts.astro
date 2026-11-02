@@ -9,6 +9,7 @@ import ShortCard from '../cards/ShortCard.astro';
 import Button from '../ui/Button.astro';
 import { getLatestShorts, youtubeChannel } from '../../data/shorts';
 import { social } from '../../data/contact';
+import { getI18n } from '../../i18n';
 
 interface Props {
   id?: string;
@@ -16,11 +17,9 @@ interface Props {
   lead?: string;
 }
 
-const {
-  id = 'videos',
-  title = 'Últimos vídeos',
-  lead = 'Piano, órgano, espineta y mucho jazz en formato corto.',
-} = Astro.props;
+const { t } = getI18n(Astro.url);
+
+const { id = 'videos', title = t('home.shorts.title'), lead = t('home.shorts.lead') } = Astro.props;
 
 const shorts = await getLatestShorts(3);
 ---
@@ -36,7 +35,7 @@ const shorts = await getLatestShorts(3);
       {/* One clear action (Instagram) plus the other platforms as quiet logo buttons */}
       <div class="shorts__follow">
         <Button href={social.instagram} external variant="secondary" surface="light" icon="instagram">
-          Seguir en Instagram
+          {t('home.shorts.followInstagram')}
         </Button>
         <Button
           href={youtubeChannel.subscribeUrl}
@@ -44,7 +43,7 @@ const shorts = await getLatestShorts(3);
           variant="secondary"
           surface="light"
           icon="youtube"
-          ariaLabel="Suscribirse en YouTube"
+          ariaLabel={t('home.shorts.subscribeYoutube')}
         />
         <Button
           href={social.tiktok}
@@ -52,7 +51,7 @@ const shorts = await getLatestShorts(3);
           variant="secondary"
           surface="light"
           icon="tiktok"
-          ariaLabel="Seguir en TikTok"
+          ariaLabel={t('home.shorts.followTiktok')}
         />
       </div>
     </div>

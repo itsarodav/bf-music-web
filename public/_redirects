@@ -1,0 +1,7 @@
+# Browser language on the home page only (inner pages keep the language of
+# their URL). First match wins. The nf_lang cookie, set by the language
+# switcher, takes precedence over Accept-Language, so a choice is never
+# overridden. Browsers have no Valencian code: Catalan goes to /va.
+/  /va          302!  Language=ca
+/  /index.html  200!  Language=es
+/  /en          302!

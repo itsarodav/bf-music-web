@@ -144,12 +144,18 @@ $navbar-intro-delay: 0.2s;
   }
 }
 
-// ---------- Tablet / desktop links ----------
-.navbar__nav {
+// ---------- Tablet / desktop links + language dropdown ----------
+.navbar__actions {
   display: none;
 
   @include tablet {
-    display: block;
+    display: flex;
+    align-items: center;
+    gap: $space-3;
+  }
+
+  @include desktop {
+    gap: $space-4;
   }
 }
 

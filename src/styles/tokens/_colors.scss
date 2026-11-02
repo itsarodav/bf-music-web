@@ -29,6 +29,8 @@ $color-shadow: $color-black;
 // Text on dark/photo backgrounds
 $color-text-on-dark: $color-white;
 $color-text-on-dark-muted: rgba($color-white, 0.72);
+$color-border-dark: rgba($color-white, 0.32); // hairlines over the photo and the menu overlay
+$color-hover-on-dark: rgba($color-white, 0.12); // hovered row in a dark glass panel
 
 // Light surfaces (contact + footer)
 $color-surface-light: $color-white;

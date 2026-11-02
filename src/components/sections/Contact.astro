@@ -3,10 +3,13 @@
 // The navbar "Contacto" link targets #contacto.
 import NewTabHint from '../ui/NewTabHint.astro';
 import { contact, socialLinks } from '../../data/contact';
+import { getI18n } from '../../i18n';
+
+const { t } = getI18n(Astro.url);
 ---
 
 <section id="contacto" class="contact" data-nav-theme="light" aria-labelledby="contact-title">
-  <h2 id="contact-title" class="contact__title">Contacto</h2>
+  <h2 id="contact-title" class="contact__title">{t('contact.title')}</h2>
 
   <div class="contact__group">
     <h3 class="contact__subtitle">Booking &amp; Management</h3>
@@ -14,7 +17,7 @@ import { contact, socialLinks } from '../../data/contact';
   </div>
 
   <div class="contact__group">
-    <h3 class="contact__subtitle">Redes sociales</h3>
+    <h3 class="contact__subtitle">{t('contact.social')}</h3>
     <ul class="contact__social">
       {socialLinks.map((link) => (
         <li>

@@ -4,6 +4,7 @@
 // "Próximamente"), never a broken link. Long labels may wrap on phones.
 import Button from './Button.astro';
 import type { ResolvedDownload } from '../../data/downloads';
+import { getI18n } from '../../i18n';
 
 type ButtonProps = Parameters<typeof Button>[0];
 
@@ -28,6 +29,8 @@ const {
   showSize = false,
   class: className,
 } = Astro.props;
+
+const { t } = getI18n(Astro.url);
 ---
 
 {download.href ? (
@@ -54,7 +57,7 @@ const {
     fullWidth={fullWidth}
     class:list={['download-button--soon', className]}
   >
-    {label}<span class="visually-hidden"> (próximamente)</span>
+    {label}<span class="visually-hidden"> {t('a11y.comingSoon')}</span>
   </Button>
 )}
 

@@ -1,0 +1,48 @@
+---
+// Every page in every language, from the route table (src/i18n/routes.ts):
+// '/musica', '/va/musica', '/en/music'… Each route renders its view; the
+// view reads the language from the URL (getI18n).
+import HomeView from '../views/HomeView.astro';
+import BioView from '../views/BioView.astro';
+import MusicView from '../views/MusicView.astro';
+import PressKitView from '../views/PressKitView.astro';
+import FilmScoringView from '../views/FilmScoringView.astro';
+import TermsView from '../views/TermsView.astro';
+import PrivacyView from '../views/PrivacyView.astro';
+import { SHOW_PRESS_KIT } from '../data/features';
+import { localizePath, locales, routeIds, type Locale, type RouteId } from '../i18n';
+
+export function getStaticPaths() {
+  return locales.flatMap((locale) =>
+    routeIds.map((routeId) => ({
+      // '' (Spanish home) becomes undefined: the site root
+      params: { slug: localizePath(routeId, locale).slice(1) || undefined },
+      props: { locale, routeId },
+    })),
+  );
+}
+
+interface Props {
+  locale: Locale;
+  routeId: RouteId;
+}
+
+const views = {
+  home: HomeView,
+  bio: BioView,
+  music: MusicView,
+  pressKit: PressKitView,
+  filmScoring: FilmScoringView,
+  terms: TermsView,
+  privacy: PrivacyView,
+} satisfies Record<RouteId, unknown>;
+
+const { locale, routeId } = Astro.props;
+
+// Press kit not published yet: production sends it to the home page
+if (routeId === 'pressKit' && !SHOW_PRESS_KIT) return Astro.redirect(localizePath('home', locale));
+
+const View = views[routeId];
+---
+
+<View />

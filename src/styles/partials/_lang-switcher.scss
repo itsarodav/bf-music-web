@@ -1,0 +1,171 @@
+@use '../tokens' as *;
+@use '../base/breakpoints' as *;
+@use '../base/mixins' as *;
+
+// Language switcher (components/navigation/LangSwitcher.astro)
+$lang-menu-width: 10rem; // fits "Valencià" plus the check
+$lang-menu-offset: $space-1-5; // gap between the bar's button and the panel
+$lang-menu-shift: -$space-0-5; // closed panel sits 4px higher, it drops in
+$lang-chevron-turn: 180deg;
+$lang-tab-size: 2.75rem; // 44px, minimum touch target
+
+// ---------- Dropdown (navbar, tablet+) ----------
+// A hairline before it separates the languages from the page links
+.lang-switcher {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding-left: $space-3;
+  border-left: 1px solid $color-border-dark;
+
+  @include desktop {
+    padding-left: $space-4;
+  }
+}
+
+// Reads like the nav links: same size, weight and shadow over the photo
+.lang-switcher__toggle {
+  @include focus-ring(4px);
+
+  display: inline-flex;
+  align-items: center;
+  gap: $space-0-5;
+  padding: $space-0-5 0;
+  font-size: $text-base;
+  font-weight: $font-medium;
+  color: $color-text-on-dark;
+  text-shadow: $shadow-text;
+  border-radius: $radius-xs;
+  cursor: pointer;
+}
+
+.lang-switcher__chevron {
+  @include transition(transform);
+
+  .is-open & {
+    transform: rotate($lang-chevron-turn);
+  }
+}
+
+// Glass panel under the button, aligned to its right edge. Closed: hidden
+// (visibility keeps it out of the tab order) and slightly raised; it fades
+// and drops into place when opened.
+.lang-switcher__menu {
+  @include glass('dark', $blur-xl);
+  @include transition(opacity, transform, visibility);
+
+  position: absolute;
+  top: calc(100% + #{$lang-menu-offset});
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  gap: $space-0-5;
+  min-width: $lang-menu-width;
+  padding: $space-0-5;
+  border-radius: $radius-md;
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY($lang-menu-shift);
+
+  .is-open & {
+    visibility: visible;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.lang-switcher__option {
+  @include focus-ring(-2px);
+  @include transition(background-color);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: $space-2;
+  padding: $space-1 $space-1-5;
+  font-size: $text-sm;
+  font-weight: $font-medium;
+  color: $color-text-on-dark;
+  border-radius: $radius-sm;
+
+  &[aria-current] {
+    font-weight: $font-semibold;
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: $color-hover-on-dark;
+    }
+  }
+}
+
+.lang-switcher__check {
+  flex-shrink: 0;
+}
+
+// Light navbar (over white sections): ink text and a solid white panel
+body:not(.is-menu-open) .navbar--light {
+  .lang-switcher {
+    border-left-color: $navbar-light-border;
+  }
+
+  .lang-switcher__toggle {
+    color: $navbar-light-text;
+    text-shadow: none;
+  }
+
+  .lang-switcher__menu {
+    background: $navbar-light-bg;
+    border-color: $navbar-light-border;
+    box-shadow: $shadow-button;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .lang-switcher__option {
+    color: $navbar-light-text;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: $glass-on-light-bg-hover;
+      }
+    }
+  }
+}
+
+// ---------- Tabs (mobile menu) ----------
+// Segmented glass control: ES | VA | EN, the current one filled in white
+.lang-tabs__list {
+  @include glass('dark', $blur-md);
+
+  display: inline-flex;
+  gap: $space-0-5;
+  padding: $space-0-5;
+  border-radius: $radius-pill;
+}
+
+.lang-tabs__tab {
+  @include focus-ring(2px);
+  @include transition(background-color, color);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: $lang-tab-size;
+  height: $lang-tab-size;
+  padding-inline: $space-2;
+  font-size: $text-sm;
+  font-weight: $font-semibold;
+  color: $color-text-on-dark-muted;
+  border-radius: $radius-pill;
+  -webkit-tap-highlight-color: transparent;
+
+  &[aria-current] {
+    color: $color-text-on-light;
+    background-color: $glass-light-bg;
+  }
+
+  &:active:not([aria-current]) {
+    color: $color-text-on-dark;
+  }
+}

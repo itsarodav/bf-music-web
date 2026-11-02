@@ -12,7 +12,7 @@ import { Image } from 'astro:assets';
 import Button from '../ui/Button.astro';
 import Icon from '../ui/Icon.astro';
 import Tag from '../ui/Tag.astro';
-import { a11y } from '../../data/site';
+import { getI18n } from '../../i18n';
 import { breakpoints } from '../../data/breakpoints';
 import type { Release } from '../../data/releases';
 
@@ -22,7 +22,8 @@ interface Props {
 }
 
 const { release, class: className } = Astro.props;
-const { title, type, releaseDate, cover, coverAlt, links, tracks } = release;
+const { id, title, type, releaseDate, cover, links, tracks } = release;
+const { t } = getI18n(Astro.url);
 
 const titleId = `release-${title.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
 const showTracks = tracks.length > 1;
@@ -44,7 +45,7 @@ const year = releaseDate.slice(0, 4);
     <div class="release-card__cover">
       <Image
         src={cover}
-        alt={coverAlt}
+        alt={t(`release.covers.${id}`)}
         widths={[96, 136, 192, 272]}
         sizes={`(min-width: ${breakpoints.tablet}px) 136px, 96px`}
       />
@@ -53,7 +54,7 @@ const year = releaseDate.slice(0, 4);
     <div class="release-card__info">
       <h2 id={titleId} class="release-card__title">{title}</h2>
       <p class="release-card__meta">
-        <Tag>{type}</Tag>
+        <Tag>{t(`release.type.${type}`)}</Tag>
         <Tag as="time" datetime={releaseDate}>{year}</Tag>
       </p>
     </div>
@@ -83,7 +84,7 @@ const year = releaseDate.slice(0, 4);
   </header>
 
   {showTracks && (
-    <ol class="release-card__tracks" aria-label={`Canciones de ${title}`}>
+    <ol class="release-card__tracks" aria-label={t('release.tracks', { title })}>
       {tracks.map((track, index) => (
         <li>
           <a
@@ -91,7 +92,7 @@ const year = releaseDate.slice(0, 4);
             href={track.spotify}
             target="_blank"
             rel="noopener noreferrer"
-            aria-label={`Escuchar «${track.title}» en Spotify, ${formatDuration(track.durationMs)} ${a11y.newTab}`}
+            aria-label={`${t('release.listenTrack', { title: track.title, duration: formatDuration(track.durationMs) })} ${t('a11y.newTab')}`}
           >
             <span class="release-card__track-number" aria-hidden="true">
               <span class="release-card__track-index">{index + 1}</span>
@@ -100,7 +101,7 @@ const year = releaseDate.slice(0, 4);
             <span class="release-card__track-info">
               <span class="release-card__track-title">{track.title}</span>
               {track.featuring && (
-                <span class="release-card__track-featuring">con {track.featuring.join(', ')}</span>
+                <span class="release-card__track-featuring">{t('release.featuring', { artists: track.featuring.join(', ') })}</span>
               )}
             </span>
             <span class="release-card__track-duration">{formatDuration(track.durationMs)}</span>

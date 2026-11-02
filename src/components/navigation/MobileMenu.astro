@@ -1,23 +1,28 @@
 ---
+// Language tabs at the foot of the menu, under the links: in thumb reach,
+// and they rise in last with the same stagger.
+import LangSwitcher from './LangSwitcher.astro';
 import type { NavLink } from '../../data/navigation';
+import { getI18n, type RouteId } from '../../i18n';
 
 interface Props {
   links: NavLink[];
-  currentPath: string;
+  currentRouteId: RouteId;
 }
 
-const { links, currentPath } = Astro.props;
+const { links, currentRouteId } = Astro.props;
+const { t } = getI18n(Astro.url);
 ---
 
 <div id="mobile-menu" class="mobile-menu" data-mobile-menu inert>
-  <nav class="mobile-menu__nav" aria-label="Menú móvil">
+  <nav class="mobile-menu__nav" aria-label={t('nav.mobile')}>
     <ul class="mobile-menu__list">
       {links.map((link) => (
         <li class="mobile-menu__item" data-menu-item>
           <a
             href={link.href}
             class="mobile-menu__link"
-            aria-current={link.href === currentPath ? 'page' : undefined}
+            aria-current={link.routeId && link.routeId === currentRouteId ? 'page' : undefined}
           >
             {link.label}
           </a>
@@ -25,6 +30,10 @@ const { links, currentPath } = Astro.props;
       ))}
     </ul>
   </nav>
+
+  <div class="mobile-menu__lang" data-menu-item>
+    <LangSwitcher variant="tabs" />
+  </div>
 </div>
 
 <script>
@@ -62,7 +71,7 @@ const { links, currentPath } = Astro.props;
       isOpen = open;
 
       toggle.setAttribute('aria-expanded', String(open));
-      toggle.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
+      toggle.setAttribute('aria-label', (open ? toggle.dataset.labelClose : toggle.dataset.labelOpen) ?? '');
       document.body.classList.toggle('is-menu-open', open);
       if (page) page.inert = open;
 

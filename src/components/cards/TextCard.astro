@@ -5,6 +5,7 @@
 // no padding of its own, each part pads itself.
 // Used in the press kit for the one-liner (lead size) and the short bio.
 import CopyButton from '../ui/CopyButton.astro';
+import { getI18n } from '../../i18n';
 
 interface Props {
   label: string;
@@ -18,7 +19,8 @@ interface Props {
   class?: string;
 }
 
-const { label, copyLabel = `Copiar ${label.toLowerCase()}`, text, textId, lead = false, class: className } = Astro.props;
+const { t } = getI18n(Astro.url);
+const { label, copyLabel = t('ui.copy'), text, textId, lead = false, class: className } = Astro.props;
 const hasFooter = Astro.slots.has('footer');
 ---
 

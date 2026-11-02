@@ -6,6 +6,7 @@
 // and the confirmation. Hidden until the script knows the clipboard works,
 // so it never shows a dead button.
 import Icon from './Icon.astro';
+import { getI18n } from '../../i18n';
 
 interface Props {
   target: string;
@@ -14,10 +15,17 @@ interface Props {
   class?: string;
 }
 
-const { target, label = 'Copiar texto', class: className } = Astro.props;
+const { t } = getI18n(Astro.url);
+const { target, label = t('ui.copy'), class: className } = Astro.props;
 ---
 
-<span class:list={['copy-button', className]} data-copy-button hidden>
+<span
+  class:list={['copy-button', className]}
+  data-copy-button
+  data-copied={t('ui.copied')}
+  data-copy-failed={t('ui.copyFailed')}
+  hidden
+>
   <button type="button" class="copy-button__button" aria-label={label} title={label} data-copy-target={target}>
     <Icon name="copy" size={16} class="copy-button__icon copy-button__icon--copy" />
     <Icon name="check" size={16} class="copy-button__icon copy-button__icon--check" />
@@ -100,14 +108,14 @@ const { target, label = 'Copiar texto', class: className } = Astro.props;
       try {
         await navigator.clipboard.writeText(source.innerText.trim());
         button.classList.add('is-copied');
-        status.textContent = 'Texto copiado';
+        status.textContent = wrapper.dataset.copied ?? '';
         window.clearTimeout(timer);
         timer = window.setTimeout(() => {
           button.classList.remove('is-copied');
           status.textContent = '';
         }, COPIED_FOR);
       } catch {
-        status.textContent = 'No se ha podido copiar el texto';
+        status.textContent = wrapper.dataset.copyFailed ?? '';
       }
     });
   });

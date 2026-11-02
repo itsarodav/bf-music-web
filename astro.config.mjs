@@ -6,6 +6,15 @@ export default defineConfig({
   // Needed to build absolute URLs (canonical, og:url, og:image).
   // Temporary Netlify URL until the real domain (blancaferrermusic.com) is live
   site: 'https://blancaferrermusic.netlify.app',
+  // Spanish without prefix, Valencian under /va, English under /en. Routes
+  // and their translated slugs live in src/i18n (see src/pages/[...slug].astro).
+  i18n: {
+    defaultLocale: 'es',
+    locales: ['es', { path: 'va', codes: ['ca-ES-valencia'] }, 'en'],
+    routing: {
+      prefixDefaultLocale: false,
+    },
+  },
   // Self-hosted fonts: downloaded from Google Fonts at build time and served from
   // our own domain (no third-party requests, preloadable). Loaded in Layout.astro
   // with <Font />, used through the $font-* tokens (src/styles/tokens/_typography.scss).

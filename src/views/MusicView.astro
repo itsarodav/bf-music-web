@@ -4,23 +4,22 @@ import PageContent from '../components/sections/PageContent.astro';
 import ReleaseCard from '../components/cards/ReleaseCard.astro';
 import VideoCard from '../components/cards/VideoCard.astro';
 import { releases, featuredRelease } from '../data/releases';
-import { helenaLoop } from '../data/media';
+import { getHelenaLoop } from '../data/media';
+import { getI18n } from '../i18n';
+
+const { t } = getI18n(Astro.url);
+const helenaLoop = getHelenaLoop(t);
 ---
 
-<Layout title="Música">
-  <PageContent title="Música">
-    <p>
-      Composiciones propias en las que la <em>formación clásica</em> y el <em>lenguaje del jazz</em> conversan con
-      naturalidad. Aquí puedes escuchar <em>Sokal Affair</em>, su primer álbum, y <em>Helena</em>, el primer single.
-    </p>
+<Layout title={t('music.title')}>
+  <PageContent title={t('music.title')}>
+    <p set:html={t('music.intro')} />
 
     {releases.map((release) => <ReleaseCard release={release} />)}
 
     <section class="page__section" aria-labelledby="music-video-title">
-      <h2 id="music-video-title" class="page__subtitle">Vídeo musical</h2>
-      <p>
-        El videoclip de <em>Helena</em>, grabado en <em>Pentasonic Studios</em> con Blanca al piano.
-      </p>
+      <h2 id="music-video-title" class="page__subtitle">{t('music.video.title')}</h2>
+      <p set:html={t('music.video.text')} />
       <VideoCard
         title="Helena"
         href={featuredRelease.links.youtube}

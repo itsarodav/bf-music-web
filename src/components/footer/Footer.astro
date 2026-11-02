@@ -2,22 +2,23 @@
 // Site footer: sitemap, legal links and brand logos, followed by the credits bar.
 import Icon from '../ui/Icon.astro';
 import Credits from './Credits.astro';
-import { sitemapLinks, legalLinks, getCurrentPath } from '../../data/navigation';
-import { site, credits, a11y } from '../../data/site';
+import { getSitemapLinks, getLegalLinks } from '../../data/navigation';
+import { site, credits } from '../../data/site';
+import { getI18n, localizePath } from '../../i18n';
 
-const currentPath = getCurrentPath(Astro.url);
+const { locale, routeId, t } = getI18n(Astro.url);
 ---
 
 <footer class="footer" data-nav-theme="light">
   <div class="footer__main">
-    <nav class="footer__nav" aria-label="Mapa del sitio">
+    <nav class="footer__nav" aria-label={t('nav.sitemap')}>
       <ul class="footer__list">
-        {sitemapLinks.map((link) => (
+        {getSitemapLinks(locale).map((link) => (
           <li>
             <a
               href={link.href}
               class="footer__link"
-              aria-current={link.href === currentPath ? 'page' : undefined}
+              aria-current={link.routeId === routeId ? 'page' : undefined}
             >
               {link.label}
             </a>
@@ -26,14 +27,14 @@ const currentPath = getCurrentPath(Astro.url);
       </ul>
     </nav>
 
-    <nav class="footer__nav" aria-label="Legal">
+    <nav class="footer__nav" aria-label={t('nav.legal')}>
       <ul class="footer__list">
-        {legalLinks.map((link) => (
+        {getLegalLinks(locale).map((link) => (
           <li>
             <a
               href={link.href}
               class="footer__link"
-              aria-current={link.href === currentPath ? 'page' : undefined}
+              aria-current={link.routeId === routeId ? 'page' : undefined}
             >
               {link.label}
             </a>
@@ -43,7 +44,7 @@ const currentPath = getCurrentPath(Astro.url);
     </nav>
 
     <div class="footer__brands">
-      <a href="/" class="footer__brand" aria-label={`${site.name}, inicio`}>
+      <a href={localizePath('home', locale)} class="footer__brand" aria-label={t('nav.homeLabel', { name: site.name })}>
         <Icon name="logo-bf" size={88} class="footer__brand-icon" />
       </a>
       <a
@@ -51,7 +52,7 @@ const currentPath = getCurrentPath(Astro.url);
         class="footer__brand"
         target="_blank"
         rel="noopener noreferrer"
-        aria-label={`${credits.agency.label} ${a11y.newTab}`}
+        aria-label={`${credits.agency.label} ${t('a11y.newTab')}`}
       >
         <Icon name="lemonims" size={88} class="footer__brand-icon" />
       </a>

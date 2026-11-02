@@ -8,7 +8,7 @@
 import Icon from '../ui/Icon.astro';
 import Tag from '../ui/Tag.astro';
 import { booking, lemonimsSocial } from '../../data/contact';
-import { a11y } from '../../data/site';
+import { getI18n } from '../../i18n';
 
 interface Props {
   /** "Booking abierto" */
@@ -19,10 +19,11 @@ interface Props {
 }
 
 const { status, ticker, class: className } = Astro.props;
+const { t } = getI18n(Astro.url);
 
 const contactLinks = [
-  { label: 'Email', value: booking.email, href: `mailto:${booking.email}`, icon: 'email' },
-  { label: 'Teléfono', value: booking.phone, href: `tel:${booking.phone.replace(/\s/g, '')}`, icon: 'phone' },
+  { label: t('booking.email'), value: booking.email, href: `mailto:${booking.email}`, icon: 'email' },
+  { label: t('booking.phone'), value: booking.phone, href: `tel:${booking.phone.replace(/\s/g, '')}`, icon: 'phone' },
 ];
 
 // Enough copies to cover the widest card; the track is two identical
@@ -30,7 +31,7 @@ const contactLinks = [
 const TICKER_COPIES = 4;
 ---
 
-<article class:list={['presentation-card', className]} aria-label={`Contacto de booking: ${booking.name}, ${booking.agency}`}>
+<article class:list={['presentation-card', className]} aria-label={t('booking.label', { name: booking.name, agency: booking.agency })}>
   <div class="presentation-card__body">
     <header class="presentation-card__header">
       <span class="presentation-card__logo" aria-hidden="true">
@@ -62,7 +63,7 @@ const TICKER_COPIES = 4;
         ))}
       </ul>
 
-      <ul class="presentation-card__social" aria-label={`${booking.agency} en redes`}>
+      <ul class="presentation-card__social" aria-label={t('booking.social', { agency: booking.agency })}>
         {lemonimsSocial.map((link) => (
           <li>
             <a
@@ -70,7 +71,7 @@ const TICKER_COPIES = 4;
               class="presentation-card__social-link"
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={`${booking.agency} en ${link.label} ${a11y.newTab}`}
+              aria-label={`${t('booking.socialLink', { agency: booking.agency, network: link.label })} ${t('a11y.newTab')}`}
             >
               <Icon name={link.icon} size={18} />
             </a>

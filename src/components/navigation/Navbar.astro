@@ -1,45 +1,54 @@
 ---
 import Icon from '../ui/Icon.astro';
 import MobileMenu from './MobileMenu.astro';
-import { navLinks, getCurrentPath } from '../../data/navigation';
+import LangSwitcher from './LangSwitcher.astro';
+import { getNavLinks } from '../../data/navigation';
 import { site } from '../../data/site';
+import { getI18n, localizePath } from '../../i18n';
 import logoUrl from '../../icons/logo-bf.svg?url';
 
-const currentPath = getCurrentPath(Astro.url);
-const isCurrent = (href: string) => href === currentPath;
+const { locale, routeId, t } = getI18n(Astro.url);
+const navLinks = getNavLinks(locale);
 ---
 
 <header class="navbar" data-navbar>
   <div class="navbar__bar">
-    <a href="/" class="navbar__logo" aria-label={`${site.name}, inicio`} style={`--logo-mask: url(${JSON.stringify(logoUrl)})`}>
+    <a href={localizePath('home', locale)} class="navbar__logo" aria-label={t('nav.homeLabel', { name: site.name })} style={`--logo-mask: url(${JSON.stringify(logoUrl)})`}>
       <Icon name="logo-bf" size={88} class="navbar__logo-icon" />
       <!-- Hover: the album cover's colors, cut to the logo's shape -->
       <span class="navbar__logo-gradient" aria-hidden="true"></span>
     </a>
 
-    <nav class="navbar__nav" aria-label="Principal">
-      <ul class="navbar__list">
-        {navLinks.map((link) => (
-          <li>
-            <a
-              href={link.href}
-              class="navbar__link"
-              aria-current={isCurrent(link.href) ? 'page' : undefined}
-            >
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
+    <!-- Tablet+: links, then the language dropdown after a hairline -->
+    <div class="navbar__actions">
+      <nav class="navbar__nav" aria-label={t('nav.main')}>
+        <ul class="navbar__list">
+          {navLinks.map((link) => (
+            <li>
+              <a
+                href={link.href}
+                class="navbar__link"
+                aria-current={link.routeId === routeId ? 'page' : undefined}
+              >
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+
+      <LangSwitcher variant="dropdown" />
+    </div>
 
     <button
       type="button"
       class="navbar__toggle"
-      aria-label="Abrir menú"
+      aria-label={t('nav.openMenu')}
       aria-expanded="false"
       aria-controls="mobile-menu"
       data-menu-toggle
+      data-label-open={t('nav.openMenu')}
+      data-label-close={t('nav.closeMenu')}
     >
       <span class="navbar__toggle-line"></span>
       <span class="navbar__toggle-line"></span>
@@ -47,7 +56,7 @@ const isCurrent = (href: string) => href === currentPath;
     </button>
   </div>
 
-  <MobileMenu links={navLinks} currentPath={currentPath} />
+  <MobileMenu links={navLinks} currentRouteId={routeId} />
 </header>
 
 <script>

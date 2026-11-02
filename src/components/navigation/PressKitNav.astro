@@ -10,6 +10,7 @@
 //   morphs it back. With reduced motion the switch is instant.
 import DownloadButton from '../ui/DownloadButton.astro';
 import type { ResolvedDownload } from '../../data/downloads';
+import { getI18n } from '../../i18n';
 
 interface Props {
   sections: { id: string; label: string }[];
@@ -17,11 +18,12 @@ interface Props {
 }
 
 const { sections, zip } = Astro.props;
+const { t } = getI18n(Astro.url);
 ---
 
 <div class="press-nav" data-press-nav>
   <div class="press-nav__inner">
-    <nav class="press-nav__nav" aria-label="Secciones del press kit">
+    <nav class="press-nav__nav" aria-label={t('press.subnav')}>
       <ul class="press-nav__list" data-press-nav-list>
         {sections.map((section) => (
           <li>

@@ -5,6 +5,7 @@ import { Image } from 'astro:assets';
 import Icon from '../ui/Icon.astro';
 import NewTabHint from '../ui/NewTabHint.astro';
 import { breakpoints } from '../../data/breakpoints';
+import { getI18n } from '../../i18n';
 
 interface Props {
   title: string;
@@ -23,7 +24,8 @@ const { title, url, publishedAt, thumbnail, platform = { name: 'YouTube', icon: 
 
 // Absolute date: a relative one ("hace 2 días") would go stale between builds
 const date = new Date(publishedAt);
-const dateLabel = new Intl.DateTimeFormat('es-ES', { day: 'numeric', month: 'short', year: 'numeric' })
+const { meta } = getI18n(Astro.url);
+const dateLabel = new Intl.DateTimeFormat(meta.intl, { day: 'numeric', month: 'short', year: 'numeric' })
   .format(date)
   .replace('.', '');
 ---

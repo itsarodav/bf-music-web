@@ -1,0 +1,22 @@
+---
+import Layout from '../layouts/Layout.astro';
+import LegalContent from '../components/sections/LegalContent.astro';
+import { legal } from '../data/site';
+import { getI18n } from '../i18n';
+
+const { t } = getI18n(Astro.url);
+
+// Section order; each body is HTML with {owner}, {manager}, {email}
+const sections = ['controller', 'data', 'cookies', 'thirdParties', 'rights', 'changes'] as const;
+---
+
+<Layout title={t('legal.privacy.title')} description={t('legal.privacy.description')}>
+  <LegalContent title={t('legal.privacy.title')} lastUpdated={legal.lastUpdated}>
+    {sections.map((section) => (
+      <>
+        <h2>{t(`legal.privacy.sections.${section}.title`)}</h2>
+        <Fragment set:html={t(`legal.privacy.sections.${section}.body`, legal)} />
+      </>
+    ))}
+  </LegalContent>
+</Layout>
