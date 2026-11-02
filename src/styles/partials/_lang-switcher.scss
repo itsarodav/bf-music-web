@@ -23,20 +23,38 @@ $lang-tab-size: 2.75rem; // 44px, minimum touch target
   }
 }
 
-// Reads like the nav links: same size, weight and shadow over the photo
+// Reads like the nav links: same size, weight and shadow over the photo.
+// At rest it has no surface; a light glass pill shows on hover and while
+// the panel is open, so it never competes with the links.
 .lang-switcher__toggle {
-  @include focus-ring(4px);
+  @include focus-ring(2px);
+  @include transition(background-color, border-color);
 
   display: inline-flex;
   align-items: center;
   gap: $space-0-5;
-  padding: $space-0-5 0;
+  padding: $space-0-5 $space-1-5;
   font-size: $text-base;
   font-weight: $font-medium;
   color: $color-text-on-dark;
   text-shadow: $shadow-text;
-  border-radius: $radius-xs;
+  border: 1px solid transparent;
+  border-radius: $radius-pill;
   cursor: pointer;
+
+  @media (hover: hover) {
+    &:hover {
+      background-color: $color-hover-on-dark;
+      border-color: $glass-dark-border;
+    }
+  }
+
+  .is-open & {
+    -webkit-backdrop-filter: blur($blur-sm) saturate($glass-saturate);
+    backdrop-filter: blur($blur-sm) saturate($glass-saturate);
+    background-color: $color-hover-on-dark;
+    border-color: $glass-dark-border;
+  }
 }
 
 .lang-switcher__chevron {
@@ -112,6 +130,20 @@ body:not(.is-menu-open) .navbar--light {
   .lang-switcher__toggle {
     color: $navbar-light-text;
     text-shadow: none;
+
+    @media (hover: hover) {
+      &:hover {
+        background-color: $glass-on-light-bg-hover;
+        border-color: $glass-on-light-border;
+      }
+    }
+  }
+
+  .is-open .lang-switcher__toggle {
+    background-color: $glass-on-light-bg-hover;
+    border-color: $glass-on-light-border;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
 
   .lang-switcher__menu {
@@ -134,11 +166,11 @@ body:not(.is-menu-open) .navbar--light {
 }
 
 // ---------- Tabs (mobile menu) ----------
-// Segmented glass control: ES | VA | EN, the current one filled in white
+// Flat segmented control: ES | VA | EN on a soft translucent track (no
+// border, highlights or shadow), the current one filled in white
 .lang-tabs__list {
-  @include glass('dark', $blur-md);
-
   display: inline-flex;
+  background-color: $color-hover-on-dark;
   gap: $space-0-5;
   padding: $space-0-5;
   border-radius: $radius-pill;

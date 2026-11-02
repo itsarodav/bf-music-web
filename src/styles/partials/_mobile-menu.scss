@@ -57,9 +57,7 @@
   }
 }
 
-// Language tabs, apart from the links by a hairline
+// Language tabs, apart from the links by space alone
 .mobile-menu__lang {
-  margin-top: $space-5;
-  padding-top: $space-4;
-  border-top: 1px solid $color-border-dark;
+  margin-top: $space-6;
 }
