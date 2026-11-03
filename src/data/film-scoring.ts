@@ -16,7 +16,7 @@ export const filmScoringProjects: VideoGridItem[] = [
   { title: 'Happiness', href: 'https://youtu.be/ATReZ6rSEi4', video: loop('happiness') },
   { title: 'Bridgerton', href: 'https://youtu.be/kjn3pvRF_1Y', video: loop('bridgerton') },
   { title: 'Heavy', href: 'https://youtu.be/4qB6_tMaCEQ', video: loop('heavy') },
-  { title: 'Fruta', href: 'https://youtu.be/Tmr4lm6q9oI', video: loop('fruta') },
+  { title: 'Nature Morte', href: 'https://youtu.be/Tmr4lm6q9oI', video: loop('fruta') },
   { title: 'Accidents Happen', href: 'https://youtu.be/z7wVKpyyJ9k', video: loop('jazz') },
   { title: 'Joe & Clou', href: 'https://youtu.be/U59i2lNMhqA', video: loop('joe-clou') },
 ];
