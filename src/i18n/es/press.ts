@@ -41,7 +41,7 @@ export const press = {
     copy: 'Copiar bio',
     // Draft (75 words), to confirm with Blanca
     short:
-      'Blanca Ferrer es pianista y compositora. Formada en piano clásico, se adentra en el jazz y la música moderna hasta graduarse en el Conservatorio Superior del Liceu de Barcelona. Su interés por el órgano y el clave enriquece un lenguaje compositivo donde tradición y frescura dialogan con naturalidad. Reconocida en el concurso de composición FeminaJazz (Madrid, 2021), presenta Sokal Affair, su álbum debut, con el que se consolida como una voz propia del panorama actual.',
+      'Blanca Ferrer es pianista y compositora. Formada en piano clásico, se adentra en el jazz y la música moderna hasta graduarse en el Conservatorio Superior del Liceu de Barcelona. Su interés por el órgano y el clave enriquece un lenguaje compositivo donde tradición y frescura dialogan con naturalidad. Distinguida con el primer premio del concurso de composición e interpretación FeminaJazz (Madrid, 2021), presenta Sokal Affair, su álbum debut, con el que se consolida como una voz propia del panorama actual.',
     full: 'Bio completa',
   },
 

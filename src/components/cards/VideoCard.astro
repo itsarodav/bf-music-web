@@ -1,6 +1,6 @@
 ---
 // Looping video with its title below and a "Ver en YouTube" button at the
-// other end of the same line. Only the button is a link: the video is visual.
+// other end of the same line. The video links there too (dims on hover).
 // The loop plays (muted) only while on screen, never with reduced motion.
 // Without `video` it shows a colored placeholder until the loop arrives.
 //
@@ -37,15 +37,18 @@ const { t } = getI18n(Astro.url);
 ---
 
 <article class:list={['video-card', { 'video-card--compact': compact }, className]} data-video-card data-hover-play={hoverPlay || undefined}>
-  <div class="video-card__media">
+  {/* The media also opens the video on YouTube, as a bigger target for the
+      mouse or a finger. Hidden from keyboard and screen readers: the button
+      below is the same link, so they only get it once. */}
+  <a class="video-card__media" href={href} target="_blank" rel="noopener noreferrer" tabindex="-1" aria-hidden="true">
     {video ? (
-      <video muted loop playsinline preload="none" poster={video.poster} aria-hidden="true" data-video-card-video>
+      <video muted loop playsinline preload="none" poster={video.poster} data-video-card-video>
         {video.sources.map((source) => <source src={source.src} type={source.type} />)}
       </video>
     ) : (
-      <div class="video-card__placeholder" aria-hidden="true"></div>
+      <div class="video-card__placeholder"></div>
     )}
-  </div>
+  </a>
 
   <div class="video-card__footer">
     <Heading class="video-card__title">{title}</Heading>
@@ -82,8 +85,10 @@ const { t } = getI18n(Astro.url);
   @use 'sass:list';
   @use '../../styles/tokens' as *;
   @use '../../styles/base/breakpoints' as *;
+  @use '../../styles/base/mixins' as *;
 
   $media-ratio: list.slash(16, 9);
+  $hover-scale: 1.03; // same slow zoom as the press photos
 
   .video-card {
     display: flex;
@@ -95,6 +100,7 @@ const { t } = getI18n(Astro.url);
 
   .video-card__media {
     position: relative;
+    display: block;
     aspect-ratio: $media-ratio;
     border-radius: $radius-xl;
     overflow: hidden;
@@ -103,14 +109,41 @@ const { t } = getI18n(Astro.url);
     isolation: isolate;
 
     video {
+      @include transition(scale);
+
       display: block;
       width: 100%;
       height: 100%;
       object-fit: cover;
+      transition-duration: $duration-slower;
+    }
+
+    // Hover dim, above the video
+    &::after {
+      @include transition(opacity);
+
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-color: $overlay-media-hover;
+      opacity: 0;
+      pointer-events: none;
     }
 
     @include desktop {
       border-radius: $radius-2xl;
+    }
+  }
+
+  @media (hover: hover) {
+    .video-card__media:hover {
+      video {
+        scale: $hover-scale;
+      }
+
+      &::after {
+        opacity: 1;
+      }
     }
   }
 

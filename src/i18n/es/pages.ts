@@ -24,7 +24,7 @@ export const bio = {
   timbre:
     'Su curiosidad sonora se extiende más allá del piano, cultivando un profundo interés por instrumentos como el órgano y el clave. Esta fascinación por la riqueza del timbre y la textura armónica influye directamente en su lenguaje compositivo, donde la tradición y la frescura dialogan con naturalidad.',
   today:
-    'Desde entonces, ha sido reconocida en certámenes como el concurso de composición <em>FeminaJazz (Madrid, 2021)</em>. Actualmente lidera su propio proyecto musical, con el que publicará <em>su primer álbum, Sokal Affair</em>, consolidándose como una voz propia dentro del panorama actual.',
+    'Desde entonces, su trabajo como compositora ha sido distinguido en certámenes como el concurso de composición e interpretación <em>FeminaJazz (Madrid, 2021)</em>, donde obtuvo el primer premio entre compositoras de todo el país. Actualmente lidera su propio proyecto musical, con el que publicará <em>su primer álbum, Sokal Affair</em>, consolidándose como una voz propia dentro del panorama actual.',
   collage: {
     studioAlt: 'Blanca Ferrer sonríe sentada en un estudio de grabación',
     pianoAlt: 'Blanca Ferrer toca el piano en casa',

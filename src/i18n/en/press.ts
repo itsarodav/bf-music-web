@@ -38,7 +38,7 @@ export const press = {
     label: 'Short bio',
     copy: 'Copy bio',
     short:
-      'Blanca Ferrer is a pianist and composer. Trained as a classical pianist, she moved into jazz and modern music, graduating from the Conservatori Superior del Liceu in Barcelona. Her interest in the organ and the harpsichord enriches a compositional language where tradition and freshness converse naturally. Recognised in the FeminaJazz composition contest (Madrid, 2021), she presents Sokal Affair, her debut album, establishing a voice of her own on today’s scene.',
+      'Blanca Ferrer is a pianist and composer. Trained as a classical pianist, she moved into jazz and modern music, graduating from the Conservatori Superior del Liceu in Barcelona. Her interest in the organ and the harpsichord enriches a compositional language where tradition and freshness converse naturally. Winner of first prize at the FeminaJazz composition and performance contest (Madrid, 2021), she presents Sokal Affair, her debut album, establishing a voice of her own on today’s scene.',
     full: 'Full bio',
   },
 
