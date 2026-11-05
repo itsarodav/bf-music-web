@@ -23,7 +23,7 @@ export const bio = {
   timbre:
     'Her curiosity for sound reaches beyond the piano, with a deep interest in instruments such as the organ and the harpsichord. This fascination with rich timbres and harmonic textures directly shapes her compositional language, where tradition and freshness converse naturally.',
   today:
-    'Since then, her work as a composer has earned recognition at competitions such as the <em>FeminaJazz composition and performance contest (Madrid, 2021)</em>, where she won first prize among women composers from across the country. She now leads her own musical project, with which she will release <em>her first album, Sokal Affair</em>, establishing a voice of her own on today’s scene.',
+    'Since then, her work as a composer has earned recognition at competitions such as the <em>FeminaJazz composition and performance contest (Madrid, 2021)</em>, where she won first prize among women composers from across the country. She now leads her own musical project, with which she has released <em>her first album, Sokal Affair</em>, a milestone that establishes her as a voice of her own on today’s scene.',
   collage: {
     studioAlt: 'Blanca Ferrer smiling, seated in a recording studio',
     pianoAlt: 'Blanca Ferrer playing the piano at home',

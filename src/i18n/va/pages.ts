@@ -19,11 +19,11 @@ export const bio = {
   title: 'Bio',
   heading: 'Biografia',
   intro:
-    'Creix en el si d’una família molt musical, on desperta la seua passió per la música clàssica al mateix temps que aprén a llegir i escriure les seues primeres notes. En l’adolescència descobrix el piano, un colp de foc que la porta a completar la seua formació clàssica abans d’endinsar-se en el jazz i la música moderna, especialitat en què es gradua pel <em>Conservatori Superior del Liceu de Barcelona</em>.',
+    'Creix en una família molt musical, on desperta la seua passió per la música clàssica al mateix temps que aprén a llegir i escriure les seues primeres notes. En l’adolescència descobrix el piano, una fascinació que marca el seu camí musical i la porta a completar la seua formació clàssica abans d’endinsar-se en el jazz i la música moderna, especialitat en què es gradua pel <em>Conservatori Superior del Liceu de Barcelona</em>.',
   timbre:
     'La seua curiositat sonora s’estén més enllà del piano, i cultiva un profund interés per instruments com l’orgue i el clavecí. Esta fascinació per la riquesa del timbre i la textura harmònica influïx directament en el seu llenguatge compositiu, on la tradició i la frescor dialoguen amb naturalitat.',
   today:
-    'Des d’aleshores, el seu treball com a compositora ha sigut distingit en certàmens com el concurs de composició i interpretació <em>FeminaJazz (Madrid, 2021)</em>, on va obtindre el primer premi entre compositores de tot el país. Actualment lidera el seu propi projecte musical, amb el qual publicarà <em>el seu primer àlbum, Sokal Affair</em>, i es consolida com una veu pròpia dins del panorama actual.',
+    'Des d’aleshores, el seu treball com a compositora ha sigut distingit en certàmens com el concurs de composició i interpretació <em>FeminaJazz (Madrid, 2021)</em>, on va obtindre el primer premi entre compositores de tot el país. Actualment lidera el seu propi projecte musical, amb el qual ha publicat <em>el seu primer àlbum, Sokal Affair</em>, una fita que la consolida com una veu pròpia dins del panorama actual.',
   collage: {
     studioAlt: 'Blanca Ferrer somriu asseguda en un estudi de gravació',
     pianoAlt: 'Blanca Ferrer toca el piano a casa',
