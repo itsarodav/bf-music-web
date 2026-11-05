@@ -155,7 +155,7 @@ const dateLabel = new Intl.DateTimeFormat(meta.intl, { day: 'numeric', month: 's
 
   .short-card__meta {
     display: flex;
-    align-items: center;
+    align-items: flex-start; // the logo stays on the first line when the date wraps
     gap: $space-0-75;
     font-size: $text-sm;
     color: $color-text-on-light-muted;
@@ -163,6 +163,7 @@ const dateLabel = new Intl.DateTimeFormat(meta.intl, { day: 'numeric', month: 's
 
   // Logo in the muted text color (the YouTube triangle stays white)
   .short-card__meta :global(.short-card__platform) {
+    height: 1lh; // one line tall: centered on the first line of the date
     flex-shrink: 0;
     color: $color-text-on-light-subtle;
   }
