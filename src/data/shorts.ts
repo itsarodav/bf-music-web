@@ -1,7 +1,7 @@
 // Latest YouTube Shorts (home "Últimos vídeos" section).
 // Read at build time from the channel's public Shorts feed (no API key).
-// A Netlify scheduled function rebuilds the site daily, so new Shorts show up
-// on their own (see netlify/functions/daily-rebuild.mts).
+// A Netlify scheduled function rebuilds the site every Monday, so new Shorts show up
+// on their own (see netlify/functions/weekly-rebuild.mts).
 
 export const youtubeChannel = {
   handle: '@blancaferrermusic',

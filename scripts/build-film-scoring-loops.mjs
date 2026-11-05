@@ -24,8 +24,9 @@ const QUALITY = { large: { x264: 28, vp9: 38 }, small: { x264: 31, vp9: 42 } };
 // quality: overrides the size-based CRF for one loop
 const loops = [
   // Dense, grainy animation: compressed harder so it stays near the others.
-  // Red car sequence, the most colorful one with fewest rats up close
-  { slug: 'happiness', input: 'InMics_Round2_BlancaFerrandoSanchez.mp4', start: 111, size: [1280, 720], quality: { x264: 32, vp9: 46 } },
+  // Red car sequence, from just before the rat jumps in. Source without the
+  // exam watermark (native 1280 x 720)
+  { slug: 'happiness', input: 'Happiness_1.mp4', start: 113, size: [1280, 720], quality: { x264: 32, vp9: 46 } },
   // Letterboxed (1920 × 960 from y = 60): picture only, cut to 16:9
   { slug: 'bridgerton', input: 'bridgerton-07.mp4', start: 60, size: [960, 540], crop: '1706:960:107:60' },
   // Letterboxed with a burned-in timecode under the picture: keep the
